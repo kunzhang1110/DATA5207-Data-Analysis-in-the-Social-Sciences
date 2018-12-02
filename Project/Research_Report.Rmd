@@ -1,0 +1,720 @@
+---
+title: 'DATA5207 Research Report'  
+subtitle: 'An investigation on factors influencing domestic violence by gender'
+date: "23 December 2018"
+author: '420033455'
+
+output:
+  pdf_document: default
+  df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(plyr)
+library(dplyr)
+library(xlsx)
+library(stringr)
+library(ggplot2)
+library(reshape2)
+library(arm)
+library(pscl)
+library(psych)
+library(glmnet) 
+library(scales)
+library(xtable)
+library(kableExtra)
+```
+
+# Introduction
+The term "domestic violence" has historically been associated with the concept of female victims perpetrated by men. Countering to popular belief, however, numerous sources have revealed that a considerable proportion of victims of domestic violence in Australia are males. Australian Broadcasting Corporation claimed that approximately one-third victims of domestic violence in Australia were males (Australian Broadcasting Corporation, 2017), which was supported by recent Personal Safety survey data  (Australian Bureau of Statistics, 2017) and Royal commission's investigation on domestic violence (Neave & Faulkner, 2016). In fact, this has even led to Men's Right Movements groups voicing for men in recent years, with the preeminent one being the "One in Three Campaign" arguing that male victims of domestic violence have long been overlooked by the police, media and society (One in Three Campaign, 2009).
+
+This research report presents our findings of the effect of factors on domestic violence within the context of NSW local government areas and explore whether they affect male victims to a comparable or different extent. We found that
+
+* Men accounted for 31.8% of victims of domestic violence in NSW
+*	The percentage of alcohol-related domestic assaults would correlate to more females being victims than males.
+*	Female unemployment rate has higher correlation to domestic violence rates against either gender.
+*	Females are more likely to be victimized from high male, female and total unemployment rates.
+*	Median income is negatively correlated with domestic violence rate for either gender to a comparable extent.
+*	Domestic violence rates are heavily influence by the percentage of families with weekly income between 1 and 399, especially for women.
+*	There is no significant impact between families with income above the range and domestic violence against women, while men will get mixed impacts when family income is between 650 to 1999. 
+
+\vspace{6mm}
+
+# Literature Review
+
+Common factors that impact domestic violence against both genders may include alcohol use, income, unemployment rate, level of education, and so forth. Alcohol use "has been correlated to domestic violence and found to be a positive predictor of domestic violence" (Oliver, 2011). This is evident in the research by Australian Institute of Criminology where they identified that "the consumption of alcohol . is also a significant contributing factor in incidents of non-fatal domestic violence" (Morgan & McAtamney, 2009) and a survey study had identified that women could be as aggressive under the influence of alcohol (Rolfe, 2006).  In addition, it has been found that families with low income would have significantly higher chances of contend with domestic violence (Slabbert, 2016) whereas unemployment also plays a determinant role in domestic abuse (Anderberg & Rainer, 2013). These were agreed by Australian researchers who cited male unemployment rate as a key risk factor (People, 2015) .
+
+\vspace{6mm}
+
+\newpage
+# Data and Methodology
+## Datasets
+
+As we aimed to investigate gender differences and the effect of alcohol on domestic violence in NSW in a particular year, we firstly needed to gather relevant information from credible sources. One of these sources was Bureau of Crime Statistics and Research (BOSCAR), which was a government agency providing datasets for all criminal incidents by LGA in the year of 2016. The dataset contained the number of victims and offenders of domestic violence, as well as the number and percentage of domestic violence incidents that had been related to the use of alcohol. Since the BOSCAR datasets could be found on the Internet was for the year of 2016 and 2017, it was only sensible to use the 2016 Australian Census dataset (Australian Bureau of Statistics, 2016) with 2016 BOSCAR dataset (Bureau of Crime Statistics and Research, 2017), in order to make sure the data were consistent with each other. By doing so, issues caused by time inconsistency were largely addressed, such as LGA amalgamation. 
+
+\vspace{3mm}
+
+## Data Wrangling
+The BOSCAR datasets had over a hundred xlsx. files, each of which contained information for an LGA. It was important to note that the "na" values for the number of victims in an age group indicated a number between 1 and 4. The actual number could not have been revealed to the protect the identity of individuals. As a result, we took the average, 2.5, and rounded up when evaluating the total number of victims. 
+
+The 2016 Census data contained census data in 110 csv files, as well as metadata including NSW LGA information and descriptions of labels for the csv files. All csv files were firstly combined as one, merged with selected fields from the metadata and then inner-joined with BOSCAR data. Inner-join was used because the census data contained "LGAs" that were not presented in the BOSCAR data. These "LGAs" were largely non-existent but only for indicative and statistical purposes, such as "Unincorporated", "No usual address", etc.
+```{r Data Wrangling: 2016 Census Data, echo=FALSE,eval=FALSE}
+
+#change eval=TRUE to run
+#load and combine Census data
+filenames <- dir(path = "./Data/NSW_LGA_2016/2016 Census GCP Local Government Areas for NSW", 
+                 pattern = "csv", 
+                 full.names = TRUE, 
+                 recursive = TRUE)
+
+census_data_list <- lapply(as.list(filenames), read.csv)
+census_data <- join_all(census_data_list,"LGA_CODE_2016") #join all data by LGA_CODE
+
+census_data <- census_data[!duplicated(as.list(census_data))] #remove duplicated columns
+
+#load geo description data
+meta_geo_data <- read.xlsx("./Data/NSW_LGA_2016/Metadata/2016Census_geog_desc_1st_and_2nd_release.xlsx",
+                      "2016_ASGS_Non-ABS_Structures")
+
+#merge census data with geo data
+census_geo_data <- merge(
+              meta_geo_data %>%
+                dplyr::select(c("Census_Code_2016", "Census_Name_2016", "Area.sqkm")),   
+              census_data %>%
+                dplyr::mutate(Census_Code_2016 = as.factor(LGA_CODE_2016)),
+              by="Census_Code_2016")
+
+#remove "(A)", "(C)" in Census_Name_2016 and save into lga_name; A->Area C->City
+for(i in 1:length(census_geo_data$Census_Code_2016)){
+  census_geo_data$lga_name[i] <- str_trim(str_extract(
+    as.character(census_geo_data$Census_Name_2016[i]),"^[^\\(]*"))
+}
+
+# write.csv(census_geo_data, file="./Data/census_geo_data.csv")
+```
+
+
+```{r Data Wrangling: 2016 BOSCAR Data, echo=FALSE,eval=FALSE}
+#load and combine crime data (BOSCAR)
+filenames <- dir(path = "./Data/BOSCAR_LGA", 
+                 pattern = "xlsx", 
+                 full.names = TRUE, 
+                 recursive = TRUE)
+
+#initializing data frame
+dv_data = data.frame(matrix(ncol = 4, nrow = length(filenames)))
+names(dv_data) = c("male.victim", "female.victim", "male.offender", "female.offender")
+
+#extract numbers of victims by gender
+boscar_data_list <- lapply(as.list(filenames), 
+                           function(x) read.xlsx(x, sheetIndex = 3))
+for(i in 1:length(boscar_data_list)){
+  # assign "na" to 2.5; "na" in the dataset is a value between [1, 4] that cannot be revealed
+  # to the public due to privacy and legal issues; so we take the mean 2.5
+  levels(boscar_data_list[[i]][,3]) = c(levels(boscar_data_list[[i]][,3]), 2.5)
+  boscar_data_list[[i]][,3][boscar_data_list[[i]][,3] == "na"] <- 2.5
+   
+  # manually sum all age group as Total number in the dataset contain "nc" values; and round up
+  dv_data$male.victim[i] <- ceiling(sum(as.numeric(as.character(boscar_data_list[[i]][5,3])),
+                                        as.numeric(as.character(boscar_data_list[[i]][6,3])),
+                                        as.numeric(as.character(boscar_data_list[[i]][7,3])),
+                                        as.numeric(as.character(boscar_data_list[[i]][8,3])),
+                                        as.numeric(as.character(boscar_data_list[[i]][9,3])))) 
+  
+  dv_data$female.victim[i] <- ceiling(sum(as.numeric(as.character(boscar_data_list[[i]][11,3])),
+                                        as.numeric(as.character(boscar_data_list[[i]][12,3])),
+                                        as.numeric(as.character(boscar_data_list[[i]][13,3])),
+                                        as.numeric(as.character(boscar_data_list[[i]][14,3])),
+                                        as.numeric(as.character(boscar_data_list[[i]][15,3]))))   
+  
+  # only retrieve LGA name and store into lga_name
+  dv_data$lga_name[i] <- str_sub(str_trim(str_extract(as.character(boscar_data_list[[i]][3,1]),
+                                                      "^(?<string>.*)Local")),1,-7)
+}
+
+
+# get numbers of offenders by gender; there is no “na" value for offenders
+boscar_data_list <- lapply(as.list(filenames), 
+                           function(x) read.xlsx(x, sheetIndex = 4))
+for(i in 1:length(boscar_data_list)){
+  dv_data$male.offender[i] <- as.numeric(as.character(boscar_data_list[[i]][11,3]))
+              
+  dv_data$female.offender[i] <- as.numeric(as.character(boscar_data_list[[i]][18,3]))
+}
+
+
+#extract percentage of alcohol-related domestic violence
+boscar_data_list <- lapply(as.list(filenames), 
+                           function(x) read.xlsx(x, sheetIndex = 6))
+
+for(i in 1:length(boscar_data_list)){
+  dv_data$alcohol.percentage[i] <- as.numeric(as.character(boscar_data_list[[i]][6,3]))/100
+  dv_data$alcohol.number[i] <- as.numeric(as.character(boscar_data_list[[i]][5,3]))
+}
+
+# inner and outer join census_geo_data with dv_data
+#all_data <- merge(census_geo_data, dv_data, by="lga_name", all=TRUE)
+all_data <-  merge(census_geo_data, dv_data, by="lga_name")
+
+write.csv(all_data, file="./Data/dv_data.csv")
+
+```
+
+```{r load and display proessed data, echo=FALSE}
+all_data <- read.csv("./Data/dv_data.csv")
+# head(all_data, 5) 
+```
+
+\vspace{3mm}
+
+## Data Analysis
+Given the time and scope of the project, we only investigated the factors mentioned in the literature review: alcohol, income and unemployment rate. We firstly explored these predictors to see how they would independently correlate with domestic violence, and then we considered them altogether to find out their individual effect on domestic violence. All analysis had been done with respect to each gender, as well as male and female combined. 
+
+\vspace{3mm}
+
+### Data Transformation
+```{r Data Transformation, echo=FALSE}
+#get sum of victims & offender in an LGA
+all_data$all.victim <- all_data$male.victim + all_data$female.victim
+all_data$all.offender <- all_data$male.offender + all_data$female.offender
+
+#get percentage of male/female victims/offenders to all victims/offender in an LGA
+all_data$male.victim.percentage <- all_data$male.victim/all_data$all.victim
+all_data$female.victim.percentage <- all_data$female.victim/all_data$all.victim
+all_data$male.offender.percentage <- all_data$male.offender/all_data$all.offender
+all_data$female.offender.percentage <- all_data$female.offender/all_data$all.offender
+
+#get grand sums of all male and/or female victims/offenders in NSW
+grand_sum_male_victim <- sum(all_data$male.victim)
+grand_sum_female_victim <- sum(all_data$female.victim)
+grand_sum_male_offender <- sum(all_data$male.offender)
+grand_sum_female_offender <- sum(all_data$female.offender)
+grand_sum_all_victim <- sum(all_data$all.victim)
+grand_sum_all_offender <- sum(all_data$all.offender)
+grand_sum_male_victim_percentage <- grand_sum_male_victim/grand_sum_all_victim
+
+#scale number of female victims down to be comparable with number of male victim
+for(i in 1:length(all_data$female.victim)){
+  all_data$female.victim.scaled[i] <- all_data$female.victim[i]*grand_sum_male_victim/grand_sum_female_victim
+}
+
+#get percentage of male/female victims/offenders to all persons in an LGA
+#@param {String} s: column name in all_data
+get.victim.population.percentage <- function(s){
+  per <- all_data[, s]
+  for(i in 1:length(all_data[, s])){
+    per[i] <- all_data[i, s]/all_data$Tot_P_P[i] * 100
+  }
+  return(per)
+}
+all_data$all.victim.population.percentage <- get.victim.population.percentage("all.victim")
+all_data$male.victim.population.percentage <- get.victim.population.percentage("male.victim")
+all_data$female.victim.population.percentage <- get.victim.population.percentage("female.victim")
+all_data$female.victim.scaled.population.percentage <- get.victim.population.percentage("female.victim.scaled")
+
+
+#scale income, unemployment rate and alcohol related variables
+all_data$z.Median_tot_fam_inc_weekly <- scale(all_data$Median_tot_fam_inc_weekly)
+all_data$z.alcohol.percentage <- scale(all_data$alcohol.percentage)
+all_data$z.Percent_Unem_loyment_P <- scale(all_data$Percent_Unem_loyment_P)
+all_data$z.Percent_Unem_loyment_M <- scale(all_data$Percent_Unem_loyment_M)
+all_data$z.Percent_Unem_loyment_F <- scale(all_data$Percent_Unem_loyment_F)
+
+```
+Before going into construction of models, a careful descriptive analysis had been conducted. The graph below revealed the fact that the number of male victims accounted for 31.80% of all victims, roughly in line with the "one in three" claim.
+
+```{r male and female victim, echo=FALSE, warning=FALSE}
+#Density plot of male and female victim percentage by LGA
+percentage_density_plot_melt <- 
+  melt(cbind(male.victim.percentage = all_data$male.victim.percentage,
+                   female.victim.percentage = all_data$female.victim.percentage),
+             measure.vars=c("male.victim.percentage", "female.victim.percentage")) %>%
+  rename("gender" = Var2)
+
+ggplot(percentage_density_plot_melt, aes(x=value, color=gender)) + 
+  ggtitle("Density plot of male and female victim percentage by LGA") +
+  geom_density() +
+  geom_vline(aes(xintercept=mean(all_data$male.victim.percentage)),
+             color="red", linetype="dashed", size=1) +
+  geom_vline(aes(xintercept=mean(all_data$female.victim.percentage)),
+             color="blue", linetype="dashed", size=1) +
+  scale_x_continuous(labels = scales::percent) +
+  labs(x = "Domestic Violence Percentage", y = "Density") +
+  theme_bw() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        axis.title.x = element_text(size=12),
+        axis.title.y = element_text(size=12),
+        axis.text.x = element_text(size=10),
+        axis.text.y = element_text(size=10))
+
+#Density plot of numbers of male and female victims 
+density_plot_melt <- 
+  melt(cbind(male.victim = all_data$male.victim,
+             female.victim = all_data$female.victim,
+             all.victim = all_data$all.victim),
+             measure.vars=c("all.victim","male.victim", "female.victim")) %>%
+  rename("gender" = Var2)
+density_number_male_female_plot <- ggplot(density_plot_melt, aes(x=value, color=gender)) + 
+  ggtitle("Density plot of numbers of male and female victims by LGA") +
+  geom_density() +
+  geom_vline(aes(xintercept=mean(all_data$all.victim)),
+             color="blue", linetype="dashed", size=1) +
+  geom_vline(aes(xintercept=mean(all_data$male.victim)),
+             color="red", linetype="dashed", size=1) +
+  geom_vline(aes(xintercept=mean(all_data$female.victim)),
+             color="green", linetype="dashed", size=1) +
+  xlim(0, 500) +
+  labs(x = "Numbers of Domestic Violence", y = "Density") +
+  theme_bw() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        axis.title.x = element_text(size=12),
+        axis.title.y = element_text(size=12),
+        axis.text.x = element_text(size=10),
+        axis.text.y = element_text(size=10))
+
+# Ranking of DV by number and by percentage
+get.ranking <- function(s1, s2){
+  victim.ranking <- all_data %>% 
+    dplyr::select(lga_name, !!sym(s1),!!sym(s2)) %>%
+    dplyr::arrange(.,desc(!!sym(s1)))
+  # head(as.data.frame(victim.ranking))
+}
+
+get.ranking("all.victim", "all.victim") #number of victim rank
+get.ranking("male.victim", "male.victim.percentage")
+get.ranking("female.victim","female.victim.percentage")
+get.ranking("male.victim.population.percentage", "male.victim")
+get.ranking("female.victim.population.percentage", "female.victim")
+```
+
+This, however, meant if we wanted to explore the effect of a predictor on domestic violence by gender, the effect (or in this context, the linear model's slope) of the same predictor would always be greater for women than for man. To counter this, we proposed a simple solution that scaled down the number of female victims to be comparable to the number of men, by 
+$$female.victim.scaled = female.victim \times \frac{all.male.victim.in.NSW}{all.female.victim.in.NSW}$$
+Additionally, because population differed substantially by LGA as shown, predictive models would be biased by some larger or smaller LGAs.  As a result, instead of using the actual number of some variables, we converted them into percentages. In particular, we define our domestic violence rate in the context of this report by dividing the numbers of victims by the total population in an LGA.
+
+Given the simplicity of the transformation methods, it had been noted they might not have been able to fully neutralize the gender and population biases but might have also introduced new ones. Advanced techniques should be explored and used in the future.  
+
+```{r population distribution, echo=FALSE, warning=FALSE,message=FALSE}
+ggplot(all_data, aes(x=Tot_P_P/1000)) + 
+  geom_histogram()+
+  xlab("Total Population in an LGA ('000)") +
+  ylab("LGA counts")
+```
+
+\vspace{3mm}
+
+### Predictive Analysis for Individual Factors
+BOSCAR dataset provided us with the number and percentage of alcohol-related domestic violence. To partially understand how this would affect domestic violence, we fitted the percentage of alcohol-related domestic violence and that of all domestic violence in an LGA to simple linear models. This by no means was able to perfectly answer the question of "how alcohol consumption correlates with domestic violence", but only aimed to provide some perspectives on the issue.
+
+Similarly, we constructed first order linear regression models for unemployment rate and median income of an LGA. For unemployment, we constructed a matrix containing model's slopes to better compare how total, male and female unemployment rates would correlate with total and gender-specific domestic violence rate. 
+
+In addition, the Census data also provided the numbers of families grouped by 17 weekly income intervals in an LGA. These would give us more insights on how different levels of income might correlate with domestic violence. As such, we built lasso models to identify which income groups would have more effects on domestic violence and which ones would have negligible effects. 
+
+\vspace{3mm}
+
+### Predictive Analysis for Individual Factors
+Previous analysis would have given us a rough understanding on the correlation between each factor and domestic violence. We picked up those that were unidirectionally correlated with domestic violence and used them together to build our model. The factors had been standardized so that they would be on the same scale. After that, we used lasso models to find out most contributing factors to domestic violence by gender and compared the differences. 
+
+It was expected that the selected factors should be somehow correlated, so a principle component analysis to and factor analysis were performed to identify latent traits inherent within the selected data. The resulting factor scores would measure the latent trait(s) of those factors. 
+
+\newpage
+
+# Results and Discussion
+## Alcohol-Related Domestic Violence and Domestic Violence
+The graphs show positive correlations between domestic violence and alcohol-related domestic violence across gender. 
+
+```{r domestic violence ~ alcohol model, echo=FALSE}
+# s ~ alcohol.number
+# all_data$alcohol.percentage = all_data$alcohol.percentage #scale down alcohol.percentage to get slopes with fewer 0s
+analyze.alcohol <- function(s, model_validity_plot=FALSE){
+
+  alcohol.model <-lm(formula =all_data[,s] ~ alcohol.percentage, data=all_data)
+  if(model_validity_plot == TRUE){
+    # arm::display(alcohol.model)
+    plot(alcohol.model)
+  }
+
+  alcohol.model.slope <- data.frame(coef(alcohol.model)[1] +
+                                       (coef(alcohol.model)[2] * c(0,0.5,1)))
+  names(alcohol.model.slope)[1] <- s
+  alcohol.model.slope$alcohol.percentage <- c(0,0.5,1)
+  print(ggplot(all_data, aes_string(x="alcohol.percentage", y=s)) +
+    geom_point(alpha=1, size=4, shape=1) +  
+    geom_smooth(data = alcohol.model.slope, 
+                method = 'lm', 
+                size=1, 
+                colour="black", 
+                fullrange = TRUE) +
+    labs(x = "Percentage of Alcohol-related Domestic Violence", y = "Percentage of Domestic Violence") +
+    ggtitle(paste("Plot for",s)) +
+
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5),
+          panel.grid.major = element_blank(),
+          axis.title.x = element_text(size=12),
+          axis.title.y = element_text(size=12),
+          axis.text.x = element_text(size=10),
+          axis.text.y = element_text(size=10)))
+   return(c(coef(alcohol.model)[2],se.coef(alcohol.model)[2]))
+}
+
+# alcohol.slope.matrix
+alcohol.slope.matrix <- data.frame(matrix(ncol = 4, nrow = 2))
+alcohol.slope.matrix[, 1] <- c("Slope", "Standard Error")
+names(alcohol.slope.matrix) <- c(" ", "all.victim.population.percentage", "male.victim.population.percentage", "female.victim.scaled.population.percentage")
+
+alcohol.slope.matrix[, 2] <- analyze.alcohol("all.victim.population.percentage")
+alcohol.slope.matrix[, 3] <- analyze.alcohol("male.victim.population.percentage")
+alcohol.slope.matrix[, 4] <- analyze.alcohol("female.victim.scaled.population.percentage")
+
+```
+
+From the coefficient table, we can see that the slope for male victim (0.46) was lower than that for scaled female victim (0.60) by 23.3%, from which we might infer that alcohol-related domestic assaults would correlate to more females being victims than males.
+
+```{r show alcohol.slope.matrix, echo=FALSE}
+# print(alcohol.slope.matrix)
+names(alcohol.slope.matrix)=c(" ", "all victims", "male victims", "female victims")
+knitr::kable(alcohol.slope.matrix) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+```
+\vspace{3mm}
+
+## Unemployment and Domestic Violence
+Nine simple linear models were constructed to explore the relations between unemployment rate r and victim proportion for male, female and the total population in an LGA. The values of slopes are shown below. For clarity purposes, we are only showing the plot of one of the models for this section and all remaining sections. Plotting can be turned on by setting plot_flag in customized functions in R code.
+
+```{r Unemployment and Domestic Violence, echo=FALSE}
+UEP_DATA = all_data[, c("Percent_Unem_loyment_M",
+                "Percent_Unem_loyment_F",
+                "Percent_Unem_loyment_P",
+                "Percnt_LabForc_prticipation_M",
+                "Percnt_LabForc_prticipation_F",
+                "Percnt_LabForc_prticipation_P",
+                "lfs_Unmplyed_lookng_for_wrk_M",
+                "lfs_Unmplyed_lookng_for_wrk_F",
+                "lfs_Unmplyed_lookng_for_wrk_P",
+                "lfs_Tot_LF_M",
+                "lfs_Tot_LF_F",
+                "lfs_Tot_LF_P",
+                "lfs_N_the_labour_force_M",
+                "lfs_N_the_labour_force_F",
+                "lfs_N_the_labour_force_P")]
+
+# Model for percentage of total unemployment rate and number of victim
+analyse.umemployment <- function(sx, sy, plot_flag=FALSE){
+  # print(paste("*****", sy, "~", sx, "*****"))
+  umemployment.model <- lm(formula =all_data[, sy] ~ all_data[, sx], data=all_data)
+  
+  umemployment.model.slope <- data.frame(coef(umemployment.model)[1] +
+                                         (coef(umemployment.model)[2] * c(2,10, 18)))
+  names(umemployment.model.slope)[1] <- sy
+  umemployment.model.slope[, sx] <- c(2,10, 18)
+
+  if(plot_flag==TRUE){
+    print(ggplot(all_data, aes_string(x=sx, y=sy)) +
+      geom_point(alpha=1, size=4, shape=1) +
+      geom_smooth(data = umemployment.model.slope,
+                  method = 'lm',
+                  size=1,
+                  colour="black",
+                  fullrange = TRUE))
+  }
+  return(coef(umemployment.model)[2]) #return slope of the model
+}
+
+# umemployment.slope.matrix
+umemployment.slope.matrix <- data.frame(matrix(ncol = 4, nrow = 3))
+umemployment.slope.matrix[, 1] <- c("Total Unemployment %", "Male Unemployment %", "Female Unemployment %")
+names(umemployment.slope.matrix) <- c("x/y", "all.victim.population.percentage", "male.victim.population.percentage", "female.victim.scaled.population.percentage")
+
+umemployment.slope.matrix[1, 2:4] <- c(analyse.umemployment("Percent_Unem_loyment_P", "all.victim.population.percentage"),
+                                    analyse.umemployment("Percent_Unem_loyment_P", "male.victim.population.percentage"),
+                                    analyse.umemployment("Percent_Unem_loyment_P", "female.victim.scaled.population.percentage")
+)
+umemployment.slope.matrix[2, 2:4] <- c(analyse.umemployment("Percent_Unem_loyment_M", "all.victim.population.percentage"),
+                                     analyse.umemployment("Percent_Unem_loyment_M", "male.victim.population.percentage"),
+                                     analyse.umemployment("Percent_Unem_loyment_M", "female.victim.scaled.population.percentage")
+)
+umemployment.slope.matrix[3, 2:4] <- c(analyse.umemployment("Percent_Unem_loyment_F", "all.victim.population.percentage"),
+                                     analyse.umemployment("Percent_Unem_loyment_F", "male.victim.population.percentage"),
+                                     analyse.umemployment("Percent_Unem_loyment_F", "female.victim.scaled.population.percentage", TRUE)
+)
+
+names(umemployment.slope.matrix)=c(" ", "all victims", "male victims", "female victims")
+knitr::kable(umemployment.slope.matrix) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+
+# Victim% ~ Male Unemployment% + Female Unemployment%
+# umemployment.model <- lm(formula =all_data$all.victim.population.percentage ~ Percent_Unem_loyment_M + Percent_Unem_loyment_F, data=all_data)
+# display(umemployment.model)
+# umemployment.model <- lm(formula =all_data$male.victim.population.percentage ~ Percent_Unem_loyment_M + Percent_Unem_loyment_F, data=all_data)
+# display(umemployment.model)
+# umemployment.model <- lm(formula =all_data$female.victim.scaled.population.percentage ~ Percent_Unem_loyment_M + Percent_Unem_loyment_F, data=all_data)
+# display(umemployment.model)
+
+```
+
+We can see that all values are positive, which confirmed the argument in the literature review that a high unemployment rate would correlate to a high domestic violence rate. Specifically, we can see that female unemployment rate has higher correlations to domestic violence rates against either gender. In addition, females are more likely to be victimized from high unemployment rates, regardless of gender.
+
+\vspace{3mm}
+
+## Family Income and Domestic Violence
+We firstly used simple linear model to explore the effect of median income.
+
+```{r Income and Median Family income, echo=FALSE}
+# Investigate Median Family income ~ Domestic Violence
+analyse.median.income <- function(s, plot_flag=FALSE){
+  median.income.model <-lm(formula = all_data[, s] ~ z.Median_tot_fam_inc_weekly, data=all_data)
+
+
+  median.income.model.slope <- data.frame(coef(median.income.model)[1] +
+                                            (coef(median.income.model)[2] * c(-0.5,0, 0.5)))
+  names(median.income.model.slope)[1] <- s
+  median.income.model.slope$z.Median_tot_fam_inc_weekly <- c(-0.5,0,0.5)
+
+  if(plot_flag==TRUE){
+    print(ggplot(all_data, aes_string(x="z.Median_tot_fam_inc_weekly", y=s)) +
+      geom_point(alpha=1, size=4, shape=1) +
+      geom_smooth(data = median.income.model.slope,
+                  method = 'lm',
+                  size=1,
+                  colour="black",
+                  fullrange = TRUE) +
+
+      theme_bw() +
+      theme(plot.title = element_text(hjust = 0.5),
+            panel.grid.major = element_blank(),
+            axis.title.x = element_text(size=12),
+            axis.title.y = element_text(size=12),
+            axis.text.x = element_text(size=10),
+            axis.text.y = element_text(size=10))
+    )
+  }
+  return(c(coef(median.income.model)[2],se.coef(median.income.model)[2]))
+}
+
+# alcohol.slope.matrix
+median.income.matrix <- data.frame(matrix(ncol = 4, nrow = 2))
+median.income.matrix[, 1] <- c("Slope", "Standard Error")
+names(median.income.matrix) <- c(" ", "all.victim.population.percentage", "male.victim.population.percentage", "female.victim.scaled.population.percentage")
+
+median.income.matrix[, 2] <- analyse.median.income("all.victim.population.percentage")
+median.income.matrix[, 3] <- analyse.median.income("male.victim.population.percentage")
+median.income.matrix[, 4] <- analyse.median.income("female.victim.scaled.population.percentage", TRUE)
+
+names(median.income.matrix)=c(" ", "all victims", "male victims", "female victims")
+knitr::kable(median.income.matrix) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+```
+
+It can be found in the coefficient matrix that there exists negative correlation between median family income and domestic violence rates and females would be slightly more affected by median income than males.
+
+Next, we used lasso models to investigate the effect of income levels on domestic violence. We began the process by dividing the numbers of families in each group by numbers of total valid families in an LGA. Valid families excluded those families that did not report or partially reported their income in 2016. Using MSE minimized lambda for each model, the coefficients for each group are shown below in the matrix and plot.
+
+```{r Income and Total Family Income (Weekly) lasso, echo=FALSE}
+FI.data <- all_data[, c("Neg_Nil_inc_Tot",
+                "FI_1_149_Tot",
+                "FI_150_299_Tot",
+                "FI_300_399_Tot",
+                "FI_400_499_Tot",
+                "FI_500_649_Tot",
+                "FI_650_799_Tot",
+                "FI_800_999_Tot",
+                "FI_1000_1249_Tot",
+                "FI_1250_1499_Tot",
+                "FI_1500_1749_Tot",
+                "FI_1750_1999_Tot",
+                "FI_2000_2499_Tot",
+                "FI_2500_2999_Tot",
+                "FI_3000_3499_Tot",
+                "FI_3500_3999_Tot",
+                "FI_4000_more_Tot")]
+
+# evaluate total number of families who reported their weekly income
+all_data$Tot_Valid_Families <- rowSums(FI.data)
+
+
+# get FI percentage
+FI.percentage <- FI.data
+for(i in 1:dim(FI.data)[1]){
+  FI.percentage[i,] = FI.data[i,]/all_data$Tot_Valid_Families[i]*100
+}
+
+# get FI scale
+FI.percentage.scaled <- FI.percentage
+for(i in 1:dim(FI.percentage)[2]){
+  FI.percentage.scaled[,i] <- scale(FI.percentage[,i])
+  names(FI.percentage.scaled)[i] <- paste("z.", names(FI.percentage)[i], sep="")
+  all_data[, names(FI.percentage.scaled)[i]] <- FI.percentage.scaled[,i]
+}
+
+# define elastic net model function
+# @y: victim
+# @a: alpha for elastic net
+get.elastic.net <- function(x, y, a, plot_flag = FALSE){
+  x <- as.matrix(x)
+  fit.elastic <- glmnet(x, y, alpha=a)
+  cvfit.elastic <- cv.glmnet(x, y, alpha=a)
+  # fit.elastic <- glmnet(x, y)
+  # cvfit.elastic <- cv.glmnet(x,y)
+  if(plot_flag==TRUE){
+    # plot(fit.elastic)
+    plot(cvfit.elastic)
+    # print(cvfit.elastic$lambda.min)
+    # print(cvfit.elastic$lambda.1se)
+    # print(coef(cvfit.elastic, s = 0))
+    # print(coef(cvfit.elastic, s = "lambda.min"))
+    # coef(cvfit.elastic, s = "lambda.1se")
+    # y.predict <- predict(cvfit.elastic, newx = x, s = "lambda.min")
+  }
+  return(coef(cvfit.elastic, s = "lambda.min"))
+}
+
+#alpha values
+alpha.lasso = 1
+alpha.ridge = 0
+alpha.mid = 0.5
+alpha.elastic.net = alpha.lasso
+
+
+# income.group.matrix
+income.group.matrix<- data.frame(as.matrix(cbind(
+  get.elastic.net(FI.percentage.scaled, all_data$all.victim.population.percentage, alpha.elastic.net),
+  get.elastic.net(FI.percentage.scaled, all_data$male.victim.population.percentage, alpha.elastic.net),
+  get.elastic.net(FI.percentage.scaled, all_data$female.victim.population.percentage, alpha.elastic.net, TRUE)
+)))
+income.group.matrix[income.group.matrix==0]<-NA #replace 0 with NA for clarity
+
+
+names(income.group.matrix)=c("all victims", "male victims", "female victims")
+knitr::kable(income.group.matrix) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+
+# plot(income.group.matrix[,1], main="All Victims", xlab="Income Level", ylab="Coefficient")
+# plot(income.group.matrix[,2], main="Male Victims",col="blue", xlab="Income Level", ylab="Coefficient")
+# abline(h=0)
+# plot(income.group.matrix[,3], main="Female Victims", col="red", xlab="Income Level", ylab="Coefficient")
+
+
+```
+
+As we can see, families with income higher than 2000 per week have no influence on domestic violence rate; families with income between 400 to 2000 mostly have negative correlation with few small positive correlations to domestic violence rate.  On the other hand, domestic violence rates are heavily influence by the numbers of families with weekly income between 1 and 399. Specifically, it can be found that the maximum coefficient 0.21 occurs for female victims in 300-399 family income group. From the findings, it can also be deduced that females would be more impacted by family income lower than 400. Males would be influenced to a lesser extent by the same income groups but will get mixed impacts when family income is between 650 to 1999. 
+
+\vspace{3mm}
+
+## Predictive Analysis for the Factors Combined
+Following the same process as above, the lasso model for all factors combined yields
+
+```{r combining all variables, echo=FALSE}
+fi.var <- names(FI.percentage.scaled)
+analyse.combined.elastic.net <- function(s){
+  fmla <- as.formula(paste("all_data[, s] ~  z.alcohol.percentage + z.Percent_Unem_loyment_P + z.Percent_Unem_loyment_M + z.Percent_Unem_loyment_F +",paste(fi.var, collapse= "+")))
+  all_variable_scaled = data.frame(cbind(FI.percentage.scaled, all_data$z.alcohol.percentage,
+                                          # all_data$z.Percent_Unem_loyment_P,
+                                         all_data$z.Percent_Unem_loyment_M,
+                                         all_data$z.Percent_Unem_loyment_F))
+  get.elastic.net(all_variable_scaled, all_data$all.victim.population.percentage, alpha.elastic.net)
+}
+
+# combined.matrix
+combined.matrix<- data.frame(as.matrix(cbind(
+  analyse.combined.elastic.net("all.victim.population.percentage"),
+  analyse.combined.elastic.net("female.victim.population.percentage"),
+  analyse.combined.elastic.net("male.victim.population.percentage")
+)))
+
+combined.matrix[combined.matrix==0]<-NA #replace 0 with NA for clarity
+names(combined.matrix)=c("all victims", "male victims", "female victims")
+knitr::kable(combined.matrix) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+
+# plot(combined.matrix[,1], main="All Victims", ylab="Coefficient")
+# plot(combined.matrix[,2], main="Male Victims",col="blue", xlab="Income Level", ylab="Coefficient")
+# abline(h=0)
+# plot(combined.matrix[,3], main="Female Victims", col="red", xlab="Income Level", ylab="Coefficient")
+```
+
+This shows that male employment rate has negligible effects on gender-specific domestic violence rate while the effect of female employment and alcohol-related domestic violence rate still retains. The most influential factors for both gender are: family with weekly income less than 400 and alcohol-related domestic violence rate. It is also interesting to note that family income group 1000-1249 would have less risk in general to suffer from domestic violence.
+
+\vspace{3mm}
+
+## Latent Variable? Financial Stress
+The principle component analysis reveals that the selected predictors (income groups and employment rates) can be represented by a single latent variable as shown.
+
+```{r Total Family Income (Weekly) number and unemployment pca, echo=FALSE, warning=FALSE, error=FALSE,cache.lazy=FALSE, message=FALSE}
+
+
+DV.pca <- prcomp(all_data[, c(fi.var,
+                              # "z.alcohol.percentage",
+                              #z.Percent_Unem_loyment_P,
+                              "z.Percent_Unem_loyment_M",
+                              "z.Percent_Unem_loyment_F")])
+
+plot(DV.pca, type = "l")
+fa.fit <- fa(all_data[, c(fi.var,
+                              # "z.alcohol.percentage",
+                              #z.Percent_Unem_loyment_P,
+                              "z.Percent_Unem_loyment_M",
+                              "z.Percent_Unem_loyment_F")],
+             nfactors=1, rotate="varimax")
+
+
+all_data$DV_stress <-fa.fit$scores
+all_data$DV_stress_positive <-fa.fit$scores +abs(min(fa.fit$scores))
+
+
+DV_factor_info <- data.frame(cbind(all_data$lga_name, all_data$DV_stress_positive))
+DV_factor_rank <- data.frame(cbind(all_data$lga_name, all_data$DV_stress_positive))%>%
+    dplyr::arrange(.,desc(MR1))
+DV_factor_rank$rank <- seq.int(nrow(DV_factor_rank))
+# DV_factor_info
+# DV_factor_rank
+
+```
+
+We call the latent variable "Financial Stress" and plot the scores of stress against victim population percentage, which yields.
+
+```{r latent variable plot, echo=FALSE}
+reg<-lm(all_data$all.victim.population.percentage ~ DV_factor_info$MR1)
+plot(DV_factor_info$MR1, all_data$all.victim.population.percentage, xlab="Financial Stress", ylab="Victim Population Percentage")
+abline(reg)
+```
+
+We can see that most points are located close to the regression line. A careful examination of the outliers shows that one of them was  Blacktown LGA, where recorded the highest in terms of number of domestic violence. This could mean that there might be other contributing factors to Blacktown's high domestic violence, such as religion, culture, etc.
+
+\vspace{6mm}
+
+# Conclusion
+The results of our research on domestic violence in NSW coincide with the findings mentioned in the literature. Use of alcohol, low income and high unemployment rate would affect people being victimized by domestic violence. These factors in general would affect women greater than men, although the differences in effect were not large. 
+
+It has been noted that the validity of the results might have been comprised by the simplicity of the models and primitivity of the data handling and scaling techniques. Furthermore, domestic violence, being a complex and sensitive issue, could not be easily explained by studying only few factors. Therefore, we concede that the results of the research were far from accurate, but we hope it could shed some light to further researches on the topic in the future.
+
+\newpage
+
+# Bibliography
+Anderberg, D., & Rainer, H. (2013). Unemployment and Domestic Violence: Theory and Evidence. Bonn, Germany: Institute for the Study of Labor.
+Australian Broadcasting Corporation. (2017, Sep 26 ). What about men?: Challenging the MRA claim of a domestic violence conspiracy. Retrieved from ABC News: https://www.abc.net.au/triplej/programs/hack/challenging-the-mra-claim-of-a-domestic-violence-conspiracy/8632190
+
+Australian Bureau of Statistics. (2016). 2016 Census Datapacks. Retrieved 12 7, 2018, from https://datapacks.censusdata.abs.gov.au/datapacks/
+
+Australian Bureau of Statistics. (2017, November 08). 4906.0 - Personal Safety, Australia, 2016. Retrieved from Australian Bureau of Statistics: http://www.abs.gov.au/ausstats/abs@.nsf/mf/4906.0
+
+Bureau of Crime Statistics and Research. (2017). NSW Local Government Area excel crime tables. Retrieved 12 7, 2018, from https://www.bocsar.nsw.gov.au/Pages/bocsar_crime_stats/bocsar_lgaexceltables.aspx
+
+Morgan, A., & McAtamney, A. (2009). Key issues in alcohol-related violence. Canberra: Australian Institute of Criminology.
+
+Neave, M., & Faulkner, P. (2016). Royal Commission into Family Violence Summary and recommendations. Melbourne: Victorian Government Printer.
+
+Oliver, M. K. (2011). Domestic Violence: Factors, Perpetuation, Cultural Differences & Treatment. San Luis Obispo: California Polytechnic State University.
+
+One in Three Campaign. (2009, Novermber). One in Three. (One in Three Campaign) Retrieved 12 07, 2018, from http://www.oneinthree.com.au
+
+People, J. (2015). Trends and Patterns in Domestic Violence Assaults. Canberra, Australia: NSW Bureau of Crime Statistics and Research.
+
+Rolfe, D. A. (2006). Alcohol, gender, aggression and violence: Findings from the Birmingham Untreated Heavy Drinkers Project. Journal of Substance Use, 343-358.
+Slabbert, I. (2016). Domestic Violence and Poverty: Some Women's Experiences. Research on Social Work Practice, vol 27, 2, 223-230.
+
+
+
+

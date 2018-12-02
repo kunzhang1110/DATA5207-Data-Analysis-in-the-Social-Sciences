@@ -1,0 +1,79 @@
+---
+title: "Lab 1 Solution"
+author: "Kun Zhang"
+date: "27 November 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Smoking Data
+```{r load smoking data}
+
+smoke.data=read.csv("./Data/Smoking/smoke_data.csv", head=TRUE, sep=",", na.strings=" ") #na.strings = " " blank spaces indicate NA value 
+#head(smoke.data, 10)
+#tail(smoke.data)
+names(smoke.data) #column/variabe names
+```
+
+## Analysing Smoking Data
+```{r analysing smoking data}
+
+mean(smoke.data$smkreg)
+# table() counts of each (combined) factor level.
+table(smoke.data$wave)
+table(smoke.data$wave, smoke.data$smkreg, smoke.data$sex.1.F.)
+# table() cacluates counts of each factor level/total counts.
+prop.table(table(smoke.data$wave))
+# proportion table; 1 indicates proportion by the 1st variable (row)
+prop.table(table(smoke.data$wave, smoke.data$smkreg), 1)
+
+library(plyr) # ref https://dplyr.tidyverse.org/
+# ddply() splits data frame, apply function, and return results in a data frame.
+ddply(smoke.data, .(parsmk), summarise, mean=mean(smkreg), sd = sd(smkreg)) 
+ddply(smoke.data, .(parsmk), summarise, smoke.regularly=prop.table(table(smkreg))) 
+ddply(smoke.data, .(wave, parsmk), summarise, smoke.regularly=prop.table(table(smkreg))) 
+
+```
+
+
+***
+
+
+# Public Opinion Data
+```{r initalize}
+load("./Data/Midterm elections/us_data.Rdata")
+```
+
+## Example 1: dplyr Chaining
+```{r example 1}
+library(dplyr) #deplyer
+us.data %>% #dplyr chaining
+  group_by(vote) %>%
+  summarise(sum.val = sum(weights)) %>% # summarise() is typically used withgroup_by(). The output will have one row for each group.
+  na.omit() %>% #omit N/A data
+ # filter(vote != "Not voting") %>%
+  mutate("Voters (%)" = sum.val / sum(sum.val) * 100) %>%# mutate() adds new variables that are functions of existing variables
+  rename("Party" = vote) %>%
+  dplyr::select(-sum.val) #dplyr::select() keeps only the variables you mention; rename() keeps all variables. 
+```
+
+
+## Example 2: dplyr Subset
+```{r example 2}
+us.data %>% #method chaining
+  group_by(rich.poor.diffs, vote) %>%
+  summarise(sum.val = sum(weights)) %>% # summarise() is typically used on grouped data created by group_by(). The output will have one row for each group.
+  na.omit() %>% #omit N/A data
+  mutate("Voters (%)" = sum.val / sum(sum.val) * 100) %>% #mutate() adds new variables that are functions of existing variables
+  subset(., vote == "Democratic" | vote == "Republican") %>% #only show subsets of the previous results;
+  dplyr::select(-sum.val)
+```
+
+
+

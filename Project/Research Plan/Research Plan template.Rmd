@@ -1,0 +1,29 @@
+---
+title: "Research plan"
+author: "Add student number here (not your name)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction 
+
+Outline the question you are answering and your hypothesis here. 
+
+# Literature and theory
+
+Outline you literature and theory here (cite at least five pieces of literature).
+
+# Data and methodology 
+
+What data are you using and how do you intend to analyse it? 
+
+# Expectations and limitations
+
+What do you expect to find? Are there any limitations to your study as you currently envisage it?
+
+#Bibliography 
+
+List your sources (literature and data) here.

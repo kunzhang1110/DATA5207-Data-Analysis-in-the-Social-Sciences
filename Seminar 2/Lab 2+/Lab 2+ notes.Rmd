@@ -1,0 +1,924 @@
+---
+title: "Seminar 2: Additional tasks"
+subtitle: 'DATA5207: Data Analysis in the Social Sciences - Summer School'
+author: Dr Shaun Ratcliff
+output:
+  pdf_document:
+    latex_engine: xelatex
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r prep earnings data, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(foreign)
+library(plyr)
+library(ggplot2)
+library(scales)
+library(car)
+
+
+earnings.data <- read.dta("Data/Earnings/earnings.dta")
+
+
+#recode gender
+
+earnings.data$gender <- recode(earnings.data$sex, "'2' = 'Female'; 
+                                                  '1' = 'Male'")	
+#recode age
+
+earnings.data$age <- 91 - earnings.data$yearbn 	
+
+
+earnings.data$race2 <- as.factor(recode(earnings.data$race, "'1'='White'; 
+       '2'='Black';
+       c('3','4')='Other';
+        '9'=NA"))
+
+levels(earnings.data$race2)[4] <- "Hispanic"
+
+earnings.data$race2[earnings.data$hisp == "1"] <- "Hispanic"
+
+earnings.data$earn.quintiles <- cut(earnings.data$earn, breaks=c(quantile(earnings.data$earn, probs = seq(0, 1, by = 0.20), na.rm=TRUE)), 
+labels=c("0-20","20-40","40-60","60-80","80-100"), include.lowest=TRUE)
+
+earnings.data$height.quintiles <- cut(earnings.data$height, 
+                                    breaks=c(quantile(earnings.data$height, 
+                                    probs = seq(0, 1, by = 0.20), na.rm=TRUE)),
+                                    labels=c("0-19","20-39","40-59","60-79","80-99"), 
+                                    include.lowest=TRUE)
+
+
+```
+
+
+To help you master the material covered in today's labs, these notes contain exercises which involve revising the methods learned so far, and looking at fitting more complex linear regression models. These allow us to create a better approximation of reality in our models. We will also look at graphing the regression line of our interactions, and the model coefficients, to make our results clearly understandable.
+
+These exercises are not compulsory. We will not mark you on these, and we will not check that you have done the work. They are designed to help those of you without prior experience with $R$ or the methods we are covering in this unit. They will not be set every class; just the first few seminars to help you get up to speed and make sure you pass the unit. 
+
+Work through these at your own pace before the next lab to familiarise yourself with these methods. If you find aspects difficult, please contact us for help. Details are available **[on canvas](https://canvas.sydney.edu.au/courses/2452/pages/unit-information#teachingteam)**.
+
+Additionally, there will be an additional session next week (when there are no classes), and a final one the week after class ends. 
+
+\vspace{3mm}
+
+##Further linear regression 
+
+In these notes we will go beyond the processes we ran today, and will look at a new (and larger) set of data, learn how to make high quality plots of this information, and then run regression on these data. 
+
+\vspace{3mm}
+
+###Data in the wild
+
+We are going to do this by examining data the survey data we used in the group actvitiy today.  Here you have a choice which dataset you can use, depending upon the level of revision you are interested in. There is the dataset we used today, *survey.data.csv*.
+
+The second version of these data, *survey.data_uncoded.csv* -- also available through the seminar 2-2 module on canvas -- is a more 'natural' version of these data. In both cases, these data are an amalgamation of 12 of these surveys. In their original format, these were not consistently coded. This is frequently how we encounter data when we first obtain it. Those who collect and store the information you want to study do not necessarily have the same priorities as we do concerning its formatting for consistency and ease of analysis. 
+
+In the first version of these data, variables were coded consistently. If you select the second dataset, your first objective is to examine these data and clean them. Start by saving these data in a new folder, make that folder your working directory and load the file in your $R$ editor. Then, examine each variable in the file by year using the table to isolate cases where variables are coded inconsistently between surveys. Recode these using the recode function.
+
+Once we have recoded these data, we want to understand what patterns exist in these data. Here we are going to focus on the dependent variable 'Taxes_Social'. This represents the question "If the government had a choice between reducing taxes or spending more on social services, which do you think it should do?" Responses were on a five point Likert scale that ranges from "Strongly favour spending more on social services" to "Strongly favour reducing taxes", coded from -2 to +2. 
+
+
+```{r prep public opinion data, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(car)
+library(arm)
+
+
+survey.data <- read.csv("Data/survey.data_messed_up.csv")
+  #names(survey.data)
+
+#Education 
+  #prop.table(table(survey.data$Education_all, survey.data$Year) ,2)
+
+survey.data$Education_all <- recode(survey.data$Education_all, "'Did not finish highschool' = 'Some schooling';  
+                                    'Completed HS' = 'High school'")
+
+# Vote 
+
+  #prop.table(table(survey.data$Vote_allparties, survey.data$Year),2)
+
+survey.data$Vote_allparties <- recode(survey.data$Vote_allparties, 
+                                      "'ALP' = 'Labor';
+                                      c('Liberals and Country Party', 'LNP') = 'Coalition';
+                                      c('Call to Au', 'Democrats', 'DLP', 'Grey Power', 'One Nation') = 'Other'")
+
+
+survey.data$vote.major <- as.numeric(as.character(recode(survey.data$Vote_allparties,
+                                                         "'Coalition' = 1;
+                                                         'Labor' = 0;
+                                                         c('Other', 'Greens') = NA")))
+
+  #prop.table(table(survey.data$vote.major, survey.data$Year),2)
+
+
+#Birthplace
+
+  #prop.table(table(survey.data$Birthplace, survey.data$Year),2)
+
+survey.data$Birthplace <- recode(survey.data$Birthplace, 
+                                 "'Overseas' = 'Other'")
+
+
+#Income 
+
+survey.data$income.quintiles <- cut(survey.data$income_percentile, 
+                                    5, labels = c(10,30,50,70,90)) # this is to recode into quintiles
+
+survey.data$z.income <- scale(survey.data$income_percentile,
+       scale = (sd(survey.data$income_percentile, na.rm=TRUE)*2)
+       )
+ 
+
+#Age standardised
+
+survey.data$z.age <- scale(survey.data$Age_year,
+       scale = (sd(survey.data$Age_year, na.rm=TRUE)*2)
+       )
+
+```
+
+\vspace{3mm}
+
+###Studying these patterns with regression
+
+
+Today we discussed how it is important to take potentially confounding factors into account when working to understand different phenomena. If we were to overlook them, we might assume all sorts of outcomes are related, when they actually have limited causal relationships with each another. To understand these relationships better, we need to attempt to establish whether there is an association between two variables after the possible influences of confounding factors are controlled for. Although this does not prove causation, it can help reassure you that what you are observing are meaningful patterns in your data, rather than spurious correlations. A good way to do this with many types of data is to fit a regression.
+
+We are going to explore this using the survey data you have been examining today. This means we need to load the `arm` package.
+
+
+\vspace{3mm}
+
+**_Task_**: First, let us look at our variable, and use as the predictors the variables you examined for the last task. Fit this model:
+
+\vspace{6mm}
+
+```{r Taxes_Social 1 - a first regression, eval=FALSE}
+
+lm(Taxes_Social ~ x, data=survey.data)
+
+```
+
+\vspace{6mm}
+
+
+Where $x$ is a vector of the variables you theorised previously would be important for shaping attitudes towards tax cuts over social spending. 
+
+When we run our model, remember that we may need to modify variables so that there regression coefficients can be meaningfully interpreted. For instance, if we include the variable 'income_percentile' into our model without transforming it, we get: 
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 2 - a first regression where income isnt scaled}
+
+lm(formula = Taxes_Social ~ income_percentile, data = survey.data)
+
+```
+
+\vspace{6mm}
+
+
+It appears income has an effect, but that effect is very . However, this is because income is measured 1-100. Respondents coded 100 are those at the $100^{th}$ percentile and have the highest incomes, and those code 1 the $1^{st}$ percentile and the lowest incomes. As a result, this regression is telling us how much we might expect attitudes towards this question on taxes and social spending to change when we compare two respondents with household incomes one percentile apart. In this context, we would expect effect sizes to be miniscule (a one percentile income difference is practically no income difference at most points on the spectrum; and any difference is likely to be error). 
+
+It makes sense to standardise this income measure (and any other continuous measures we are using). When we do so and re-run the model, we get these results: 
+
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 3 - a second regression where income is scaled}
+
+lm(formula = Taxes_Social ~ z.income, data = survey.data)
+
+```
+
+\vspace{6mm}
+
+Even though the model fit statistics are the same, the coefficients are very different. They show that respondents with higher household incomes are more likely to prefer reducing taxes even if it means cutting social spending. Comparing voters with incomes two standard deviations apart we would expect the one with the higher income to an average take a positions .1645 lower on the five point scale (where the higher score indicates greater support for tax cuts).  
+
+Now run your regression, save the output into a new item called `tax.model.1` and use the `display()` function to view your results. Your output should look something like this (varying based on the variables you have chosen to use): 
+
+\vspace{6mm}
+
+```{r Taxes_Social 4 - regression with multiple predictors}
+
+tax.model.2 <- lm(Taxes_Social ~ z.income + z.age + Birthplace + Education_all + 
+                     Urban, data = survey.data)
+
+display(tax.model.2)
+
+```
+
+\vspace{6mm}
+
+What do your findings suggest, and what do they tell you about your theories and predictions from earlier? 
+
+We will now look at different ways to present your results. Before we move on, don’t forget to save your work. 
+
+
+\vspace{3mm}
+
+###Plotting the coefficients from your models
+
+Up to this point, we have fit a regression to survey data to understand the association between a number of socioeconomic variables and attitudes towards taxes and social spending However, if we were publishing these results in a paper or a report, this table would not be the best way to present our findings. A better way to communicate your findings is by plotting the coefficients. This can be done in a few steps. 
+
+\vspace{3mm}
+
+**_Task_**: Before we proceed, replicate the regression I produced above. Save your own model specifications for future use. 
+
+Once you have replicated my model, the next step to doing plotting your coefficients is to extract their values from the model, and save these into data frames of their own, which we can manipulate and eventually plot. This can be done with the syntax: 
+
+\vspace{6mm}
+
+```{r Taxes_Social 5 - extracting coefficients}
+
+coef.fit.taxes.job <- data.frame(coef(tax.model.2))
+se.fit.taxes.job <- data.frame(se.coef(tax.model.2))
+
+```
+
+\vspace{6mm}
+
+The command `se.coef()` is similar to the `coef()` function. It extracts the values of the standard errors from the model, and nothing else. This allows us to manipulate, transform or display the standard errors as well as the coefficient, without having to worry about other regression output. Our code above creates one data frame for the coefficients (the first command) and another for standard errors (the second). Although technically we do not need to turn these outputs into data frames, doing so can make some manipulations a little easier as we proceed. 
+
+We then use the second data frame to add variables for plus and minus one and two standard errors in the coefficient data frame using the code: 
+
+\vspace{6mm}
+
+```{r Taxes_Social 6 - calculating standard errors}
+
+coef.fit.taxes.job$one.se.upper <- coef.fit.taxes.job[,1] + se.fit.taxes.job[,1]
+coef.fit.taxes.job$one.se.lower <- coef.fit.taxes.job[,1] - se.fit.taxes.job[,1]
+coef.fit.taxes.job$two.se.upper <- coef.fit.taxes.job[,1] + se.fit.taxes.job[,1] *2
+coef.fit.taxes.job$two.se.lower <- coef.fit.taxes.job[,1] - se.fit.taxes.job[,1] *2
+  
+```
+
+\vspace{6mm}
+
+We can add variables labels to this data frame. First by pulling the variable names from the model using the `variable.names` command, and then modifying them using the `levels()` function:
+
+\vspace{6mm}
+
+```{r Taxes_Social 7 - labelling variables from model}
+
+coef.fit.taxes.job$vars <- as.factor(variable.names(tax.model.2))
+
+levels(coef.fit.taxes.job$vars) <- c("Intercept", "Household income", "Age", 
+                                    "Birthplace - Other", "Education - Some schooling", 
+                                    "Education - Some tertiary",  
+                                    "Education - University", "Urban resident")
+
+```
+
+\vspace{6mm}
+
+When we plot these, though, we will want to make sure our variables are correctly ordered. As we found above, `ggplot()` order categories using its own internal logic, unless instructed otherwise (through the specific ordering of varliables). We ensure our variables are plotting the way we want through the following code:
+
+\vspace{6mm}
+
+```{r Taxes_Social 8 - ordering variables from model}
+
+coef.fit.taxes.job$vars <- factor(coef.fit.taxes.job$vars, 
+                                 levels=c("Birthplace - Other", 
+                                  "Education - Some schooling",
+                                  "Education - Some tertiary", 
+                                  "Education - University", 
+                                   "Urban resident", "Age", 
+                                   "Household income", "Intercept"))
+
+```
+
+\vspace{6mm}
+
+
+We then graph our coefficients and standard errors using similar code to previously, but with a few differences (discussed after the hash on each line):
+
+\vspace{6mm}
+
+
+```{r Taxes_Social 9 - code to plot coefficients from model, eval=FALSE}
+
+ggplot(coef.fit.taxes.job, aes(x = coef.tax.model.2., y = vars)) +
+  geom_point(alpha=1, colour="black", size=2.3) +   
+  geom_errorbarh(aes(xmin=one.se.lower,xmax=one.se.upper), height=0,size=.65) +
+  geom_errorbarh(aes(xmin=two.se.lower,xmax=two.se.upper), height=0,size=.25) +
+  geom_vline(xintercept=0, colour="black", size = .5) +
+  labs(x = "Coefficient values", y = "Regression coefficients") + 
+  theme_bw() +
+  theme(panel.border = element_blank(), 
+      panel.grid.major.x = element_blank(), 
+      panel.grid.major.y = element_line(colour="light grey", size=0.1), 
+      panel.grid.minor = element_blank(), 
+      legend.position="none", 
+      title = element_text(size=13, face="bold"), 
+      strip.background = element_blank(), 
+      axis.title.x = element_text(size=12, face="bold", vjust=-.75), 
+      axis.title.y = element_text(size=12, face="bold", vjust=1.5), 
+      axis.text.x = element_text(size=10, vjust=-.25), 
+      axis.text.y = element_text(size=8.5), 
+      axis.ticks.y=element_blank())
+
+```
+
+\vspace{6mm}
+
+
+In this code, we use the `geom_vline()` command to draw a vertical line through zero (in which we also specify the position, size and colour of this line). With `geom_errorbarh()` we specify the data from which the standard error values are to be drawn, as well as the specifics of the line (with height = 0 ensuring there are no endcaps on our error bars -- which misleadingly draws a readers attention to the outer limits of their bounds). We repeat this line of code to create narrower error bars representing the distance within two standard errors of our parameters. We make these smaller to visually represent the lower estimated probability that the true value of the coefficient is towards the outer boundards of two standard errors, rather than one.
+
+This code should produce a graph that with a point, and two sets of error bars for one (thicker) and two standard errors (narrower), for each paramater. This should have a similar appearance to:
+
+\vspace{6mm}
+
+```{r Taxes_Social 10 - plotting coefficients from model, message=FALSE, echo=FALSE,  fig.height=3.5, fig.width=5, fig.align="center"}
+
+ggplot(coef.fit.taxes.job, aes(x = coef.tax.model.2., y = vars)) +
+  geom_point(alpha=1, colour="black", size=2.3) +   
+  geom_errorbarh(aes(xmin=one.se.lower,xmax=one.se.upper), height=0,size=.65) +
+  geom_errorbarh(aes(xmin=two.se.lower,xmax=two.se.upper), height=0,size=.25) +
+  geom_vline(xintercept=0, colour="black", size = .5) +
+  labs(x = "Coefficient values", y = "Regression coefficients") + 
+  theme_bw() +
+  theme(panel.border = element_blank(), 
+      panel.grid.major.x = element_blank(), 
+      panel.grid.major.y = element_line(colour="light grey", size=0.1), 
+      panel.grid.minor = element_blank(), 
+      legend.position="none", 
+      title = element_text(size=13, face="bold"), 
+      strip.background = element_blank(), 
+      axis.title.x = element_text(size=12, face="bold", vjust=-.75), 
+      axis.title.y = element_text(size=12, face="bold", vjust=1.5), 
+      axis.text.x = element_text(size=10, vjust=-.25), 
+      axis.text.y = element_text(size=8.5), 
+      axis.ticks.y=element_blank())
+
+```
+
+\vspace{6mm}
+
+
+###Visualising the regression line 
+
+Another way to examine your model, and explain the findings to your audience, is to plot the regression line alongside the data. We will look at doing this by plotting the relationship between household income and support for tax cuts over social spending, as worked out in the model in the last section.
+
+We start doing this by estimating the income slope from the model at three different points. This can be done with the following syntax:
+
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 11 - calculating income slopes}
+
+income.slope <- data.frame(coef(tax.model.2)[1] + 
+                             (coef(tax.model.2)[2] * c(-.5,0,.5)))
+names(income.slope)[1] <- "Taxes_Social"
+
+
+```
+
+\vspace{6mm}
+
+This adopts similar syntax to what we have already used to sum the model intercept (the value of the dependent variable when other independent variables are held at zero) with the income slope at three points: the mean income, and one standard deviation above and below it. This provides the estimated attitudes of our respondent to the employment competition created by migrants at three different income levels. You can  check this worked by printing the output for `income.slope` in the editor. If you replicated my steps, you should obtain these values:
+
+\vspace{6mm}
+
+```{r Taxes_Social 12 - the estimated value of our dependent variable at three different income levels}
+
+print(income.slope)
+
+```
+
+\vspace{6mm}
+
+
+This output shows the estimated position of respondents at each of the income levels we used in our estimate. Remember, though, we scaled household income earlier. It has a mean of zero and a standard deviation of two. Although this is useful for regression models, when we plot our results it may be easier for a reader to interpret income on its original scale, as percentiles. We can rescale income at these three points with the syntax:
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 13 - rescale income}
+
+income.slope$income.quintiles <- (c(-.5,0,.5) * 
+                                    attr(survey.data$z.income, 'scaled:scale')) +
+                                    attr(survey.data$z.income, 'scaled:center')
+
+```
+
+\vspace{6mm}
+
+You can then check that this worked by printing the output for `income.slope` again. When you do this you should get: 
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 14 - printing income slopes again}
+
+print(income.slope)
+
+```
+
+\vspace{6mm}
+
+The first column of this output shows the estimated position of respondents at a different income level, with the level of income shown in the second column. So, a respondent with a household income at the $21^{st}$ percentile will have a position of `r round(income.slope[1,1], 2)`, which indicates that when we hold the other factors of our model at zero, these respondents are estimated to be on average close to the neutral option for our item, saying that their answer to the question "If the government had a choice between reducing taxes or spending more on social services, which do you think it should do?" was "Depends" (coded 0). 
+
+We have given this column the name income quintiles, not percentiles, so it will match up with our observed data later. We then create a data frame for our observed data, calculating the mean attitudes of respondents in each income quintile. We create the income categories with the `cut()` command:
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 15 - creating income quintiles, eval=FALSE}
+
+survey.data$income.quintiles <- cut(survey.data$income_percentile, 
+                                    5, labels = c(10,30,50,70,90)) 
+
+```
+
+\vspace{6mm}
+
+You can then obtain the mean values for our dependent variable for respondents in each quintile with the following code, which should look familiar to you: 
+
+\vspace{6mm}
+
+```{r Taxes_Social 16 - creating income quintiles}
+
+
+income.average <- na.omit(ddply(survey.data, .(income.quintiles), summarize, 
+      Taxes_Social = mean(Taxes_Social, na.rm=TRUE)))
+
+income.average$income.quintiles <- as.numeric(as.character(income.average$income.quintiles))
+
+```
+
+\vspace{6mm}
+
+This provides the mean answer from respondents in each income quintile to the survey item `Taxes_Social`, and saves this output in a new item called `income.average`. `na.omit()` instructs $R$ to remove all missing data. Otherwise, `ddply()` would produce the mean values for respondents who did not provide their income level. The second line of code converts the first column -- specifying the income quintile a respondent belongs to -- into a numeric variable (we are required to convert it to a character first, or $R$ will just number the factor levels 1-5). This provides us with:
+
+\vspace{6mm}
+
+```{r Taxes_Social 17 - printing output for income quintiles}
+
+income.average
+
+```
+
+\vspace{6mm}
+
+This shows the actual position of respondents on this issue at different income levels. We can plot these results using the `income.average` data frame for the plot, but also using the estimates from our regression, saved as `income.slope`, to plot the modelled slopes which predict how voters' attitudes change on this issue as their income varies, using the `geom_smooth` function in `ggplot()`. To do this, we the following code:
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 18 - code to plot the output for income quintiles, eval=FALSE}
+
+tax.pref.income.print <- ggplot(income.average, aes(income.quintiles, Taxes_Social)) +
+  geom_point(alpha=1, size=4, shape=1) +  
+  geom_hline(yintercept = 0) +
+  geom_smooth(data = income.slope, 
+              method = 'lm', 
+              size=1, 
+              colour="black", 
+              fullrange = TRUE) + 
+  labs(x = "Household income percentile", 
+      y = "Taxes or social services\n(Higher = Greater support for tax cuts)") +
+  scale_x_continuous(expand=c(0,0), 
+                     breaks=c(25,50,75), limits=c(0,100)) +
+  scale_y_continuous(expand=c(0,0), 
+                     minor_breaks=c(0.0001), breaks=c(-.25, 0,.25, .5), limits=c(-.5,.55)) + 
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position="none", 
+        strip.text.x = element_text(size=16, face="bold", vjust=1), 
+        title = element_text(size=16, face="bold", 
+        vjust=1.75),strip.background = element_blank(), 
+        axis.title.x = element_text(size=13, vjust=-.4), 
+        axis.title.y = element_text(size=13, vjust=1.5), 
+        axis.text.x = element_text(size=9, vjust=-.25), 
+        axis.text.y = element_text(size=9, hjust=.25)) 
+
+
+```
+
+\vspace{6mm}
+
+Using the `geom_point()` function, we specify the points that represent the mean values for respondents in each income quintile from the original data. With `geom_smooth()` we create a curve showing the estimated relationship between income and attitudes towards taxes and spending -- controlling for other potentially confounding factors -- derived from our regression. We tell `ggplot()` that this data is sourced from the item `income.slope`. We also specify that the method to create this line is `lm`, which indicates that it is a linear model, and with `fullrange = TRUE` we extend the curve to the edges of the plot. 
+
+You graph should look like the example below. The regression line does not perfectly match the original data. This is not a surprise, we are holding the other factors in the model at zero. However, what this shows is that even after controlling for other individual characteristics, such as education and age, support for tax cuts over social spending increases on average as household income goes up; albiet at a slower rate than when we do not control for these (slightly) confounding factors. 
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 19 - plotting the output for income quintiles, echo=FALSE, message=FALSE, fig.height=4, fig.width=4, fig.align="center"}
+
+ggplot(income.average, aes(income.quintiles, Taxes_Social)) +
+  geom_point(alpha=1, size=4, shape=1) +  
+  geom_hline(yintercept = 0) +
+  geom_smooth(method = 'lm', data = income.slope, size=1, colour="black", fullrange = TRUE) + 
+  labs(x = "Household income percentile", 
+      y = "Taxes or social services\n(Higher = Greater support for tax cuts)") +
+  scale_x_continuous(expand=c(0,0), breaks=c(25,50,75), limits=c(0,100)) +
+  scale_y_continuous(expand=c(0,0), minor_breaks=c(0.0001), breaks=c(-.25, 0,.25, .5), limits=c(-.5,.55)) + 
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position="none", 
+        strip.text.x = element_text(size=13, face="bold", vjust=1), 
+        title = element_text(size=13, face="bold", 
+        vjust=1.75),strip.background = element_blank(), 
+        axis.title.x = element_text(size=11, vjust=-.4), 
+        axis.title.y = element_text(size=11, vjust=1.5), 
+        axis.text.x = element_text(size=9, vjust=-.25), 
+        axis.text.y = element_text(size=9, hjust=.25)) 
+
+
+```
+
+\vspace{6mm}
+
+
+  
+\newpage
+
+
+##Incorporating complexity into our models
+
+Many of the problems we want to understand are complex. Phenomena often have complex causes. This can include the interaction of different effects. When we were looking at the association between household income and attitudes towards taxation and spending, for instance, we might also hypothesise that income does not infuence attitudes alone. Other factors, including education and age, may also be associated with political preferences, and also interact with a voter's household income; with income not being equally important for all individuals, but rather its significance being boosted when present with other characteristics of our respondents.
+
+In this section, we look at adding complexity to these models to take into account this possibility that phenomena do not have the same effect in all instances. We found earlier that it was lower income voters who were less supportive of tax cuts over social spending. However, income may not have the same relationship to attitudes towards this issue on voters of all ages or levels of education. It might be younger voters, or those with lower levels of education, and with lower incomes, who feel that social spending matters more than tax cuts. Or the reverse could also be true. If we overlook these additional influences on outcomes, we might miss an important factor confounding our results, and therefore make an overly simplistic (and incorrect) assumption based on our data. 
+
+
+\vspace{3mm}
+
+###Including an interaction in your model
+
+Adding an interaction to a regression model in $R$ is relatively straightforward, involving the variables you want to interact specified in your code and separated by an asterix ($*$). We can fit a model to these data with the same specification that we used earlier -- with predictors for income, age, birthplace, education and whether respondents live in urban or rural areas -- that incoudes an interaction between income and education, with the syntax: 
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 20 - regression with interaction}
+
+tax.model.3 <- lm(formula = Taxes_Social ~ z.income + z.age + Birthplace + 
+                     Education_all + Urban + z.income * Education_all, data = survey.data)
+
+
+```
+
+\vspace{6mm}
+
+You should try fitting this model by opening the editor you used yesterday, and adding a new section below your existing work with this syntax. When you run this you should obtain:
+
+\vspace{6mm}
+
+```{r Taxes_Social 21 - display output from regression with interaction}
+
+display(tax.model.3)
+
+```
+
+\vspace{6mm}
+
+As you should be able to see, new parameters showing the slopes for income and education are now included. Compare this to your original model to see how it differs (hint: the interactions add to our understanding of attitudes, but not a lot). 
+
+
+\vspace{3mm}
+
+###Plotting interactions
+
+Once again, if we were publishing these results in a paper or report, this table of regression output would not be the best way to do this. We might prefer to communicate your findings by plotting the coefficients. 
+
+As we saw above, we extract the coefficients from the model and place them in data frames of their own, which we can manipulate and eventually plot. This can be done with the syntax: 
+
+\vspace{6mm}
+
+```{r Taxes_Social 22 - extract coefficients and SEs from model}
+
+coef.fit.taxes.job <- data.frame(coef(tax.model.3))
+se.fit.taxes.job <- data.frame(se.coef(tax.model.3))
+
+```
+
+\vspace{6mm}
+
+These lines of code create one data frame for the coefficients (the first command) and another for standard errors (the second). Once again, we use the second data frame to add columns to this data frame for values of plus and minus one and two standard errors in the coefficient data frame using the code:
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 23 - calculate standard errors}
+
+coef.fit.taxes.job$one.se.upper <- coef.fit.taxes.job[,1] + se.fit.taxes.job[,1]
+coef.fit.taxes.job$one.se.lower <- coef.fit.taxes.job[,1] - se.fit.taxes.job[,1]
+coef.fit.taxes.job$two.se.upper <- coef.fit.taxes.job[,1] + se.fit.taxes.job[,1] *2
+coef.fit.taxes.job$two.se.lower <- coef.fit.taxes.job[,1] - se.fit.taxes.job[,1] *2
+
+```
+
+\vspace{6mm}
+
+
+Finally, we can add labels for our variable within this data frame by extracting, renaming and re-ordering variable labels.
+
+First we extract the variable levels from the model:
+
+\vspace{6mm}
+
+```{r Taxes_Social 24a - extract variables}
+
+coef.fit.taxes.job$vars <- as.factor(variable.names(tax.model.3)) 
+
+
+```
+
+\vspace{6mm}
+
+I then rename and order them exactly the way they are ordered in the model:
+
+\vspace{6mm}
+
+```{r Taxes_Social 24b - label and order variables}
+
+
+levels(coef.fit.taxes.job$vars) <- 
+  c("Intercept", "Household income", "Age", "Birthplace - Other", 
+    "Education - Some schooling", "Education - Some tertiary",  
+    "Education - University", "Urban resident",  "Income x Some schooling ", 
+    "Income x Some tertiary ", "Income x University")
+
+coef.fit.taxes.job$vars <- 
+  factor(coef.fit.taxes.job$vars, c("Income x Some schooling ", 
+                                   "Income x Some tertiary ", "Income x University", 
+                                   "Birthplace - Other", "Education - Some schooling", 
+                                   "Education - Some tertiary",  
+                                   "Education - University", "Urban resident", "Age",
+                                   "Household income", "Intercept"))
+
+```
+
+\vspace{6mm}
+
+We plot this graph using similar code to previously, but with a few differences (discussed after the hash on each line):
+
+\vspace{6mm}
+
+```{r Taxes_Social 25 - code to plot regression coefficients, eval=FALSE}
+
+ggplot(coef.fit.taxes.job, aes(coef.tax.model.3., factor(vars))) +
+  geom_point(alpha=1, colour="black", size=2.3) +    
+  geom_errorbarh(aes(xmin=one.se.lower,xmax=one.se.upper), height=0,size=.65) +
+  geom_errorbarh(aes(xmin=two.se.lower,xmax=two.se.upper), height=0,size=.25) +
+  geom_vline(xintercept=0, colour="black", size = .5) + 
+  labs(Title = "Income", x = "Coefficient values", y = "Regression coefficients") + 
+  scale_x_continuous() +
+  scale_y_discrete() + 
+  theme_bw() +
+  theme(panel.border = element_blank(), 
+      panel.grid.major.x = element_blank(), 
+      panel.grid.major.y = element_line(colour="light grey", size=0.1), 
+      panel.grid.minor = element_blank(), 
+        legend.position="none", 
+        title = element_text(size=13, face="bold"), 
+        strip.background = element_blank(), 
+        axis.title.x = element_text(size=12, face="bold", vjust=-.75), 
+        axis.title.y = element_text(size=12, face="bold", vjust=1.5), 
+        axis.text.x = element_text(size=10, vjust=-.25), 
+        axis.text.y = element_text(size=8.5), 
+        axis.ticks.y=element_blank())
+
+```
+
+\vspace{6mm}
+
+
+Running this code in $R$ should produce a plot showing coefficients and standard errors for each of the parameters in your model:
+
+\vspace{6mm}
+
+```{r Taxes_Social 26 - plot regression coefficients, message=FALSE, echo=FALSE,  fig.height=3.5, fig.width=5, fig.align="center"}
+
+ggplot(coef.fit.taxes.job, aes(coef.tax.model.3., factor(vars))) +
+  geom_point(alpha=1, colour="black", size=2.3) +         
+  geom_errorbarh(aes(xmin=one.se.lower,xmax=one.se.upper), height=0,size=.65) +
+  geom_errorbarh(aes(xmin=two.se.lower,xmax=two.se.upper), height=0,size=.25) +
+  geom_vline(xintercept=0, colour="black", size = .5) + 
+  labs(Title = "Income", x = "Coefficient values", y = "Regression coefficients") + 
+  scale_x_continuous() +
+  scale_y_discrete() + 
+  theme_bw() +
+  theme(panel.border = element_blank(), 
+      panel.grid.major.x = element_blank(), 
+      panel.grid.major.y = element_line(colour="light grey", size=0.1), 
+      panel.grid.minor = element_blank(), 
+        legend.position="none", 
+        title = element_text(size=13, face="bold"), 
+        strip.background = element_blank(), 
+        axis.title.x = element_text(size=12, face="bold", vjust=-.75), 
+        axis.title.y = element_text(size=12, face="bold", vjust=1.5), 
+        axis.text.x = element_text(size=10, vjust=-.25), 
+        axis.text.y = element_text(size=8.5), 
+        axis.ticks.y=element_blank())
+
+```
+
+\vspace{6mm}
+
+
+As we did above, we can also plot the regression lines from the interactions in this model. Let’s look at the interaction between income and education. We can estimate the curves for this with the code: 
+
+\vspace{6mm}
+
+```{r Taxes_Social 27 - calculate slopes for interaction plots}
+
+income.edu.slope <- data.frame(some.school = c(coef(tax.model.3)[1] +  
+                                                 (coef(tax.model.3)[2] * c(-.5,0,.5)) +
+                                                 coef(tax.model.3)[5] + 
+                                                 (coef(tax.model.3)[9] * c(-.5,0,.5))),
+                           
+                               high.school = c(coef(tax.model.3)[1] +
+                                                 (coef(tax.model.3)[2] * c(-.5,0,.5))), 
+                            
+                               some.tertiary = c(coef(tax.model.3)[1] + 
+                                                   (coef(tax.model.3)[2] * c(-.5,0,.5)) +
+                                                   coef(tax.model.3)[6] + 
+                                                   (coef(tax.model.3)[10] * 
+                                                      c(-.5,0,.5))),
+                            
+                               university = c(coef(tax.model.3)[1] + 
+                                                (coef(tax.model.3)[2] * c(-.5,0,.5)) +
+                                                coef(tax.model.3)[7] + 
+                                                (coef(tax.model.3)[11] * c(-.5,0,.5))))
+
+```
+
+\vspace{6mm}
+
+This single block of code creates a data frame with four columns -- which are specified where we provide a variable name followed by the equals sign -- one for each education group. We then stack these columns, one on top of the other, with the `melt()` function, rename the columns and the levels of the education variable to match how we would like this presented when we plot it: 
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 28 - calculate slopes for interaction plots}
+
+library(reshape2)
+
+#melt the slopes data
+
+income.edu.slope <- melt(income.edu.slope) 
+
+#change the variable names
+
+names(income.edu.slope) <- c("education", "Taxes_Social") 
+
+#edit the level names for education
+
+levels(income.edu.slope$education) <- c("Some school", 
+                                        "High school", 
+                                        "Some tertiary", 
+                                        "University")                                  
+
+
+```
+
+\vspace{6mm}
+
+
+We also add a variable corresponding to income with the three values we used earlier, as we will be plotting support for tax cuts over social spending by education and household income: 
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 29 - add income information}
+
+income.edu.slope$income.quintiles <- (c(-.5,0,.5) * 
+                                        attr(survey.data$z.income, 'scaled:scale')) + 
+                                        attr(survey.data$z.income, 'scaled:center')
+
+```
+
+\vspace{6mm}
+
+Additionally, we calculate the descriptive data for this, although here we start by recoding education to match how we want to present it in our plot (we could do this at different points in the process, with the most logical being before we ran the regression): 
+	
+\vspace{6mm}
+
+```{r Taxes_Social 30 - calculate descriptive data for interaction slopes}
+
+survey.data$education <- survey.data$Education_all
+levels(survey.data$education) <- c("High school",
+                                   "Some school",
+                                   "Some tertiary",
+                                   "University")
+
+
+income.average <- na.omit(ddply(survey.data, .(income.quintiles, education), summarize, 
+      Taxes_Social = mean(Taxes_Social, na.rm=TRUE)))
+
+```
+
+\vspace{6mm}
+
+
+We again convert income quintiles into a numeric variable, and reorder education in this table to match how we want it to appear in our graph:
+
+
+\vspace{6mm}
+
+```{r Taxes_Social 31 - reorder quintiles for interaction plot}
+
+income.average$income.quintiles <- 
+  as.numeric(as.character(income.average$income.quintiles))
+income.average$education <- factor(income.average$education, 
+                                   c("Some school",
+                                     "High school",
+                                     "Some tertiary",
+                                     "University"))
+
+
+```
+
+\vspace{6mm}
+
+
+Once you have done this you can plot your graph using the same code as before, but with a few minor changes. Shown below, the main difference is the use of `facet_wrap()` at the end of the syntax to create a separate pane in the graph for each level of educational attainment. Try running this yourself: 
+
+\vspace{6mm}
+
+```{r Taxes_Social 32 - code to plot interaction slopes, eval=FALSE}
+
+ggplot(income.average, aes(income.quintiles, Taxes_Social)) + 
+  geom_point(alpha=1, shape=1) +  
+  geom_smooth(data = income.edu.slope, 
+              method = 'lm', 
+              size=.5,
+              colour="black", 
+              fullrange = TRUE) +  	
+  geom_hline(yintercept = 0) +
+  labs(x = "Household income percentile", 
+       y = "Taxes or social services\n(Higher = Greater support for tax cuts)") + 
+  scale_x_continuous(expand=c(0,0), breaks=c(25,50,75), limits=c(0,100)) + 
+  scale_y_continuous(, minor_breaks=c(0.0001)) +  	 
+theme_bw() + 
+  theme(panel.grid = element_blank(), 
+        legend.position="none", 
+        strip.text.x = element_text(size=13, face="bold", vjust=1), 
+        title = element_text(size=13, face="bold", vjust=1.75),
+        strip.background = element_blank(), 
+        axis.title.x = element_text(size=13, vjust=-.4), 	 	
+        axis.title.y = element_text(size=13, vjust=1.5), 
+        axis.text.x = element_text(size=9, vjust=-.25), 	 
+        axis.text.y = element_text(size=9, hjust=.25)) + 
+facet_wrap(~ education)
+```
+
+\vspace{6mm}
+
+When you run this syntax, your plot should looks like this:  
+
+\vspace{6mm}
+
+```{r Taxes_Social 33 - plotting interaction slopes, echo=FALSE, message=FALSE, fig.height=4, fig.width=4, fig.align="center"}
+
+ggplot(income.average, aes(income.quintiles, Taxes_Social)) + 
+  geom_point(alpha=1, shape=1) +  
+  geom_smooth(data = income.edu.slope, method = 'lm', size=.5, colour="black", fullrange = TRUE) +  
+  geom_hline(yintercept = 0) +
+  labs(x = "Household income percentile", 
+       y = "Taxes or social services\n(Higher = Greater support for tax cuts)") + 
+  scale_x_continuous(expand=c(0,0), breaks=c(25,50,75), limits=c(0,100)) + 
+  scale_y_continuous(, minor_breaks=c(0.0001)) +  	 
+theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position="none", 
+        strip.text.x = element_text(size=13, face="bold", vjust=1), 
+        title = element_text(size=13, face="bold", vjust=1.75),
+        strip.background = element_blank(), 
+        axis.title.x = element_text(size=13, vjust=-.4), 	 	
+        axis.title.y = element_text(size=13, vjust=1.5), 
+        axis.text.x = element_text(size=9, vjust=-.25), 	 
+        axis.text.y = element_text(size=9, hjust=.25)) + 
+facet_wrap(~ education)
+
+```
+
+\vspace{6mm}
+
+**_Task_**: Interpret these findings. What are the potential limits to a linear model suggested at here?
+
+
+\vspace{3mm}
+
+###Specifying other models with interactions 
+
+**_Task_**: Using the theories you developed on the impact of individual level charactertics on attitudes towards tax cuts over social spending earlier, outline some different interactions you expect to influence attitudes towards this issue, and fit models to test these ideas.
+
+
+##If you need additional assistance
+
+These additional tasks are not compulsory. They are designed to help those of you without prior experience with $R$ or the methods we are covering in this unit. They will not be set every seminar; just the first few to help you get up to speed and make sure you pass the unit. 
+**Work through these exercises at your own pace before the next lab to familiarise yourself with these methods.** If you are finding something difficult, please contact us and arrange a time to speak. Details are available **[on canvas](https://canvas.sydney.edu.au/courses/2452/pages/unit-information#teachingteam)**. 
+
+We will also offer some additional support next week for those who wish to receive further revision.
+

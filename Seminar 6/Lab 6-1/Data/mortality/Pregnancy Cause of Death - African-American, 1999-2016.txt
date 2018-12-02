@@ -1,0 +1,256 @@
+"Notes"	"County"	"County Code"	Deaths	Population	Crude Rate	Crude Rate Lower 95% Confidence Interval	Crude Rate Upper 95% Confidence Interval	% of Total Deaths
+	"Jefferson County, AL"	"01073"	25	4959561	0.5	0.3	0.7	0.4%
+	"Mobile County, AL"	"01097"	14	2559110	Unreliable	0.3	0.9	0.2%
+	"Montgomery County, AL"	"01101"	11	2191678	Unreliable	0.3	0.9	0.2%
+	"Maricopa County, AZ"	"04013"	24	3651864	0.7	0.4	1.0	0.4%
+	"Pulaski County, AR"	"05119"	31	2375419	1.3	0.9	1.9	0.5%
+	"Alameda County, CA"	"06001"	39	3907535	1.0	0.7	1.4	0.7%
+	"Los Angeles County, CA"	"06037"	126	17811079	0.7	0.6	0.8	2.1%
+	"Riverside County, CA"	"06065"	18	2710672	Unreliable	0.4	1.0	0.3%
+	"Sacramento County, CA"	"06067"	31	2994311	1.0	0.7	1.5	0.5%
+	"San Bernardino County, CA"	"06071"	33	3635415	0.9	0.6	1.3	0.6%
+	"San Diego County, CA"	"06073"	18	3470051	Unreliable	0.3	0.8	0.3%
+	"San Francisco County, CA"	"06075"	10	1057189	Unreliable	0.5	1.7	0.2%
+	"San Joaquin County, CA"	"06077"	10	1035745	Unreliable	0.5	1.8	0.2%
+	"Fairfield County, CT"	"09001"	13	1963483	Unreliable	0.4	1.1	0.2%
+	"New Castle County, DE"	"10003"	16	2292288	Unreliable	0.4	1.1	0.3%
+	"District of Columbia, DC"	"11001"	75	5982894	1.3	1.0	1.6	1.3%
+	"Alachua County, FL"	"12001"	17	897454	Unreliable	1.1	3.0	0.3%
+	"Broward County, FL"	"12011"	53	8391196	0.6	0.5	0.8	0.9%
+	"Duval County, FL"	"12031"	37	4596623	0.8	0.6	1.1	0.6%
+	"Escambia County, FL"	"12033"	14	1252494	Unreliable	0.6	1.9	0.2%
+	"Hillsborough County, FL"	"12057"	28	3677083	0.8	0.5	1.1	0.5%
+	"Leon County, FL"	"12073"	13	1484941	Unreliable	0.5	1.5	0.2%
+	"Miami-Dade County, FL"	"12086"	75	8943533	0.8	0.7	1.1	1.3%
+	"Orange County, FL"	"12095"	39	4307965	0.9	0.6	1.2	0.7%
+	"Palm Beach County, FL"	"12099"	52	4056830	1.3	1.0	1.7	0.9%
+	"Pinellas County, FL"	"12103"	16	1756484	Unreliable	0.5	1.5	0.3%
+	"Bibb County, GA"	"13021"	10	1433719	Unreliable	0.3	1.3	0.2%
+	"Chatham County, GA"	"13051"	16	1907711	Unreliable	0.5	1.4	0.3%
+	"Clayton County, GA"	"13063"	30	3002506	1.0	0.7	1.4	0.5%
+	"Cobb County, GA"	"13067"	23	2986193	0.8	0.5	1.2	0.4%
+	"DeKalb County, GA"	"13089"	73	6940357	1.1	0.8	1.3	1.2%
+	"Dougherty County, GA"	"13095"	11	1111200	Unreliable	0.5	1.8	0.2%
+	"Fulton County, GA"	"13121"	91	7244552	1.3	1.0	1.5	1.5%
+	"Gwinnett County, GA"	"13135"	26	3085986	0.8	0.6	1.2	0.4%
+	"Henry County, GA"	"13151"	12	1076118	Unreliable	0.6	1.9	0.2%
+	"Muscogee County, GA"	"13215"	17	1598211	Unreliable	0.6	1.7	0.3%
+	"Richmond County, GA"	"13245"	25	1963416	1.3	0.8	1.9	0.4%
+	"Cook County, IL"	"17031"	181	24504131	0.7	0.6	0.8	3.0%
+	"Lake County, IN"	"18089"	19	2313474	Unreliable	0.5	1.3	0.3%
+	"Marion County, IN"	"18097"	28	4403844	0.6	0.4	0.9	0.5%
+	"Jefferson County, KY"	"21111"	29	2771418	1.0	0.7	1.5	0.5%
+	"Caddo Parish, LA"	"22017"	19	2141233	Unreliable	0.5	1.4	0.3%
+	"East Baton Rouge Parish, LA"	"22033"	35	3435856	1.0	0.7	1.4	0.6%
+	"Jefferson Parish, LA"	"22051"	20	2075968	1.0	0.6	1.5	0.3%
+	"Orleans Parish, LA"	"22071"	30	4615698	0.6	0.4	0.9	0.5%
+	"Rapides Parish, LA"	"22079"	13	745280	Unreliable	0.9	3.0	0.2%
+	"Tangipahoa Parish, LA"	"22105"	10	620795	Unreliable	0.8	3.0	0.2%
+	"Anne Arundel County, MD"	"24003"	12	1510802	Unreliable	0.4	1.4	0.2%
+	"Baltimore County, MD"	"24005"	27	3654618	0.7	0.5	1.1	0.5%
+	"Charles County, MD"	"24017"	10	985400	Unreliable	0.5	1.9	0.2%
+	"Montgomery County, MD"	"24031"	22	3118961	0.7	0.4	1.1	0.4%
+	"Prince George's County, MD"	"24033"	59	10276801	0.6	0.4	0.7	1.0%
+	"Baltimore city, MD"	"24510"	45	7372369	0.6	0.4	0.8	0.8%
+	"Genesee County, MI"	"26049"	17	1661456	Unreliable	0.6	1.6	0.3%
+	"Kent County, MI"	"26081"	19	1174767	Unreliable	1.0	2.5	0.3%
+	"Macomb County, MI"	"26099"	16	1134102	Unreliable	0.8	2.3	0.3%
+	"Oakland County, MI"	"26125"	29	2854608	1.0	0.7	1.5	0.5%
+	"Saginaw County, MI"	"26145"	15	731879	Unreliable	1.1	3.4	0.3%
+	"Wayne County, MI"	"26163"	135	14337079	0.9	0.8	1.1	2.3%
+	"Hennepin County, MN"	"27053"	18	2533450	Unreliable	0.4	1.1	0.3%
+	"Forrest County, MS"	"28035"	11	477335	Unreliable	1.2	4.1	0.2%
+	"Hinds County, MS"	"28049"	26	2988181	0.9	0.6	1.3	0.4%
+	"Jackson County, MO"	"29095"	37	2986371	1.2	0.9	1.7	0.6%
+	"St. Louis County, MO"	"29189"	35	4097587	0.9	0.6	1.2	0.6%
+	"St. Louis city, MO"	"29510"	52	2980491	1.7	1.3	2.3	0.9%
+	"Douglas County, NE"	"31055"	11	1131986	Unreliable	0.5	1.7	0.2%
+	"Clark County, NV"	"32003"	17	3801446	Unreliable	0.3	0.7	0.3%
+	"Atlantic County, NJ"	"34001"	14	892399	Unreliable	0.9	2.6	0.2%
+	"Burlington County, NJ"	"34005"	15	1404393	Unreliable	0.6	1.8	0.3%
+	"Camden County, NJ"	"34007"	24	1941118	1.2	0.8	1.8	0.4%
+	"Cumberland County, NJ"	"34011"	11	625438	Unreliable	0.9	3.1	0.2%
+	"Essex County, NJ"	"34013"	96	6178439	1.6	1.3	1.9	1.6%
+	"Hudson County, NJ"	"34017"	20	1811711	1.1	0.7	1.7	0.3%
+	"Mercer County, NJ"	"34021"	13	1404516	Unreliable	0.5	1.6	0.2%
+	"Middlesex County, NJ"	"34023"	15	1564597	Unreliable	0.5	1.6	0.3%
+	"Passaic County, NJ"	"34031"	15	1395758	Unreliable	0.6	1.8	0.3%
+	"Union County, NJ"	"34039"	20	2246856	0.9	0.5	1.4	0.3%
+	"Bronx County, NY"	"36005"	94	11201513	0.8	0.7	1.0	1.6%
+	"Erie County, NY"	"36029"	32	2356681	1.4	0.9	1.9	0.5%
+	"Kings County, NY"	"36047"	177	17155107	1.0	0.9	1.2	3.0%
+	"Monroe County, NY"	"36055"	14	2146653	Unreliable	0.4	1.1	0.2%
+	"Nassau County, NY"	"36059"	21	2890874	0.7	0.4	1.1	0.4%
+	"New York County, NY"	"36061"	27	5803334	0.5	0.3	0.7	0.5%
+	"Onondaga County, NY"	"36067"	11	976787	Unreliable	0.6	2.0	0.2%
+	"Queens County, NY"	"36081"	83	8855955	0.9	0.7	1.2	1.4%
+	"Richmond County, NY"	"36085"	13	966874	Unreliable	0.7	2.3	0.2%
+	"Suffolk County, NY"	"36103"	13	2217583	Unreliable	0.3	1.0	0.2%
+	"Westchester County, NY"	"36119"	22	2747491	0.8	0.5	1.2	0.4%
+	"Guilford County, NC"	"37081"	16	2786990	Unreliable	0.3	0.9	0.3%
+	"Mecklenburg County, NC"	"37119"	20	4881525	0.4	0.3	0.6	0.3%
+	"Wake County, NC"	"37183"	13	3206509	Unreliable	0.2	0.7	0.2%
+	"Cuyahoga County, OH"	"39035"	46	7088211	0.6	0.5	0.9	0.8%
+	"Franklin County, OH"	"39049"	42	4495511	0.9	0.7	1.3	0.7%
+	"Hamilton County, OH"	"39061"	33	3798535	0.9	0.6	1.2	0.6%
+	"Lucas County, OH"	"39095"	12	1577921	Unreliable	0.4	1.3	0.2%
+	"Montgomery County, OH"	"39113"	15	2107323	Unreliable	0.4	1.2	0.3%
+	"Summit County, OH"	"39153"	11	1454569	Unreliable	0.4	1.4	0.2%
+	"Oklahoma County, OK"	"40109"	23	2140719	1.1	0.7	1.6	0.4%
+	"Tulsa County, OK"	"40143"	22	1273887	1.7	1.1	2.6	0.4%
+	"Allegheny County, PA"	"42003"	25	3037643	0.8	0.5	1.2	0.4%
+	"Delaware County, PA"	"42045"	10	1913893	Unreliable	0.3	1.0	0.2%
+	"Montgomery County, PA"	"42091"	10	1280465	Unreliable	0.4	1.4	0.2%
+	"Philadelphia County, PA"	"42101"	117	12519379	0.9	0.8	1.1	2.0%
+	"Charleston County, SC"	"45019"	18	1955393	Unreliable	0.5	1.5	0.3%
+	"Greenville County, SC"	"45045"	15	1465904	Unreliable	0.6	1.7	0.3%
+	"Orangeburg County, SC"	"45075"	11	1028115	Unreliable	0.5	1.9	0.2%
+	"Richland County, SC"	"45079"	27	3108654	0.9	0.6	1.3	0.5%
+	"Davidson County, TN"	"47037"	22	3122313	0.7	0.4	1.1	0.4%
+	"Shelby County, TN"	"47157"	74	8623439	0.9	0.7	1.1	1.2%
+	"Bexar County, TX"	"48029"	22	2396544	0.9	0.6	1.4	0.4%
+	"Collin County, TX"	"48085"	10	1076607	Unreliable	0.4	1.7	0.2%
+	"Dallas County, TX"	"48113"	102	9528984	1.1	0.9	1.3	1.7%
+	"Fort Bend County, TX"	"48157"	20	2057044	1.0	0.6	1.5	0.3%
+	"Harris County, TX"	"48201"	196	13844094	1.4	1.2	1.6	3.3%
+	"Jefferson County, TX"	"48245"	11	1570470	Unreliable	0.3	1.3	0.2%
+	"Tarrant County, TX"	"48439"	50	4697989	1.1	0.8	1.4	0.8%
+	"Travis County, TX"	"48453"	18	1671382	Unreliable	0.6	1.7	0.3%
+	"Fairfax County, VA"	"51059"	14	1877397	Unreliable	0.4	1.3	0.2%
+	"Newport News city, VA"	"51700"	10	1387475	Unreliable	0.3	1.3	0.2%
+	"Norfolk city, VA"	"51710"	11	1963003	Unreliable	0.3	1.0	0.2%
+	"Richmond city, VA"	"51760"	15	1998330	Unreliable	0.4	1.2	0.3%
+	"King County, WA"	"53033"	10	2427990	Unreliable	0.2	0.8	0.2%
+	"Milwaukee County, WI"	"55079"	33	4648801	0.7	0.5	1.0	0.6%
+"Total"			5937	733107645	0.8	0.8	0.8	100.0%
+"---"
+"Dataset: Multiple Cause of Death, 1999-2016"
+"Query Parameters:"
+"Title:"
+"2013 Urbanization: All"
+"Autopsy: All"
+"Gender: All"
+"Hispanic Origin: All"
+"MCD - ICD-10 Codes: O00-O99 (Pregnancy, childbirth and the puerperium)"
+"Place of Death: All"
+"Race: Black or African American"
+"States: All"
+"Ten-Year Age Groups: All"
+"UCD - ICD-10 Codes: All"
+"Weekday: All"
+"Year/Month: All"
+"Group By: County"
+"Show Totals: True"
+"Show Zero Values: False"
+"Show Suppressed: False"
+"Calculate Rates Per: 100,000"
+"Rate Options: Default intercensal populations for years 2001-2009 (except Infant Age Groups)"
+"---"
+"Help: See http://wonder.cdc.gov/wonder/help/mcd.html for more information."
+"---"
+"Query Date: Feb 18, 2018 7:48:32 PM"
+"---"
+"Suggested Citation: Centers for Disease Control and Prevention, National Center for Health Statistics. Multiple Cause of Death"
+"1999-2016 on CDC WONDER Online Database, released December, 2017. Data are from the Multiple Cause of Death Files, 1999-2016, as"
+"compiled from data provided by the 57 vital statistics jurisdictions through the Vital Statistics Cooperative Program. Accessed"
+"at http://wonder.cdc.gov/mcd-icd10.html on Feb 18, 2018 7:48:32 PM"
+"---"
+Messages:
+"1. Rows with suppressed Deaths are hidden, but the Deaths and Population values in those rows are included in the totals. Use"
+"Quick Options above to show suppressed rows."
+"---"
+Footnotes:
+"1. Data are not available for this area for all of the requested years. See Caveats below for more information."
+"2. Data discontinuity due to county line boundary changes in requested years. See Caveats below for more information."
+"3. Deaths for Allen Parish, Louisiana are under reported in years 2006 through 2008. See Caveats below for more information."
+"---"
+Caveats:
+"1. Note: County of residence is misidentified in 316 deaths that occurred in the year 2000, for Hartford County, CT (FIPS code"
+"09003) and New London County, CT (FIPS code 09011). More information: http://wonder.cdc.gov/wonder/help/mcd.html#errata."
+"2. As of April 3, 2017, the underlying cause of death has been revised for 125 deaths in 2014. More information:"
+"http://wonder.cdc.gov/wonder/help/mcd.html#2014-Revision."
+"3. Circumstances in Georgia for the years 2008 and 2009 have resulted in unusually high death counts for the ICD-10 cause of"
+"death code R99, ""Other ill-defined and unspecified causes of mortality."" Caution should be used in interpreting these data."
+"More information: http://wonder.cdc.gov/wonder/help/mcd.html#Georgia-Reporting-Anomalies."
+"4. Circumstances in New Jersey for the year 2009 have resulted in unusually high death counts for the ICD-10 cause of death code"
+"R99, ""Other ill-defined and unspecified causes of mortality"" and therefore unusually low death counts in other ICD-10 codes,"
+"most notably R95, ""Sudden Infant Death Syndrome"" and X40-X49, ""Unintentional poisoning."" Caution should be used in"
+"interpreting these data. More information: http://wonder.cdc.gov/wonder/help/mcd.html#New-Jersey-Reporting-Anomalies."
+"5. Circumstances in California resulted in unusually high death counts for the ICD-10 cause of death code R99, ""Other"
+"ill-defined and unspecified causes of mortality"" for deaths occurring in years 2000 and 2001. Caution should be used in"
+"interpreting these data. More information: http://wonder.cdc.gov/wonder/help/mcd.html#California-Reporting-Anomalies."
+"6. Data for Prince of Wales-Hyder Census Area, AK (FIPS code 02198), Hoonah-Angoon Census Area, AK (FIPS code 02105), Skagway"
+"Municipality, AK (FIPS code 02230), Petersburg Borough/Census Area, AK (FIPS code 02195) and Wrangell City and Borough, AK (FIPS"
+"code 02275) are only available for 2014 and later; for computational purposes, counts and population estimates for 2013 and"
+"earlier are set to zero. Thus, counts and rates shown in multi-year requests for this entity do not include any data for years"
+"before 2014, only data for 2014 and later. More information: http://wonder.cdc.gov/wonder/help/mcd.html#Alaska2014."
+"7. Data for Prince of Wales-Outer Ketchikan Census Area, AK (FIPS code 02201), Skagway-Hoonah-Angoon Census Area, AK (FIPS code"
+"02232) and Wrangell-Petersburg Census Area, AK (FIPS code 02280) are only available for 2013 and earlier; for computational"
+"purposes, counts and population estimates for 2014 and later are set to zero. Thus, counts and rates shown in multi-year"
+"requests for this entity do not include any data for years after 2013, only data for 2013 and earlier. More information:"
+"http://wonder.cdc.gov/wonder/help/mcd.html#Alaska2014."
+"8. Data for Bedford city, Va. (FIPS code 51515) are only available for 2013 and earlier; for computational purposes, counts and"
+"population estimates for 2014 and later are set to zero. Thus, counts and rates shown in multi-year requests for this entity do"
+"not include any data for years after 2014, only data for 2013 and earlier. More information:"
+"http://wonder.cdc.gov/wonder/help/mcd.html#Bedford."
+"9. There is a discontinuity in the mortality and population data for Bedford County (FIPS code 51019) between years 2013 and"
+"2014. The discontinuity occurs because Bedford City, Virginia (FIPS code 51515), formerly an independent city, merged with"
+"Bedford County (FIPS code 51019) on July 1, 2013. Beginning in 2014, deaths and population counts for Bedford City, Virginia"
+"(FIPS code 51515) are included in Bedford County (FIPS code 51019)."
+"10. Data for Denali Borough, Alaska (FIPS code 02068) are only available for 2003 and later; for computational purposes, counts"
+"and population estimates for 1999-2002 are set to zero. Thus, counts and rates shown in multi-year requests for this entity do"
+"not include any data for years prior to 2003, only data for 2003 and later. More information:"
+"http://wonder.cdc.gov/wonder/help/mcd.html#Denali Borough."
+"11. There is a discontinuity in the mortality and population data for Yukon-Koyukuk Census Area (FIPS code 02290) between 2002"
+"and 2003. The discontinuity occurs because part of Yukon-Koyukuk Census Area became Denali Borough, Alaska (FIPS code 02068) and"
+"beginning in 2003, deaths and population counts for this former part of Yukon-Koyukuk are reported for Denali Borough and are no"
+"longer included with data for Yukon-Koyukuk."
+"12. Death rates for Clifton Forge city, Virginia (FIPS code 51560) are available only for 1999-2000. For 2001 and beyond, death"
+"counts and population estimates for Clifton Forge city have been combined with those for Alleghany county, Virginia (FIPS code"
+"51005). Death counts and population estimates for this entity from multi-year requests, only reflect data from 1999 and 2000;"
+"for 2001 and beyond they have been set to zero. More information: http://wonder.cdc.gov/wonder/help/mcd.html#Clifton Forge."
+"13. There is a discontinuity in the mortality and population data for Alleghany, Virginia (FIPS code 51005) between 2000 and"
+"2001. It occurs because for 2001 and beyond, death counts and population estimates for Clifton Forge city, Virginia (FIPS code"
+"51560) have been combined with those for Alleghany county."
+"14. Data for Broomfield, Colorado (FIPS code 08014) are only available for 2003 and later; for computational purposes, counts"
+"and population estimates for 1999-2002 are set to zero. Thus, counts and rates shown in multi-year requests for this entity do"
+"not include any data for years prior to 2003, only data for 2003 and later. More information:"
+"http://wonder.cdc.gov/wonder/help/mcd.html#Broomfield."
+"15. There is a discontinuity in the mortality and population data for Adams, Colorado (FIPS code 08001), Boulder, Colorado (FIPS"
+"code 08013), Jefferson, Colorado (FIPS code 08059), and Weld, Colorado (FIPS code 080123) between 2002 and 2003. This"
+"discontinuity occurs because territory in each of these four counties has been combined to form a new county, Broomfield,"
+"Colorado (FIPS code 08014). Beginning in 2003, deaths and population counts for this territory are reported for Broomfield"
+"county and are no longer included with data for Adams, Boulder, Jefferson, and Weld."
+"16. Deaths for Allen Parish, Louisiana (FIPS code 22003] in years 2006 through 2008 are under reported due to problems with"
+"registering the deaths with the Louisiana Vital Statistics Office."
+"17. Deaths and population estimates are shown separately from the adjacent counties for Carson City, Nevada (FIPS code 32510)."
+"18. Deaths and population estimates are reported separately for Baltimore City (FIPS code 24510) and Baltimore county (FIPS code"
+"24005)."
+"19. Deaths and population estimates are reported separately for St. Louis City (FIPS code 29510) and county (FIPS code 29189)."
+"20. Data are Suppressed when the data meet the criteria for confidentiality constraints. More information:"
+"http://wonder.cdc.gov/wonder/help/mcd.html#Assurance of Confidentiality."
+"21. Death rates are flagged as Unreliable when the rate is calculated with a numerator of 20 or less. More information:"
+"http://wonder.cdc.gov/wonder/help/mcd.html#Unreliable."
+"22. Information included on the death certificate about the race and Hispanic ethnicity of the decedent is reported by the"
+"funeral director as provided by an informant, often the surviving next of kin, or, in the absence of an informant, on the basis"
+"of observation. Race and ethnicity information from the census is by self-report. To the extent that race and Hispanic origin"
+"are inconsistent between these two data sources, death rates will be biased. More information:"
+"http://wonder.cdc.gov/wonder/help/mcd.html#Racial Differences."
+"23. The method used to calculate 95% confidence intervals is documented here: More information:"
+"http://wonder.cdc.gov/wonder/help/mcd.html#Confidence-Intervals."
+"24. The population figures for year 2016 are bridged-race estimates of the July 1 resident population, from the Vintage 2016"
+"postcensal series released by NCHS on June 26, 2017. The population figures for year 2015 are bridged-race estimates of the July"
+"1 resident population, from the Vintage 2015 postcensal series released by NCHS on June 28, 2016. The population figures for"
+"year 2014 are bridged-race estimates of the July 1 resident population, from the Vintage 2014 postcensal series released by NCHS"
+"on June 30, 2015. The population figures for year 2013 are bridged-race estimates of the July 1 resident population, from the"
+"Vintage 2013 postcensal series released by NCHS on June 26, 2014. The population figures for year 2012 are bridged-race"
+"estimates of the July 1 resident population, from the Vintage 2012 postcensal series released by NCHS on June 13, 2013."
+"Population figures for 2011 are bridged-race estimates of the July 1 resident population, from the county-level postcensal"
+"Vintage 2011 series released by NCHS on July 18, 2012. Population figures for 2010 are April 1 Census counts. The population"
+"figures for years 2001 - 2009, are bridged-race estimates of the July 1 resident population, from the revised intercensal"
+"county-level 2000 - 2009 series released by NCHS on October 26, 2012. Population figures for 2000 are April 1 Census counts."
+"Population figures for 1999 are from the 1990-1999 intercensal series of July 1 estimates. Population figures for Infant Age"
+"Groups are the number of live births. <br/><b>Note:</b> Rates and population figures for years 2001 - 2009 differ slightly from"
+"previously published reports, due to use of the population estimates which were available at the time of release."
+"25. The population figures used in the calculation of death rates for the age group 'under 1 year' are the estimates of the"
+"resident population that is under one year of age. More information: http://wonder.cdc.gov/wonder/help/mcd.html#Age Group."

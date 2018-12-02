@@ -1,0 +1,184 @@
+---
+title: "Lab 4-2 Solution"
+author: "Kun Zhang"
+date: "11 December 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r initialization}
+library(dplyr)
+wvs.dat <- read.csv("Data/WVS/wvs.dat_clean.csv")
+dim(wvs.dat)
+```
+
+```{r define functions to recode variables}
+
+library(dplyr)
+
+
+recode_likert4 <- function(my_var) {
+  scale(as.numeric(as.character(recode(my_var,
+                                  '1' = '4',
+                                   '2' = '3',
+                                   '3' = '2',
+                                   '4' = '1',
+                                  '-2' = NULL))))
+}
+
+recode_likert10 <- function(my_var) {
+    scale(as.numeric(as.character(recode(my_var,
+                                  '1' = '10',
+                                   '2' = '9',
+                                   '3' = '8',
+                                   '4' = '7',
+                                   '5' = '6',
+                                   '6' = '5',
+                                   '7' = '4',
+                                   '8' = '3',
+                                   '9' = '2',
+                                   '10' = '1',
+                                  '-2' = NULL))))
+}
+
+recode_to_notnull <- function(my_var) {
+  scale(as.numeric(as.character(recode(my_var,
+                                 '-2' = NULL,
+                                 .default = my_var))))
+}
+
+```
+
+```{r recode and cleanup}
+
+
+wvs.dat$Age.in.years <- recode(wvs.dat$V240,
+                                  '-2' = NULL,
+                                  '0' = NULL,
+                                  .default = wvs.dat$V240)
+ 
+wvs.dat$Children <- recode_to_notnull(wvs.dat$V58)
+ 
+wvs.dat$Highest.nonschool.qualification <- recode_to_notnull(wvs.dat$H22)
+
+wvs.dat$Population.of.town.lived.in <- recode_to_notnull(wvs.dat$V253)
+
+wvs.dat$importance.of.family <- recode_likert4(wvs.dat$V4)
+wvs.dat$importance.of.friends <- recode_likert4(wvs.dat$V5)
+wvs.dat$importance.of.leisure <- recode_likert4(wvs.dat$V6)
+wvs.dat$importance.of.politics <- recode_likert4(wvs.dat$V7)
+wvs.dat$importance.of.work <- recode_likert4(wvs.dat$V8)
+wvs.dat$importance.of.religion <- recode_likert4(wvs.dat$V9)
+wvs.dat$trust.family <- recode_likert4(wvs.dat$V102)
+wvs.dat$trust.neighbours <- recode_likert4(wvs.dat$V103)
+wvs.dat$trust.acquaintances <- recode_likert4(wvs.dat$V104)
+wvs.dat$trust.just.met <- recode_likert4(wvs.dat$V105)
+wvs.dat$trust.other.religions <- recode_likert4(wvs.dat$V106)
+wvs.dat$trust.other.nationality <- recode_likert4(wvs.dat$V107)
+
+wvs.dat$V228A <- recode_likert4(wvs.dat$V228A)
+wvs.dat$V228B <- recode_likert4(wvs.dat$V228B)
+wvs.dat$V228C <- recode_likert4(wvs.dat$V228C)
+
+
+wvs.dat$justified.bribery <- recode_likert10(wvs.dat$V202)
+
+wvs.dat$gender <- scale(as.numeric(as.character(recode(wvs.dat$V238, 
+                                                 '2'='0', 
+                                                 .default = as.character(wvs.dat$V238)))))
+
+# delete columns/varaiables for which we have no information for 20 per cent or more of the rows
+wvs.dat <- wvs.dat[, -which(colMeans(is.na(wvs.dat)) > 0.2)]
+
+# remove all rows with any other missing observations
+library(tidyr)
+wvs.dat <- wvs.dat %>%
+  drop_na()
+
+
+x = as.matrix(wvs.dat[, c("gender",
+                "Age.in.years",
+                "Children",
+                "Highest.nonschool.qualification",
+                "Population.of.town.lived.in",
+                "importance.of.family",
+                "importance.of.friends",
+                "importance.of.leisure",
+                "importance.of.politics",
+                "importance.of.work",
+                "importance.of.religion",
+                "trust.family",
+                "trust.neighbours",
+                "trust.acquaintances",
+                "trust.just.met",
+                "trust.other.religions",
+                "trust.other.nationality")])
+
+x2 = as.matrix(wvs.dat[, c("gender",
+                "Age.in.years",
+                "Children",
+                "Highest.nonschool.qualification",
+                "Population.of.town.lived.in",
+                "importance.of.family",
+                "importance.of.friends",
+                "importance.of.leisure",
+                "importance.of.politics",
+                "importance.of.work",
+                "importance.of.religion",
+                "trust.family",
+                "trust.neighbours",
+                "trust.acquaintances",
+                "trust.just.met",
+                "trust.other.religions",
+                "trust.other.nationality",
+                "V228A",
+                "V228B",
+                "V228C")])
+
+y = wvs.dat$justified.bribery
+y2 = wvs.dat$justified.bribery
+
+```
+
+
+## Lasso Regularization
+```{r Lasso}
+library(glmnet) # Lasso and Elastic-Net Regularized Generalized Linear Models
+# lasso fit model
+fit = glmnet(x,y)
+#print(fit)
+plot(fit)
+# x-axis bottom: the sum of absolute values of regression coefficients (the size of the term that multiplies)
+# Larger values of the L1 norm mean more variables are in play
+# x axis top: the number of non-zero variables
+
+
+# cross validate
+cvfit = cv.glmnet(x,y)
+plot(cvfit)
+coef(cvfit, s = "lambda.min")
+(cvfit$lambda.1se)
+# predict() uses the coeffecient to evaluate predicted values 
+predict(cvfit, newx = x[1:7,], s = "lambda.min")
+```
+Five Varaibles: gender, Age.in.years, Children, trust.family, trust.acquaintances
+
+## Elastic net
+```{r elastic net}
+fit.elastic = glmnet(x, y, alpha=0.5)
+plot(fit.elastic)
+cvfit.elastic = cv.glmnet(x,y, alpha=0.5)
+plot(cvfit.elastic)
+coef(cvfit.elastic, s = "lambda.min")
+(cvfit.elastic$lambda.1se)
+predict(cvfit.elastic, newx = x[1:6,], s = "lambda.min")
+
+
+```
+11 Variables
+lambda.1se for elatic net is smaller than that of pure lasso.
+

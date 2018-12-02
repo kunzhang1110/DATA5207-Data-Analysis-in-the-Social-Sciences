@@ -1,0 +1,5 @@
+# Second release of GCP contains the following amendments
+
+G14 Religious Affiliation By Sex has been revised to correctly recode 'Secular Beliefs and Other Spiritual Beliefs and No Religious Affiliation, nfd' to 'Other Spiritual Beliefs'.
+
+The Short header for G8341 in Table G36 modified from "R_650_over_LT_Lld_type_ns" to "R_950_over_LT_Lld_type_ns"

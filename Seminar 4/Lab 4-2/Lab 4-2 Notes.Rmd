@@ -1,0 +1,371 @@
+---
+title: "Week 9: Regularisation and variable selection in the social sciences"
+subtitle: "DATA5207: Data Analysis in the Social Sciences - Semester 1, 2018 "
+author: Dr Richard Scalzo and Dr Shaun Ratcliff
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+
+When we are conducting research, there are two primary ways to select variables. We can use our subject matter expertise to decide which inputs are likely to have significant predictive power, and include these in our model. However, this method has limitations and is not always appropriate. 
+
+We may not be an expert in the subject matter we are required to examine, and one may not be available to consult. There may be no experts in the subjects you are studying (rarer, but not impossible). In a world of increasingly rich and vast data, we may have so much information that subject matter expertise alone is not enough to decide which variables should be included in a model. Finally, even expert researchers are themselves human and subject to cognitive bias, so if enough data are available, automating the reasoning process about variable inclusion can lead to new insights and overturn conventional wisdom.  In these situations, we have a number of variable selection tools available to use to help decide how we should specify our models. These range from random forest to lasso models.
+
+In the week 9 labs we will examine using lasso to solve two research problems. 
+
+\vspace{6mm}
+
+
+##Learning to use lasso
+
+Today we will look at lasso models as a tool to select variables for further study. We are using the dataset we explored in week 7, the 2012 Australian World Values Survey (WVS), for this exercise. This is a survey of Australians, run in conjunction with other similar surveys conducted around the world. It asks respondents more questions than most other surveys, and therefore provides a useful datasource for researchers. A copy of the dataset, code book and questionnaire is available in the zipped folder on the week 9 module on canvas. These data come from the *Australian Data Archive*. You can use their [catalogue](https://web.archive.org/web/20170303193935/https://ada.edu.au/social-science/01252) to decode variables (which are unfortunately poorly coded); although we will provide you with some assistance with recoding for this exercise. 
+
+The outcome of interest for our first exercise is the extent to which someone approves of bribery. However, the very wealth of data provided by the WVS can present some complications. You can load the dataset and use the *dim()* function to observe its dimensions using this syntax:
+
+\vspace{6mm}
+
+```{r read in data and observe dimensions}
+
+wvs.dat <- read.csv("/Users/tassjames/Desktop/Teaching/DATA 5207/Week 9/wvs.dat_clean.csv")
+
+dim(wvs.dat)
+
+```
+
+\vspace{6mm}
+
+When you do this you can see that there are  `r dim(wvs.dat)[2]` variables in this dataset (note that this version does not contain the variables we used to create the quality of life measure with the factor analysis, but does not include the latent factor scores it produced). Variable selection tools, such as lasso, can be useful for this type of analysis, as they can help us understand which variables are useful for understanding the phenomena we are trying to study.
+
+
+###Fitting our model
+
+For our lasso models we will be using the *glmnet* package, which implements lasso and related regularization methods, and also provides some convenient interpolation routines.
+
+We will be using linear regression to build our machine learning model. Linear regression usually works by adjusting the fit coefficients associated with each predictor so as to minimise the sum of squared residuals between the prediction and the data.  Assuming the residuals are uncorrelated, Gaussian, and all have identical variance, minimizing the sum of squared residuals is equivalent to maximizing the **likelihood** or the probability that the data would have been drawn from the model with the corresponding fit coefficients.  Moreover, in the standard case where we have plenty of data, the fit can be done quickly all in one go, as a matrix algebra operation, and we get a unique set of optimal coefficients.
+
+In some situations, such as when there are more variables than data points or when multiple predictors have very similar or identical effects across all the data, there may not be a unique solution for the regression.  In fact there may be *infinitely* many combinations of coefficient values that explain the data equally well.  If we can get more or different data to remove the ambiguity, that's great, but we don't always have that luxury.  In fact, we usually don't, especially if we're interested in legacy data or historical effects.
+
+We may, however, have some idea about what kinds of solutions we would like the regression to have -- for example, that the coefficients be as small as possible.  We can use this knowledge to get rid of undesirable solutions and produce a unique optimal set of coefficients. **Variable selection** is the automated process of selecting for regression solutions in which only a subset of coefficients are nonzero.
+
+One intuitive approach to variable selection would be to try all possible combinations of variables, and see which produce reasonable optimiaed likelihoods and which do not. However, as the number $N$ of variables gets larger than a handful, the number of *combinations* of variables to be included or excluded grows like $2^N$, and quickly becomes prohibitive to do interactively by humans. For only slightly larger $N$ searching all possible combinations becomes intractable for computers as well.
+
+An approximate approach, which enables us to explore the whole space of possibilities without having to do a brute-force search on all possible combinations of variables, is to add an extra penalty term to the likelihood which is large for such solutions, and then finding the coefficient values that instead minimize the likelihood plus this penalty term.  This process is called **regularization** and is closely related to variable selection.
+
+In the **lasso** algorithm for variable selection, we add a term proportional to the sum of the absolute values of the coefficients, with size controlled by a parameter $\lambda$.  When many coefficients have large nonzero values, this term becomes large, so in trying to minimize the modified likelihood we favor solutions with only a few nonzero coefficients.  Stronger effects will be harder to select out.
+
+*glmnet* works by varying the value of $\lambda$ to control the influence of the regularization term.  When $\lambda = 0$, the regularization term goes away and we're just minimizing the sum of squared residuals again.  When $\lambda$ is small, the algorithm has an incentive to shrink some coefficients to zero, and when $\lambda$ is large, the influence of the regularization term overcomes all but the strongest effects that are critical to predicting the response variable.  As $\lambda$ increases and the number of variables shrink, the explanatory power of the model may suffer, but there will be a sweet spot where we can get rid of unnecessary variables without affecting the predictive value of the model very much.
+
+
+\vspace{6mm}
+
+###Preparing your data
+
+Before we begin, we need to prepare our data. *glmnet* requires a predictor matrix and a response vector as input.So we need to do the following to the data: 
+
+- Unpack and recode variables.
+- standaride predictors so that the betas are all more or less comparable.
+- Repack into a predictor matrix.
+- Then, we fit our model.
+
+
+We start this by loading the *dplyr* package and create a set of functions, based on the existing *recode()* function, to recode and rescale our likert scales, one for each set of variables with different numbers of response categories:
+
+\vspace{6mm}
+
+```{r define functions to recode variables}
+
+library(dplyr)
+
+
+recode_likert4 <- function(my_var) {
+  scale(as.numeric(as.character(recode(my_var,
+                                  '1' = '4',
+                                   '2' = '3',
+                                   '3' = '2',
+                                   '4' = '1',
+                                  '-2' = NULL))))
+}
+
+recode_likert10 <- function(my_var) {
+    scale(as.numeric(as.character(recode(my_var,
+                                  '1' = '10',
+                                   '2' = '9',
+                                   '3' = '8',
+                                   '4' = '7',
+                                   '5' = '6',
+                                   '6' = '5',
+                                   '7' = '4',
+                                   '8' = '3',
+                                   '9' = '2',
+                                   '10' = '1',
+                                  '-2' = NULL))))
+}
+
+recode_to_notnull <- function(my_var) {
+  scale(as.numeric(as.character(recode(my_var,
+                                 '-2' = NULL,
+                                 .default = my_var))))
+}
+
+```
+
+\vspace{6mm}
+
+We then use the existing recode function, or the new functions we created, to recode the variables:
+
+\vspace{6mm}
+
+
+```{r recode a few key variables}
+
+wvs.dat$Age.in.years <- recode(wvs.dat$V240,
+                                  '-2' = NULL,
+                                  '0' = NULL,
+                                  .default = wvs.dat$V240)
+ 
+wvs.dat$Children <- recode_to_notnull(wvs.dat$V58)
+ 
+wvs.dat$Highest.nonschool.qualification <- recode_to_notnull(wvs.dat$H22)
+
+wvs.dat$Population.of.town.lived.in <- recode_to_notnull(wvs.dat$V253)
+
+wvs.dat$importance.of.family <- recode_likert4(wvs.dat$V4)
+wvs.dat$importance.of.friends <- recode_likert4(wvs.dat$V5)
+wvs.dat$importance.of.leisure <- recode_likert4(wvs.dat$V6)
+wvs.dat$importance.of.politics <- recode_likert4(wvs.dat$V7)
+wvs.dat$importance.of.work <- recode_likert4(wvs.dat$V8)
+wvs.dat$importance.of.religion <- recode_likert4(wvs.dat$V9)
+
+wvs.dat$trust.family <- recode_likert4(wvs.dat$V102)
+wvs.dat$trust.neighbours <- recode_likert4(wvs.dat$V103)
+wvs.dat$trust.acquaintances <- recode_likert4(wvs.dat$V104)
+wvs.dat$trust.just.met <- recode_likert4(wvs.dat$V105)
+wvs.dat$trust.other.religions <- recode_likert4(wvs.dat$V106)
+wvs.dat$trust.other.nationality <- recode_likert4(wvs.dat$V107)
+
+wvs.dat$justified.bribery <- recode_likert10(wvs.dat$V202)
+
+```
+
+\vspace{6mm}
+
+Note that right now we are using a number of Likert variables, which are ordinal. We will treat these as continuous. For our purposes this is probably fine, but we should remain aware that this is an assumption, not a given. Lasso cannot be directly used on discrete or categorical predictors. However, we can get around this by converting categorical predictors variable into binary variables; what the neural-net folks call a "one-hot" encoding: each category corresponds to a single vector element which is 1 if the variable takes on that categorical value, and 0 otherwise. So, say:
+
+gender = (male, female, nonbinary)
+
+We convert these, so that: 
+
+male = (1,0,0), female = (0,1,0), nonbinary = (0,0,1).  
+
+The effect of this in the regression is to give each category value its own potential effect coefficient which can be shrunk to zero by the lasso independently. We can convert the gender variable in the WVS `V238` to a standardised binary variable with the syntax: 
+
+\vspace{6mm}
+
+```{r recode gender}
+
+wvs.dat$gender <- scale(as.numeric(as.character(recode(wvs.dat$V238, 
+                                                 '2'='0', 
+                                                 .default = as.character(wvs.dat$V238)))))
+
+```
+
+\vspace{6mm}
+
+This is not necessarily elegant, but it's one way to construct a model.
+
+These are plenty of variables for our first model. We will start by trying to predict the extent to which someone approves of bribery based on the demographic information and opinions contained in our variables.
+
+The function we are using to fit a lasso model cannot handle missing data, requiring us to remove any rows with missing data. Even if it did not, since we are running variable selection, which means fitting a model that examines the relationship between all the variables in our data and the dependent variable we are interested in (our quality of life measure) we want to first remove any rows with a substantial missing observations; as those with a large amount of missingness would be problematic.
+
+We start by removing the variables with much missing data before tackling the rest. The exact number we remove is somewhat arbitrary, but here we will delete those for which we have no information for 20 per cent or more of the rows:
+
+
+\vspace{6mm}
+
+```{r delete rows with large n missing data}
+
+wvs.dat <- wvs.dat[, -which(colMeans(is.na(wvs.dat)) > 0.2)]
+
+
+```
+
+\vspace{6mm}
+
+This reduces the number of variables in the dataset to `r dim(wvs.dat)[2]`, with the others columns removed. We then remove all rows with any other missing observations with the code:
+
+\vspace{6mm}
+
+```{r}
+
+library(tidyr)
+
+wvs.dat <- wvs.dat %>% 
+  drop_na()
+
+```
+
+\vspace{6mm}
+
+Having done this, we are nearly ready to fit our model. Before we do though, first we need to set up our predictor matrix and response variable vector:
+
+\vspace{6mm}
+
+```{r recode a few things}
+
+x = as.matrix(wvs.dat[, c("gender",
+                "Age.in.years",
+                "Children",
+                "Highest.nonschool.qualification",
+                "Population.of.town.lived.in",
+                "importance.of.family",
+                "importance.of.friends",
+                "importance.of.leisure",
+                "importance.of.politics",
+                "importance.of.work",
+                "importance.of.religion",
+                "trust.family",
+                "trust.neighbours",
+                "trust.acquaintances",
+                "trust.just.met",
+                "trust.other.religions",
+                "trust.other.nationality")])
+
+y = wvs.dat$justified.bribery
+
+```
+
+\vspace{6mm}
+
+
+###Fitting our model
+
+
+To start, you will need to use the *install.packages()* function to download the *glmnet* package, and then load this:
+
+\vspace{6mm}
+
+```{r load glmnet package}
+
+library(glmnet)
+
+```
+
+\vspace{6mm}
+
+
+Then to fit your model, use the code:
+
+\vspace{6mm}
+
+```{r}
+
+fit = glmnet(x,y)
+
+```
+
+\vspace{6mm}
+
+This creates a fit object.  The fitting procedure varies $\lambda$ across a range of values, and produces a different best-fit model for each value of $\lambda$.  You can interact with these models and make predictions with them as you would for the result of any normal regression.
+
+We can print the results by typing:
+
+\vspace{6mm}
+
+```{r print fit output, eval=FALSE}
+
+print(fit)
+
+```
+\vspace{6mm}
+
+This presents a table of results from the model. For each value of $\lambda$ (shown in the right-most column), the `Df` column gives the number of non-zero coefficients, and `%Dev` gives the fraction of (null) deviance explained by the corresponding model.
+
+We can plot a visual of the results by typing:
+
+\vspace{6mm}
+
+```{r plot fit output, eval = FALSE}
+
+plot(fit)
+
+```
+
+\vspace{6mm}
+
+This creates a plot that has a sort of branching structure. The "$L^1$ Norm" that forms the x-axis is just the sum of absolute values of regression coefficients, i.e., the size of the term that $\lambda$ multiplies.  Larger values of the $L^1$ norm mean more variables are in play.  A dual x-axis along the top of the plot shows the number of non-zero variables. The value of each regression coefficient in the model is represented by a curve on the plot branching off from the x-axis.
+
+Because $\lambda$ may seem like an artificial addition to an otherwise sensible model, and we don't have a good intuition for how big it should be, we may well ask how we choose its value. One way to do this is to cross-validate: fit the model coefficients on a subset of the data, and then use the model to make a prediction for the rest of the data, and see what the variance of the residuals looks like. Fortunately *glmnet* has functionality to do this automatically for us:
+
+\vspace{6mm}
+
+```{r}
+
+cvfit = cv.glmnet(x,y)
+plot(cvfit)
+
+```
+
+\vspace{6mm}
+
+You can now see the typical mean-squared error of the *predictions* plotted against the value of $\log(\lambda)$. The vertical lines show natural values of lambda that bracket the point of diminishing returns for regularization. For $\lambda$ outside the range on the low side, you're not really regularizing, whereas for $\lambda$ outside the range on the high side, the predictive value of the model starts to suffer and the mean square error starts to grow considerably.
+
+While you can access the models for any $\lambda$, two values might be of most interest to you: ```cvfit$lambda.min``` minimizes the regularized likelihood, while ```cvfit$lambda.1se``` lies on the high side of the bracketed range before the mean squared error starts to blow up.
+
+\vspace{6mm}
+
+```{r}
+
+coef(cvfit, s = "lambda.min")
+
+
+```
+
+\vspace{6mm}
+
+will show the coefficients, while
+
+```{r}
+
+predict(cvfit, newx = x[1:5,], s = "lambda.min")
+
+```
+
+will make a prediction for new values of $x$.
+
+\vspace{6mm}
+
+###Other types of regularization
+
+There are two other kinds of regularization you might find useful. Lasso is also known as "$L^1$ regularization" because the penalty term looks like the $L^1$ norm, or the sum of absolute values of regression coefficients. There is also "ridge regression", or "$L^2$ regularization" where we add a term like the sum of squared coefficient values. There could in principle be a "$L^p$ regularization" for any non-negative $p$ but these are the two most commonly used.  Ridge regression tends not to select variables out, but to set coefficients of highly correlated sets of predictors to similar values.
+
+In particular, glmnet also accepts a parameter $\alpha$ lying between 0 and 1 that allows us to apply a penalty anywhere between ridge ($\alpha = 0$) and lasso ($\alpha = 1$). Setting some intermediate value of $\alpha$ gives us the **elastic net**, which combines the best of both ridge and lasso:  grouping coefficients of highly correlated sets of predictors to similar values, *including zero* if those predictors are selected out.  If you have time, you might consider passing a non-zero value of $\alpha$ to the fit method and see what comes out:
+
+```{r, eval=FALSE}
+
+fit = glmnet(x, y, alpha=0.5)
+print(fit)
+plot(fit)
+
+```
+
+\vspace{6mm}
+
+
+##Fitting your own model
+
+**_Task_**: Using these data, we want to then run a lasso model using the quality of life measure we created last week. This is saved in the data frame provided as the variable `life.quality`. Fit this model to 20 predictors. You should use a mix of the variables you used last week (if they can be made continuous) and those used above. What do the results tell you? Which variables are selected out by lasso, and at what effect values?
+
+
+\vspace{6mm}
+
+##Class discussion
+
+At the end of the class we will discuss the strengths and weaknesses of these methods. When are they appropriate, and what are the potential downsides of variable selection tools? 
+
+
+

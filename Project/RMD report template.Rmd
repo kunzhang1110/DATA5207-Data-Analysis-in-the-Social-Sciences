@@ -1,0 +1,39 @@
+---
+title: "Research project (add your own title here)"
+author: "Add student number here (not your name)"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Introduction 
+
+Research question including thesis statement/argument/preview main findings (250 words).
+
+\vspace{6mm}
+
+# Literature and theory
+
+Condense/revise from research proposal.
+
+\vspace{6mm}
+
+# Data and methodology 
+
+Describe your data and source, explain how you plan to examine it, justify the choice, discuss limitations.
+
+\vspace{6mm}
+
+# Expectations and limitations
+
+Analyse the results – what are the main findings and what does it all mean, how does it compare to other findings?
+
+\vspace{6mm}
+
+#Bibliography 
+
+List your sources (literature and data) here.

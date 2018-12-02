@@ -1,0 +1,1437 @@
+---
+title: 'Seminar 1: Additional tasks'
+author: "Dr Shaun Ratcliff"
+subtitle: 'DATA5207: Data Analysis in the Social Sciences - Semester 1, 2018 '
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r load smoke data, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(plyr)
+library(ggplot2)
+library(scales)
+
+smoke.data <- read.csv("Data/Smoking/smoke_data.csv", head=TRUE, sep=",", na.strings="")
+
+
+```
+
+
+To help you master the material covered in the day 1 labs, these notes contain exercises that involve more complex descriptive analyses using survey data to understand smoking behaviour amongst Australian adolescents, and earnings in the United States. We also look at graphing these results. We practice using `ggplot()`, including plotting confidence intervals, and `reshape2`. 
+
+These exercises are not compulsory. We will not mark you on these, and we will not check that you have done the work. They are designed to help those of you without prior experience with $R$ or the methods we are covering in this unit. They will not be set every class; just a few of them to help you get up to speed and make sure you pass the unit. 
+
+Work through these at your own pace to familiarise yourself with these methods. If you are finding something difficult, please contact us and arrange a time to speak with us. Details are available **[on canvas](https://canvas.sydney.edu.au/courses/2452/pages/unit-information#teachingteam)**.
+ 
+Additionally, there will be an additional session next week. 
+
+
+##Visualising the smoking data
+
+In today's first lab, we looked at some patterns in data on the rates of smoking amongst Australian adolescents. We found that as we dug deeper into the data, these patterns become harder to interpret when presented in tabular format. An alternative to tables is data visualisation, which we also examined in the labs. 
+
+
+###Creating another line graph with ggplot
+
+```{r prep for smoke plots, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(plyr)
+library(ggplot2)
+library(scales)
+library(reshape2)
+
+smoke.data <- read.csv("Data/Smoking/smoke_data.csv", head=TRUE, sep=",", na.strings="")
+
+smoke.trend.1 <- ddply(smoke.data,~ wave, function(smoke.data) prop.table(table(smoke.data$smkreg))) 
+
+names(smoke.trend.1)[3] <- "smokes"  
+
+```
+
+
+Load the `ggplot2` and `scales` packages using the `library()` function. Once you have done this, we want to graph the data on smoking amongst Australian adolescents in the item `smoke.trend.1` we saved earlier. 
+
+First, we need to clean these data slightly. When we saved the output in the week 1 lab, the columns (now variables) were called:
+
+\vspace{6mm}
+
+```{r smoking 17 - earlier output}
+
+names(smoke.trend.1)
+
+```
+
+\vspace{6mm}
+
+`ggplot()` cannot use variables with numeric names. To view the variable names in the data frame, run it through the `names()` function. As with labels, we do not want to have to type out the names of all our variables (particularly when we start using larger datasets). We can selectively change the label for the third variable ("1"), the proportion of respondents in each wave who report smoking regularly, with the syntax: 
+
+\vspace{6mm}
+
+```{r smoking 18 - earlier output, eval=FALSE}
+
+names(smoke.trend.1)[3] <- "smokes"  
+
+```
+
+\vspace{6mm}
+
+
+Once we have done this, we can create our graph with the following code into $R$:  
+
+
+\vspace{6mm}
+
+```{r smoking 19b - filled plot, eval=FALSE}
+
+ggplot(smoke.trend.1, aes(x = wave, y = smokes)) + 
+  geom_line(alpha=.6, size=1) + 
+  labs(title = "Percentage of adolescents who report smoking", 
+       y = "Proportion of smokers", 
+       x = "survey wave") + 
+  scale_y_continuous(labels = percent, limits=c(0,.2),breaks=c(.05,.1,.15)) +
+  theme_bw() + 
+  theme(axis.text = element_text(size=10), 
+        plot.title = element_text(size=10, face="bold", hjust=.5))  
+
+```
+
+\vspace{6mm}
+
+We have added `geom_line()` to our code. This creates and specifies the attributes of the line for our graph. We have also specified labels for our title and axes with `labs()`. Further, we have directed `ggplot()` to treat the labels for the y-axis as percentages with the `labels` command (which is from the `scales` package) in `scale_y_continuous()`, which also places specific limits to the y-axis, and locates the precise points of axis breaks. `theme_bw()` removes the grey background of the default settings, and within `theme()` we edit the axis plot title text, specifying font size, whether it is bold, and adjusting its position if needed. This gives us:
+
+\vspace{6mm}
+
+```{r graphing filled smoke plot,  echo=FALSE,  warning=FALSE, message=FALSE, fig.height=4, fig.width=4}
+
+ggplot(smoke.trend.1, aes(x = wave, y = smokes)) + 
+  geom_line(alpha=.6, size=1) + 
+  labs(title = "Percentage of adolescents who report smoking", y = "Proportion of smokers", x =     "survey wave") + 
+  scale_y_continuous(labels = percent, limits=c(0,.2),breaks=c(.05,.1,.15)) +
+  theme_bw() + 
+  theme(axis.text = element_text(size=10), 
+        plot.title = element_text(size=10, face="bold", hjust=.5))  
+
+```
+
+\vspace{6mm}
+
+There is more we could do with this to improve it further, but it’s a good start, showing some clear trends. We will spend more time on plotting our results during the week. Before we move on, though, don’t forget to save your editor file. 
+
+
+\vspace{3mm}
+
+###Plotting by groups
+
+
+We will generally want to add further complexity to our analysis. As discussed above, we want to examine the association between parental and adolescent behaviour, using the data we saved in the item `smoke.trend.2` earlier. Before we plot this, though, we need to edit this variable in the `smoke.trend.2` table, which was saved as a numeric variable (0 for those whose parents did not smoke, 1 for those who did), which unfortunately `ggplot()` cannot use. We do this by running the code: 
+
+
+\vspace{6mm}
+
+```{r smoking 20 - editing smoke.trend.2 data, eval=FALSE}
+
+smoke.trend.2$parents <- as.factor(smoke.trend.2$parsmk)
+levels(smoke.trend.2$parents) <- c("Non-smokers", "Smokers")
+
+```
+
+\vspace{6mm}
+
+This transfers the values of this into a new factor variable we label `parents` and save into the existing dataset, with the `as.factor()` function. We then rename the levels of the new factor variable with the `levels` command, to make them clearer when we label the curves in our plots. You can check that we renamed the levels correctly by printing the dataset.
+
+Once we have done this, we can plot these data. We can do this with small edits to the `ggplot()` code we wrote in the previous section.  We just need to make small edits to our code to specify that we want to graph two separate lines: one for each group of respondents defined by the behaviour they reported for their parents.This is done by adding a command in the aesthetics line specifying that we want to group respondents by our new variable `parents`. Your syntax should look like this: 
+
+
+\vspace{6mm}
+
+```{r smoking 21 - code for smoke plot with wave x parent interaction, eval=FALSE}
+
+ggplot(smoke.trend.2, aes(x = wave, y = smoke, group = parents)) + 
+  geom_line(alpha=.6, size=1) + 
+  geom_dl(aes(label=parents), alpha=.5, method=last.qp) +
+  labs(title = "Percentage of adolescents who report smoking\n by parents smoking status", 
+       y = "Proportion of smokers", 
+       x = "survey wave") + 
+  scale_y_continuous(labels = percent, limits=c(0,.3),breaks=c(.05,.15, .25)) +
+  scale_x_continuous(breaks = c(2,3,4,5), limits=c(1,7)) +
+  theme_bw() +
+  theme(axis.text = element_text(size=10), 
+        plot.title = element_text(size=10, 
+                                  face="bold", hjust=.5)) 
+
+
+```
+
+\vspace{6mm}
+
+
+The \\n in the title tells `ggplot()` to start a new line at that point in the text. You may have also noticed that the other addition to our code is we have included the `geom_dl()` function, instructing `ggplot()` to add labels to our plots using the grouping variable `parents` (along with a command ordering the labels to only appear at the end of the data series, with `method=last.qp`). For `geom_dl()` to work, we need to load the `directlabels` package. 
+
+
+```{r prep for more complex smoke plots, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(directlabels)
+
+smoke.trend.2 <- ddply(smoke.data, .(wave, parsmk), summarize, 
+        smoke = mean(smkreg))
+smoke.trend.2$parents <- as.factor(smoke.trend.2$parsmk)
+levels(smoke.trend.2$parents) <- c("Non-smokers", "Smokers")
+
+
+```
+
+
+Running this code you should get:  
+
+
+\vspace{6mm}
+
+```{r graphing smoke plot with wave x parent interaction,  echo=FALSE,  warning=FALSE, message=FALSE, fig.height=4.5, fig.width=6.5}
+
+ggplot(smoke.trend.2, aes(x = wave, y = smoke, group = parents)) + 
+  geom_line(alpha=.6, size=1) + 
+  geom_dl(aes(label=parents), method=last.qp) +
+  labs(title = "Percentage of adolescents who report smoking\n by parents smoking status", 
+       y = "Proportion of smokers", 
+       x = "survey wave") + 
+  scale_y_continuous(labels = percent, limits=c(0,.3),breaks=c(.05,.15, .25)) +
+  scale_x_continuous(breaks = c(2,3,4,5), limits=c(1,7)) +
+  theme_bw() +
+  theme(axis.text = element_text(size=10), 
+        plot.title = element_text(size=10, 
+                                  face="bold", hjust=.5))
+
+```
+
+\vspace{6mm}
+
+
+###Calculating and plotting confidence intervals 
+
+We can build on this analysis further by adding confidence intervals, which are useful as we want to provide our readers or audience with a sence of the (un)certainty in our estimates. 
+
+First, I am going to show you the hard way, then the easy way (this is good practice for learning how to program in R, and it will come in handy later). 
+
+1. We can calculate confidence intervals (for proportions) using the math:
+
+
+\vspace{6mm}
+
+```{r smoking 22 - the hard way to calculate confidence intervals, eval=FALSE}
+
+estimate <- table(smoke.data$smkreg)[2] / length(smoke.data$smkreg)
+se <- sqrt(estimate * (1-estimate) / length(smoke.data$smkreg))
+int.95 <- estimate + qnorm(c(.025,.975))*se #obtain 95% confidende intervals
+
+```
+
+\vspace{6mm}
+
+
+Here we take the proportion of respondents who said they smoked regularly in the first line, obtain the standard error for this in the second line, and convert this into 95 per cent confidence intervals in the third.
+
+
+2. We can also use the *Rmisc* package. You should have installed this already, so load it up and then run the code: 
+
+\vspace{6mm}
+
+```{r smoking 23 - the easy way to calculate confidence intervals, eval=FALSE}
+
+CI(smoke.data$smkreg , ci = 0.95)
+
+```
+
+\vspace{6mm}
+
+
+These two methods should provide you with the same results. 
+
+Once we have done this, we can add this to our `ddply()` syntax to calculate the confidence intervals for the proportion of respondents of each wave of our data who reported their parents did and did not smoke:
+
+
+\vspace{6mm}
+
+```{r smoking 25 - calculating confidence intervals for our smoking data, eval=FALSE}
+
+ddply(smoke.data, .(wave, parsmk), summarize, 
+                      smoke =  CI(smkreg , ci = 0.95)[2],
+                      upper.ci =  CI(smkreg , ci = 0.95)[1],
+                      lower.ci =  CI(smkreg , ci = 0.95)[3])
+
+```
+
+\vspace{6mm}
+
+
+We save the three sets of output from the `CI()` function separately, specified by placing the number of the output in brackets '[ ]'. Otherwise, this would produce a single, unintelligible list of figures (run this code with a single `CI()` command to see what I mean by this). Save this output as `smoke.trend.3` for graphing. 
+
+After we edit the variable for reported parental smoking behaviour (as done above), we can use our existing `ggplot()` code to graph these results. We can add the confidence intervals to our plots using the `geom_ribbon()` command. The code to do this looks like:
+
+
+\vspace{6mm}
+
+```{r smoking 26 - code for smoke plot with wave x parent interaction and 95%CIs, eval=FALSE}
+
+geom_ribbon(aes(ymin = lower.ci, ymax = upper.ci), alpha = .1) + #add confidence intervals
+
+```
+
+\vspace{6mm}
+
+
+Try running this to make sure your plot works. 
+
+We can also edit the horizontal and vertical grid lines in our graph using the theme command:
+
+\vspace{6mm}
+
+```{r smoking 26b - edit the theme for smoke plot with wave x parent interaction and CIs, eval=FALSE}
+
+theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
+panel.grid.major.y = element_line(colour="grey", size=0.4 , linetype = "dashed"),
+axis.text = element_text(size=10), 
+plot.title = element_text(size=10, face="bold", hjust=.5)) 
+
+```
+
+\vspace{6mm}
+
+
+Besides the axis and title text, which had we previously edited (shown on the third and fourth lines of the code above), we can remove the minor grid lines (here represented by `panel.grid.minor`) and the vertical lines (`panel.grid.major.x`) with the command element_blank, which instructs `ggplot()` to remove these completely. We can also edit the attributes of our major horizontal lines by documenting these in the command `element_line()`. Here, we specify their colour, size and the type of line to be used. 
+
+Doing this should provide you with a graph that looks like: 
+
+
+```{r prep for smoke plot with wave x parent interaction and CIs, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(Rmisc)
+
+
+smoke.trend.3 <- ddply(smoke.data, .(wave, parsmk), summarize, 
+                      smoke =  CI(smkreg , ci = 0.95)[2],
+                      upper.ci =  CI(smkreg , ci = 0.95)[1],
+                      lower.ci =  CI(smkreg , ci = 0.95)[3])
+
+smoke.trend.3$parents <- as.factor(smoke.trend.3$parsmk)
+levels(smoke.trend.3$parents) <- c("Non-smokers", "Smokers")
+
+```
+
+
+\vspace{6mm}
+
+
+```{r graphing smoke plot with wave x parent interaction and CIs,  echo=FALSE,  warning=FALSE, message=FALSE, fig.height=4.5, fig.width=6.5}
+
+ggplot(smoke.trend.3, aes(x = wave, y = smoke, group = parents)) + 
+  geom_line(alpha=.6, size=1) + 
+  geom_dl(aes(label=parents), method=last.qp) +
+  geom_ribbon(aes(ymin = lower.ci, ymax = upper.ci), alpha = .1) +
+  labs(title = "Percentage of adolescents who report smoking\n by parents smoking status", 
+       y = "Proportion of smokers", 
+       x = "survey wave") + 
+  scale_y_continuous(labels = percent, limits=c(0,.3),breaks=c(.05,.15, .25)) +
+  scale_x_continuous(breaks = c(2,3,4,5), limits=c(1,7)) +
+  theme_bw() +
+theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
+  panel.grid.major.y = element_line(colour="grey", size=0.4 , linetype = "dashed"),
+  axis.text = element_text(size=10), 
+  plot.title = element_text(size=10, face="bold", hjust=.5)) 
+
+```
+
+\vspace{6mm}
+
+
+###Facets
+
+
+We may want to take this exercise further to better understand our data. The real world is rarely simple. There are a number of interactions between different factors in peoples’ lives which can result in different outcomes. In this case, we believe respondents of different genders may exhibit different behaviour. We can observe this using our data, and then plot these differences using `ggplot()`, which is capable of plotting complex data cleanly and efficiently using facets. These are subplots that each display a subset of your data.  
+
+**_Task_**: Before we explore the use of facets, we will undertake an exercise to prepare the data we will be plotting. Using the methods covered so far, calculate the percentage of respondents who smoke by gender and their parents’ behavior, and calculate the confidence intervals for this. Save this into a new item called `smoke.trend.4`, and edit the parents and gender variables as we did previously. You should then obtain these results (which I have also rounded for clarity): 
+
+
+
+```{r prep for smoke plot with wave x parent x gender interaction and CIs, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(Rmisc)
+
+
+smoke.trend.4 <- ddply(smoke.data, .(wave, parsmk, sex.1.F.), summarize, 
+                      smoke =  round(CI(smkreg , ci = 0.95)[2], 2),
+                      upper.ci =  round(CI(smkreg , ci = 0.95)[1], 2),
+                      lower.ci =  round(CI(smkreg , ci = 0.95)[3], 2))
+
+smoke.trend.4$parents <- as.factor(smoke.trend.4$parsmk)
+levels(smoke.trend.4$parents) <- c("Non-smokers", "Smokers")
+
+smoke.trend.4$gender <- as.factor(smoke.trend.4$sex.1.F.)
+levels(smoke.trend.4$gender) <- c("Male", "Female")
+
+```
+
+
+\vspace{6mm}
+
+```{r smoking 27 - printing smoking by wave x parents x gender interaction}
+
+head(smoke.trend.4)
+
+```
+
+\vspace{6mm}
+
+We then use the command `facet_wrap()` to facet our plot by a single variable. The first argument of facet wrap is a formula, which we create with a tilde (~) followed by the name of the variable with which we intend to subset our data. In this context, a formula is a data structure in $R$ and not a synonym for an equation. The variable that we pass to this command should be discrete. Your code should look like:
+ 
+ 
+\vspace{6mm}
+
+```{r smoking 28 - testing out facet wrap, eval=FALSE}
+
+facet_wrap(~ gender)
+
+```
+
+\vspace{6mm}
+
+
+This can be attached to the end of the syntax for your last `ggplot()` visualisation using an addition symbol to connect the code. Remember, you will need to change the data source for the plot (and, you will also find, the limits of the y-axis). This will provide a plot that looks like: 
+
+\vspace{6mm}
+
+```{r graphing smoke plot with wave x parent x gender and CIs,  echo=FALSE,  warning=FALSE, message=FALSE, fig.height=4.5, fig.width=6.5}
+
+ggplot(smoke.trend.4, aes(x = wave, y = smoke, group = parents)) + 
+  geom_line(alpha=.6, size=1) + 
+  geom_dl(aes(label=parents), method=last.qp) +
+  geom_ribbon(aes(ymin = lower.ci, ymax = upper.ci), alpha = .1) +
+  labs(title = "Percentage of adolescents who report smoking\n by gender and parents smoking status", 
+       y = "Proportion of smokers", 
+       x = "survey wave") + 
+  scale_y_continuous(labels = percent, limits=c(0,.35),breaks=c(.05,.15, .25)) +
+  scale_x_continuous(breaks = c(2,3,4,5), limits=c(1,7)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(colour="grey", size=0.4 , linetype = "dashed"),
+    axis.text = element_text(size=10), 
+    plot.title = element_text(size=10, face="bold", hjust=.5)) +
+  facet_wrap(~ gender)
+
+```
+
+\vspace{6mm}
+
+
+The `facet_wrap()` command can also be edited a number of ways. We can allow the axes of each facet to vary, for instance, with the code:
+
+\vspace{6mm}
+
+```{r smoking 27 - facet_wrap w scales free, eval=FALSE}
+
+facet_wrap(~ gender, scales = "free")
+
+```
+
+\vspace{6mm}
+
+
+While we can allow one or the other axis to vary with `scales = free_x` or `scales = free_y`. 
+
+Additionally, if you have two variables with which you want to facet your plot by, you can do this
+with `facet_grid()`. In our case, it is a bit of a struggle to get the line labelling to fit properly, so this may be a better option. The syntax for doing this is similar to `facet_wrap()`, with the variable forming the y-axis placed to the left of the tilde in the formula, and the x-axis to the right. The code to plot our data using gender as the x-axis and reported parental behaviour the y-axis is:
+
+\vspace{6mm}
+
+```{r smoking 28 - facet_grid, eval=FALSE}
+
+facet_grid(parents ~ gender)
+
+```
+
+\vspace{6mm}
+
+
+You also want to take the labelling out of the plot, as it is no longer needed. This then gives us:
+
+\vspace{6mm}
+
+```{r graphing smoke plot with facet_grid,  echo=FALSE,  warning=FALSE, message=FALSE, fig.height=4.5, fig.width=6.5}
+
+ggplot(smoke.trend.4, aes(x = wave, y = smoke, group = parents)) + 
+  geom_line(alpha=.6, size=1) + 
+  geom_ribbon(aes(ymin = lower.ci, ymax = upper.ci), alpha = .1) +
+  labs(title = "Percentage of adolescents who report smoking\n by gender and parents smoking status", 
+       y = "Proportion of smokers", 
+       x = "survey wave") + 
+  scale_y_continuous(labels = percent, limits=c(0,.35),breaks=c(.05,.15, .25)) +
+  scale_x_continuous(breaks = c(2,3,4,5), limits=c(1,7)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(colour="grey", size=0.4 , linetype = "dashed"),
+    axis.text = element_text(size=10), 
+    plot.title = element_text(size=10, face="bold", hjust=.5)) +
+  facet_grid(parents ~ gender)
+
+```
+
+\vspace{6mm}
+
+
+If you wish to save the output from this `ggplot()` command, save it into an $R$ item called `smoke.graph.1` and run this code: 
+
+\vspace{6mm}
+
+```{r smoking 29 - save smoke graph output, eval=FALSE}
+
+pdf(file="./ smoke.graph.1.pdf", width=5, height=5)
+
+print(smoke.graph.1) 	
+
+aux <- dev.off()
+
+```
+
+\vspace{6mm}
+
+The command `pdf()` provides the file path to which we want to print `ggplot()` output as a pdf, and the dimensions for the plot. `print()` provides instructions on where to source the graph information. `aux()` closes off the command.
+
+This is also a good time to save a copy of the syntax in our editor, so that if there is a problem (or we close the program) we can come back to it later. Use the instructions above (if you haven’t already created a saved version of this file) to do so. 
+
+We can now use these methods to have some fun. Before we do, don’t forget to save the editor file again. 
+
+
+
+
+
+##Cleaning, manipulating and exploring your data
+
+\vspace{3mm}
+
+###Cleaning data 
+
+
+We are going to start with data on individual earnings in the United States. Besides earnings information, these data include the height, gender, age, education, and race and ethnicity of respondents. These data can be obtained from the file *earnings.dta* in the seminar 1-1 canvas module, in the *Earnings* sub-folder. 
+
+Like the smoking data, these were obtained from the website of Columbia University political scientist and statistician Andrew Gelman:
+
+\vspace{6mm}
+
+[http://www.stat.columbia.edu/~gelman/arm/examples/](http://www.stat.columbia.edu/~gelman/arm/examples/)
+
+\vspace{6mm}
+
+Create a new folder and save these data in it, and open a new $R$ *Markdown* editor window. Before starting, if you have not reset your computer since the last session, you may still have a data open in the $R$ environment. We want to clear our data logs. We do this with the syntax:
+
+
+\vspace{6mm}
+
+```{r earnings 1 - clear environment, eval=FALSE}
+
+rm(list=ls(all=TRUE))
+
+```
+
+\vspace{6mm}
+
+We now want to load the earnings data. This example provides us with something you will frequently encounter in the wild: data in a different format. Unlike the last example, these data were not saved as a *.csv* file, but rather in *.dta* format. This is the file format used by the statistical software *STATA*. We call the package *foreign* and then use the function `read.dta()` to load these data. Save this into a new data frame called `earnings.data` to allow us to examine it further. 
+
+
+
+```{r prep earnings data, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(foreign)
+library(car)
+
+earnings.data <- read.dta("Data/Earnings/earnings.dta")
+
+
+#recode gender
+
+earnings.data$gender <- recode(earnings.data$sex, "'2' = 'Female'; 
+                                                  '1' = 'Male'")	
+#recode age
+
+earnings.data$age <- 91 - earnings.data$yearbn 	
+
+
+```
+
+
+Using the head function to examine these data we observe: 
+
+
+\vspace{6mm}
+
+```{r earnings 1 - summary of file}
+
+head(earnings.data)
+
+```
+
+\vspace{6mm}
+
+
+We can see there are nine variables, and some of them will require cleaning if they are going to be useful.
+
+In particular, the way race is currently coded is not useful. If we make a table of the outputs for race, we can see these are simple numeric labels, with very small numbers in some instances:  
+
+\vspace{6mm}
+
+```{r earnings 2 - race table}
+
+table(earnings.data$race)
+
+```
+
+\vspace{6mm}
+
+
+Further, whether respondents identify as Hispanic is included as a separate variable. Similarly, instead of age we have year of birth (which is a less intuitive value), although it is a discrete value sex is coded numeric. Education, income and height are correctly coded as numeric. 
+
+To make these data useful, we need to transform our data so it is in format most useful for our needs. We can start with race. We load the package `car`, which provides us with the `recode()` function. We then use this to give each level (or groups of levels) more descriptive labels:
+
+
+\vspace{6mm}
+
+```{r earnings 3 - summary of file, eval=FALSE}
+
+earnings.data$race2 <- as.factor(recode(earnings.data$race, "'1'='White'; 
+       '2'='Black';
+       c('3','4')='Other';
+        '9'=NA"))
+
+```
+
+\vspace{6mm}
+
+
+
+`recode()` allows us to specify new labels more precisely than the `levels()` command we used yesterday. Although not always required, when recoding is a little more complex this function can be useful. As you can see, we wrap the recode in the `as.factor()` function, which converts this variable (which would otherwise be a character) into a factor. The difference between these two types of variables is small (they are both strings), but is important for the next step.
+
+We then want to combine the output from `hisp` to our new race variable. There are a few ways to do this, but the easiest is one that allows us to do so in two relatively simple lines of code. First we create a fourth level for the `race2` variable, labelled 'Hispanic':
+
+\vspace{6mm}
+
+```{r earnings 4 - create hispanic level, eval=FALSE}
+
+levels(earnings.data$race2)[4] <- "Hispanic"
+
+```
+
+\vspace{6mm}
+
+We then recode all observations of the variable "race2" with the new value "Hispanic" when they coincide with observations of the variable `hisp` with the value of "1":
+
+\vspace{6mm}
+
+```{r earnings 5 - recode Hispanic respondents, eval=FALSE}
+
+earnings.data$race2[earnings.data$hisp == "1"] <- "Hispanic"
+
+```
+
+\vspace{6mm}
+
+
+If you examine a table of this variable now, you should see the following values: 
+
+\vspace{6mm}
+
+```{r earnings 6 - check Hispanic recode, eval=FALSE}
+
+> table(earnings.data$race2)
+
+    Black    Other    White Hispanic 
+     201       43     1670      110 
+>
+
+```
+
+\vspace{6mm}
+
+
+This demonstrates that we have successfully relabeled 110 respondents as being Hispanic. 
+
+We also want to recode gender and age. This is relatively trivial, with the syntax below converting the numeric gender labels into strings, and with age we simply subtract 91 (the year the survey was conducted) from the year of birth (in two digit units). This can be done like this: 
+
+\vspace{6mm}
+
+```{r earnings 7 - gender and age recode, eval=FALSE}
+
+#recode gender
+
+earnings.data$gender <- recode(earnings.data$sex, "'2' = 'Female'; 
+                                                  '1' = 'Male'")	
+#recode age
+
+earnings.data$age <- 91 - earnings.data$yearbn 	
+
+
+```
+
+\vspace{6mm}
+
+
+However, there is one complication with the recoding of age. One respondent was born in 1899  (coded 99 in these data; which only include the last two digits of birth year) and is given the age of -8. We can fix this with another line of code:  
+
+
+\vspace{6mm}
+
+```{r earnings 8 - second age recode, eval=FALSE}
+
+earnings.data$age <- recode(earnings.data$age, "'-8' = '92'")
+
+```
+
+\vspace{6mm}
+
+Finally, we want to recode income into quintiles. For some of our analysis, will want to treat income as a categorical variable. We can transform the variable `earn`, which measures earnings in US dollars. with the `cut()` function. As its name suggests, this command allows us to cut a continuous variable into segments:
+
+\vspace{6mm}
+
+```{r earnings 9 - quintiles recode, eval=FALSE}
+
+earnings.data$earn.quintiles <- cut(earnings.data$earn, 
+                                    breaks=c(quantile(earnings.data$earn, 
+                                    probs = seq(0, 1, by = 0.20), na.rm=TRUE)), 
+                                    labels=c("0-20","20-40","40-60","60-80","80-100"), 
+                                    include.lowest=TRUE)
+
+```
+
+\vspace{6mm}
+
+
+From left to right, this code tells $R$ to break the earn variable into quintiles, by treating these data as a probability distribution and then placing a cut at every $20^{th}$ percentile. We also direct $R$ to allow missing data (`na.rm=TRUE`), label our data in an intuitive way and instruct it to include the lowest value (otherwise it can oddly leave it out).
+
+We also want to convert height in inches (the variable height) into quintiles using the same methods. Call the new variable `height.quintiles`.
+
+You should check all of these variables have recoded correctly using the table() command, and remember to save your editor file. 
+
+Now we can use these data to examine the relationship between different socioeconomic variables and individual earnings. 
+
+
+###Exploring our data using custom functions
+
+We are now ready to examine these data. For this exercise, we want to calculate the means and confidence intervals for earnings using the original continuous variable here.
+
+One of the great advantages of $R$ is its flexibility, which can allow us to study these data in a variety of ways. Beyond the option to download packages containing functions which increase the capabilities of this software, we can write our own functions quite easily. I am going to show you a simple example here that allows us to estimate the confidence intervals for the mean incomes of different demographic groups within `ddply`. This and similar studies are worth doing as income levels likely vary amongst different groups in society in important ways.
+
+We tell $R$ that this a new function we are creating with the code: 
+
+
+\vspace{6mm}
+
+```{r earnings 10a - specifying a function 1, eval=FALSE}
+
+calculate.95.ci.means <- function(x){}
+
+```
+
+\vspace{6mm}
+
+
+This tells $R$ that we wish to specify a new function with the name `calculate.95.ci.means`, with the code defining the function included within the braces {}. As we explore $R$ further you will find that braces are regularly used for coding new functions and for loops, with their meaning consistently concerning specific instructions for programming outputs. The code documenting the operation of the function is included within these braces. We write out this syntax within the braces, which in this instance calculates the confidence intervals for means:
+
+
+\vspace{6mm}
+
+```{r earnings 10b - specifying a function 2, eval=FALSE}
+
+  n <- table(is.na(x))[1] #the N of our data
+  estimate <- mean(x, na.rm=TRUE) #the mean value of our data
+  se <- sd(x, na.rm=TRUE) / sqrt(n) #calculate the standard error 
+  int.95 <- estimate + qt(c(.025,.975), n-1)*se #obtain 95% confidende intervals
+  result <- c(estimate, int.95) # combine estimate (mean of x) and CIs
+  return(result) #return this result
+
+
+```
+
+\vspace{6mm}
+
+
+This is like the syntax used previously to calculate the confidence intervals for proportions. However, rather than including a specific variable within the formula, we include `x`, which represents a variable that we can specify later, like any other function. 
+
+To activate this new function, run the code in your edit. Doing so should simply print the code in the command prompt, making it clear there are no errors with the prompt open for the next command: 
+
+
+
+\vspace{6mm}
+
+```{r earnings 10c - specifying a function 3, eval=FALSE}
+
+> calculate.95.ci.means <- function(x){
++   n <- table(is.na(x))[1] #the N of our data
++   estimate <- mean(x, na.rm=TRUE) #the mean value of our data
++   se <- sd(x, na.rm=TRUE) / sqrt(n) #calculate the standard error 
++   int.95 <- estimate + qt(c(.025,.975), n-1)*se #obtain 95% confidence intervals
++   result <- c(estimate, int.95)
++   return(result)
++ }
+>
+
+
+
+```
+
+\vspace{6mm}
+
+Once you have run this syntax. You can test out how well this works by running the original earn variable in your new function. Doing this should provide you with: 
+
+
+```{r prep earnings data for analysis, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(car)
+
+earnings.data$race2 <- as.factor(recode(earnings.data$race, "'1'='White'; 
+       '2'='Black';
+       c('3','4')='Other';
+        '9'=NA"))
+
+levels(earnings.data$race2)[4] <- "Hispanic"
+
+earnings.data$race2[earnings.data$hisp == "1"] <- "Hispanic"
+
+earnings.data$earn.quintiles <- cut(earnings.data$earn, breaks=c(quantile(earnings.data$earn, probs = seq(0, 1, by = 0.20), na.rm=TRUE)), 
+labels=c("0-20","20-40","40-60","60-80","80-100"), include.lowest=TRUE)
+
+earnings.data$height.quintiles <- cut(earnings.data$height, 
+                                    breaks=c(quantile(earnings.data$height, 
+                                    probs = seq(0, 1, by = 0.20), na.rm=TRUE)),
+                                    labels=c("0-19","20-39","40-59","60-79","80-99"), 
+                                    include.lowest=TRUE)
+
+calculate.95.ci.means <- function(x){
+   n <- table(is.na(x))[1] #the N of our data
+   estimate <- mean(x, na.rm=TRUE) #the mean value of our data
+   se <- sd(x, na.rm=TRUE) / sqrt(n) #calculate the standard error 
+   int.95 <- estimate + qt(c(.025,.975), n-1)*se #obtain 95% confidence intervals
+   result <- c(estimate, int.95) #combine mean with CIs
+   return(result)
+}
+
+```
+
+
+\vspace{6mm}
+
+```{r testing this function}
+
+ calculate.95.ci.means(earnings.data$earn)
+
+```
+
+\vspace{6mm}
+
+
+
+This provides us with lower and upper confidence intervals for the earnings of respondents in this dataset. 
+
+Once we have done this, we can use a modified version of the `ddply()` code from yesterday to examine and then plot average earnings (the original, continuous variable) x race (recoded) x height (quintiles). Try doing this (don’t forget to call the `plyr` package first). 
+
+Once you have done all of this, you can can visualise these results. To do this, we first need to ensure the `ggplot2` and `scales` packages are loaded. We then want to edit the data from our cross tabulations a little. Before doing this, save them in the item `earnings_race.height_means` and reorder race by earnings, and rename the levels for variable `height.quintiles` to make sure the labels of your plots are intuitive. This can be done with the syntax: 
+
+
+\vspace{6mm}
+
+```{r earnings 11 - specifying a function 3, eval=FALSE}
+
+#reorder race categories by earnings
+  
+earnings_race.height_means$race2 <- reorder(earnings_race.height_means$race2,
+                                            earnings_race.height_means$mean) 
+
+
+#rename height quintile levels
+
+levels(earnings_race.height_means$height.quintiles) <- c("Shortest quintile",
+                                                         "20-40th percentile",
+                                                         "40-60th percentile",
+                                                         "60-80th percentile",
+                                                         "Tallest quintile") 
+
+
+```
+
+\vspace{6mm}
+
+
+Then we plot these data. There are some differences to the code we used previously, though. Here we create a dot plot with `geom_point` since our x-axis is discrete, rather than continuous. We also use `geom_errorbar` to plot the confidence intervals. Finally, since one of these confidence intervals falls below zero, we control the plot limits with `coord_cartesian` rather than the limits command in `scale_x`. Your code should look like:
+
+
+\vspace{6mm}
+
+```{r earnings 12 - creating earnings by race x height plot, eval=FALSE}
+
+ggplot(earnings_race.height_means, aes(x = race2, y = mean)) + 
+  geom_point(alpha=.6, size=1, group=1) + 
+  geom_errorbar(aes(ymin = lower.ci, ymax = upper.ci), width=0, alpha = .1, group=1) + 
+  labs(title = "Average income by height and race", 
+       y = "Mean annual earnings", 
+       x = "Race and ethnicity") + 
+  scale_y_continuous(labels = dollar) + 
+  coord_cartesian(ylim = c(0,60000)) + 
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(), 
+    panel.grid.major.y = element_line(colour="grey", size=0.4, linetype = "dashed"),
+    axis.text.x = element_text(size=10, angle=90, hjust=1, vjust=.5), 
+    axis.text.y = element_text(size=10), 
+    plot.title = element_text(size=14, face="bold", hjust=.5)) + 
+  facet_wrap(~ height.quintiles, nrow = 1) 
+
+```
+
+\vspace{6mm}
+
+
+As its name suggests, the function `geom_errorbar()` within our code creates error bars for our confidence intervals. Within the `aes()` command in this line of code, we specify the data that provides the bounds of the confidence intervals with `ymin` and `ymax` (if creating horizontal error bars, we would use the command `geom_errorbarh()` and `xmin` and `xmax`). In this line of code we also add information on the width and opacity of our error bars. 
+
+Previously we used the `scale_y_continuous()` command to label our y-axis as percentages (which is enabled with the scales package we loaded earlier). We now use the same command to label this axis as dollars. Previously we also used this line of code to set the limits of the y-axis. This time we do so using the `coord_cartesian()` command. Both are fine most of the time. The latter is advantageous when we have confidence intervals that are so far outside the bounds of the rest of our data we want to cut them off at some point (see how other goes off below zero at the lower bounds of our plot? If we do this with `scale_y_continuous()` it will delete this error bar entirely; see what I mean by experimenting with the limits of your plot using both lines of code).
+
+Additionally, you may have observed that I have placed the y-axis labels on a 90 degree angle.   We need to do this, to ensure the text fits. Further, in the `facet_wrap()` command, we set `nrow=1` to specify that all panels be placed on a single row, making in easier to compare the earnings of different population groups. 
+ 
+ 
+When you run this code, your plot should look like:
+
+
+
+```{r prep earnings data by race and height, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(plyr)
+library(ggplot2)
+library(scales)
+
+earnings_race.height_means <- na.omit(ddply(earnings.data, .(race2, height.quintiles), summarize, 
+                      mean =  calculate.95.ci.means(earn)[1],
+                      upper.ci =  calculate.95.ci.means(earn)[2],
+                      lower.ci =  calculate.95.ci.means(earn)[3]))
+  
+earnings_race.height_means$race2 <- reorder(earnings_race.height_means$race2, earnings_race.height_means$mean) #reorder race categories by earnings
+
+levels(earnings_race.height_means$height.quintiles) <- c("Shortest quintile","20-40th percentile","40-60th percentile","60-80th percentile","Tallest quintile") #rename height quintile levels
+
+```
+
+
+\vspace{6mm}
+
+```{r graphing earnings plot by race x height,  echo=FALSE,  warning=FALSE, message=FALSE, fig.height=4.5, fig.width=7.5}
+
+ggplot(earnings_race.height_means, aes(x = race2, y = mean)) + 
+  geom_point(alpha=.6, size=1) + 
+  geom_errorbar(aes(ymin = lower.ci, ymax = upper.ci), width=0, alpha = .1) + 
+  labs(title = "Average income by height and race", y = "Mean annual earnings", x = "Race and ethnicity") + 
+  scale_y_continuous(labels = dollar) + 
+  coord_cartesian(ylim = c(0,60000)) + 
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(), 
+   panel.grid.major.y = element_line(colour="grey", size=0.4, linetype = "dashed"),
+axis.text.x = element_text(size=10, angle=90, hjust=1, vjust=.5), axis.text.y = element_text(size=10), plot.title = element_text(size=14, face="bold", hjust=.5)) +
+facet_wrap(~ height.quintiles, nrow = 1) 
+
+```
+
+\vspace{6mm}
+
+
+What does this tell us? 
+
+**_Task_**: Repeat this analysis for earnings:
+
+- by gender.
+- by gender x race and ethnicity (recoded).
+- by height (in quintiles) x gender. 
+
+
+\vspace{3mm}
+
+###Exploring our data further using more complex functions
+
+Why do average incomes vary for different groups? It may be that some groups have lower earnings simply because the individuals belonging to that group are disproportionately distributed at the lower end of the income scale. However, distributions of earnings by population group may not follow a normal distribution. There may be monotonic patterns. We can work to understand this by repeating the above exercise using the discrete variable for income we created earlier; calculating the proportions of respondents from different demographic group in each earnings quintile. 
+
+We begin this process by examining a basic way to write the code for a function to calculate 95 per cent confidence intervals for proportions. The syntax for this process is similar to the function documented in the previous section, with a notable difference. Besides specifying an input $x$ for the function, we also specify input $j$. If you read through the syntax below, you can see this tells the function we want to examine the $j^{th}$ output of table command for $x$:  
+
+
+\vspace{6mm}
+
+```{r earnings 13 - creating a function for confidence intervals for proportions, eval=FALSE}
+
+calculate.95.ci.prop <- function(x, j){ #how the function reads
+  estimate <- table(x)[j] / sum(table(x)) #the proportion
+  se <- sqrt(estimate * (1-estimate) / length(x)) #calculate the standard error 
+  int.95 <- estimate + qnorm(c(.025,.975))*se #obtain 95% confidence intervals
+  result <- c(estimate, int.95) #combine estimate with CIs
+  return(result) #return the results of the function
+}
+
+```
+
+\vspace{6mm}
+
+
+In this context, the $j^{th}$ output of $x$ is the earnings quintile with which we wish to calculate the outcome of (the return command struggles with printing the confidence intervals for multiple groups at once without more complex coding, which we will undertake shortly). To test this function, first we need to run it, and then we can use it with the syntax: 
+
+
+```{r prep function for confidence intervals of proportions, echo=FALSE,  warning=FALSE, message=FALSE}
+
+calculate.95.ci.prop <- function(x, j){ #how the function reads
+  estimate <- table(x)[j] / sum(table(x)) #the proportion
+  se <- sqrt(estimate * (1-estimate) / sum(table(x)))  #calculate the standard error 
+  int.95 <- estimate + qnorm(c(.025,.975))*se #obtain 95% confidence intervals
+  result <- c(estimate, int.95)
+  return(result) #return the results of the function
+}
+
+```
+
+
+
+\vspace{6mm}
+
+```{r earnings 14 - testing our function for confidence intervals for proportions}
+
+calculate.95.ci.prop(earnings.data$earn.quintiles, 1)
+
+```
+
+\vspace{6mm}
+
+
+This tells $R$ that we wish to run the function using the `earn.quintiles` variable from `earnings.data`, with the first quintile specified as the one for which we wish to calculate confidence intervals. These results indicate that our data estimates 20 per cent of the sample are in the lowest earnings quintile (the obvious result), the lower bound of our 95 per cent confidence interval is 19 per cent, and the upper bound 23 per cent. We can examine the outputs for different quintiles by changing the number after the commas, commanding our function to print the proportion for a different group (in this case, corresponding to an earnings quintile). 
+
+This function merely provides us with a mass of numbers. It also requires us to examine one quintile at a time. When we are using this function, we really want the proportion of respondents in every group. We can have our function print this out also, with a few additions to the code: 
+
+
+
+\vspace{6mm}
+
+```{r earnings 14 - creating a more complex function for confidence intervals for proportions, eval=FALSE}
+
+calculate.95.ci.prop <- function(x){ 
+  estimate <- table(x) / sum(table(x)) 
+  se <- sqrt(estimate * (1-estimate) / sum(table(x))) 
+  uci <- estimate + qnorm(.975)*se #obtain upper 95% confidence intervals
+  lci <- estimate + qnorm(.025)*se #obtain lower 95% confidence intervals
+  int.95 <- data.frame(levels(x)) #create a new data frame based on the levels in x
+  
+  #then bind the estimate (the proportions of x) with the lci and uci 
+  #and add to our new data frame
+  int.95[,c(2:4)] <- cbind(estimate,lci,uci) 
+  
+  #rename the columns of our data frame
+    #useful when we print out our results
+  
+  names(int.95) <- c("Categories", "Proportion", "Lower CI", "Upper CI") 
+  return(int.95) #return the results of the function
+}
+
+```
+
+\vspace{6mm}
+
+
+This new syntax calculates the upper and lower quintiles separately, and then binds them with the estimate for the proportions of each group in a new data frame, which is relabelled and then printed. This should provide you with the output:
+
+
+
+```{r prep more complex function for confidence intervals of proportions, echo=FALSE,  warning=FALSE, message=FALSE}
+
+calculate.95.ci.prop <- function(x){ 
+  estimate <- table(x) / sum(table(x)) 
+  se <- sqrt(estimate * (1-estimate) / sum(table(x))) 
+  uci <- round(estimate + qnorm(.975)*se,2) #obtain upper 95% confidence intervals
+  lci <- round(estimate + qnorm(.025)*se,2) #obtain lower 95% confidence intervals
+  int.95 <- data.frame(levels(x)) #create a new data frame based on the levels in x
+  int.95[,c(2:4)] <- cbind(round(estimate,2),lci,uci) #bind the estimate (the proportions of x) with the lci and uci and add to our new data frame
+  names(int.95) <- c("Categories", "Proportion", "Lower CI", "Upper CI") #rename the columns of our data frame (this comes in useful when we print out our results
+  return(int.95) #return the results of the function
+}
+
+```
+
+\vspace{6mm}
+
+```{r test more complex function for confidence intervals of proportions}
+
+calculate.95.ci.prop(earnings.data$earn.quintiles)
+
+
+```
+
+\vspace{6mm}
+
+One difference between my output and the output you ontain is that mine is rounded. Experiment with the code to obtain the same, rounded results I have here.
+
+\vspace{3mm}
+
+**_Task_**: Once we have our function for calculating the proportions and their 95 per cent confidence intervals working, use the `ddply()` command -- based on the syntax provided above -- to calculate the proportions and confidence intervals for each of our earnings quintiles:
+
+- by height (in quintiles).
+- by gender.
+- by race (recoded).
+- by height x gender. 
+- by race x height.
+
+
+\vspace{3mm}
+
+For earnings quintiles by height quintiles you should obtain the results (for the first and last five categories):
+
+
+\vspace{6mm}
+
+```{r print proportions of respondents in earnings quintiles by height}
+
+head(ddply(earnings.data, .(height.quintiles), summarize,
+              earnings = calculate.95.ci.prop(earn.quintiles)[,1],
+              proportion = calculate.95.ci.prop(earn.quintiles)[,2],
+              lci = calculate.95.ci.prop(earn.quintiles)[,3],
+              uci = calculate.95.ci.prop(earn.quintiles)[,4]))
+
+
+```
+
+\vspace{6mm}
+
+Once you have completed these tasks, what do you infer from your findings? Some of these cross-tabulations, printed with confidence intervals, are a little confusing, right?  We can more clearly interpret our findings by once again visualising them with `ggplot()`. 
+
+First, we might benefit by grouping all non-White respondents together, as clearly these groups have such a small number of observations that we cannot make any strong claims about their earnings (based on their height) from these data. Let us recode `race2` so that it just includes categories for 'White' and 'Other'. Name this new variable `race3`. Re-run the tabulation for `earnings x race x height` with this new, recoded race variable. We then need to clean the output of our analysis, modifying the level names for race and ethnicity, and do the same for earnings:
+
+
+\vspace{6mm}
+
+```{r earnings 15 - cleaning analysis data, eval=FALSE}
+
+#rename height quintile levels
+
+levels(earnings_race.height_props$height.quintiles) <- c("Shortest quintile",
+                                                         "20-40th percentile",
+                                                         "40-60th percentile",
+                                                         "60-80th percentile",
+                                                         "Tallest quintile") 
+
+
+#rename earnings quintile levels
+
+levels(earnings_race.height_props$earnings) <- c("Lowest earnings quintile",
+                                                 "20-40th percentile",
+                                                 "40-60th percentile",
+                                                 "60-80th percentile",
+                                                 "Highest quintile") 
+
+```
+
+\vspace{6mm}
+
+
+Then, we plot these data using the code:
+
+
+\vspace{6mm}
+
+```{r earnings 16 - plotting earnings by race x height, eval=FALSE}
+
+ggplot(earnings_race.height_props, aes(x = earnings, y = proportion)) + 
+  geom_point(alpha=.6, size=1, group=1) + 
+  geom_errorbar(aes(ymin = lci, ymax = uci), width=0, alpha = .1, group=1) + 
+  labs(title = "Distribution of individual annual earnings\n by height and race", 
+       y = "Proportion in each quintile", 
+       x = "Earnings quintile") + 
+  scale_y_continuous(labels = percent, breaks = c(.2,.4)) + 
+  coord_cartesian(ylim = c(0,.5)) + 
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(), 
+        panel.grid.major = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.text.x = element_text(size=10, angle=90, hjust=1, vjust=.5), 
+        axis.text.y = element_text(size=10), 
+        plot.title = element_text(size=14, face="bold", hjust=.5)) +
+facet_grid(height.quintiles ~ race3) 
+
+```
+
+\vspace{6mm}
+
+
+With this code, I have made earnings the x-axis and the proportion of each group in each earnings quintile the y-axis. Using `scale_y_continuous()` I have labelled the y-axis as percentages, and specified the axis breaks. I have used `coord_cartesian()` to set the y-axis limits, and in `theme()` I have removed the y-axis lines, and the x-axis title. Using `facet_grid()` I have specified that this visualisation is a grid of plots, with the y-axis race and the x-axis height.
+
+
+
+\vspace{3mm}
+
+**_Task_**: Once you have graphed these data, what do you find? Are the race/ethnicity categories ordered correctly? Does anything else need to be done?
+
+\vspace{3mm}
+
+
+
+We can reorder the levels of the variable for race and ethnicity using the syntax: 
+
+
+\vspace{6mm}
+
+```{r earnings 17 - reorder race, eval=FALSE}
+
+earnings_race.height_props$race3 <- factor(earnings_race.height_props$race3, 
+                                           c("White", "Other"), order=TRUE)
+
+```
+
+\vspace{6mm}
+
+
+This tells R that this variable is a factor, and indicates the order levels should be arranged. After running this code, your plot should now look like:
+
+
+
+
+
+
+```{r prep earnings by race x height quintiles, echo=FALSE,  warning=FALSE, message=FALSE}
+
+
+earnings.data$race3 <- recode(earnings.data$race2, "'White'='White'; 
+       c('Black','Hispanic','Other') = 'Other'")
+
+
+earnings_race.height_props <- na.omit(ddply(earnings.data, .(race3, height.quintiles), summarize,
+              earnings = calculate.95.ci.prop(earn.quintiles)[,1],
+              proportion = calculate.95.ci.prop(earn.quintiles)[,2],
+              lci = calculate.95.ci.prop(earn.quintiles)[,3],
+              uci = calculate.95.ci.prop(earn.quintiles)[,4]))
+
+earnings_race.height_props$race3 <- factor(earnings_race.height_props$race3, c("White", "Other"), order=TRUE)
+
+levels(earnings_race.height_props$height.quintiles) <- c("Shortest quintile","20-40th percentile","40-60th percentile","60-80th percentile","Tallest quintile")  
+	
+levels(earnings_race.height_props$earnings) <- c("Lowest earnings quintile","20-40th percentile","40-60th percentile","60-80th percentile","Highest quintile") 
+
+```
+
+
+\vspace{6mm}
+
+```{r graphing proportion of respondents in earnings quintiles by race x height,  echo=FALSE,  warning=FALSE, message=FALSE, fig.height=10, fig.width=5}
+
+ggplot(earnings_race.height_props, aes(x = earnings, y = proportion)) + 
+  geom_point(alpha=.6, size=1, group=1) + 
+  geom_errorbar(aes(ymin = lci, ymax = uci), width=0, alpha = .1, group=1) + 
+  labs(title = "Distribution of individual annual earnings\n by height and race", 
+       y = "Proportion in each quintile", 
+       x = "Earnings quintile") + 
+  scale_y_continuous(labels = percent, breaks = c(.2,.4)) + 
+  coord_cartesian(ylim = c(0,.5)) + 
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(), 
+        panel.grid.major = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.text.x = element_text(size=10, angle=90, hjust=1, vjust=.5), 
+        axis.text.y = element_text(size=10), 
+        plot.title = element_text(size=14, face="bold", hjust=.5)) +
+facet_grid(height.quintiles ~ race3) 
+
+```
+
+\vspace{6mm}
+
+
+You can then edit your plot further so that it represents your data in the way that you believe it is best. 
+
+We are now ready to examine other ways data may be cleaned and modified. Before we move on, you should save your editor file once again. 
+
+
+\vspace{3mm}
+
+##Reshaping data
+
+Beyond the simple cleaning of data, frequently the format in which we are provided information is not conducive for exploratory data analysis, or for the use a desired statistical method. The `reshape2` package, which we will use in this section, provides useful functionality to avoid having to hack data around in a spreadsheet prior to importing into $R$ for analysis.
+
+To examine this package and its functions, we return to the smoking data we looked at previously. In these data, respondents were surveyed repeatedly over six waves. When we examined these data yesterday, we looked at the proportion of adolescents that responded to our survey in each wave that (said they) smoked. 
+
+There are a few different ways to examine this kind of repeated measures. Here, we are going to look at reshaping our data to examine it. This is not necessarily the most efficient way to do this, but it provides us with an opportunity to practice the functions for the `reshape2`. 
+
+Start by reopening the editor file you created (and saved) when we examined the adolescent smoking data. We want to clear our data logs. Again, we do this with the syntax:
+
+
+\vspace{6mm}
+
+```{r smoking B1 - clear logs, eval=FALSE}
+
+rm(list=ls(all=TRUE))
+
+
+```
+
+\vspace{6mm}
+
+
+Scroll to the bottom of this *markdown* file, and create a marker in the page (outside of $R$ chunks) to designate that we are beginning a new analysis with these data like this:
+
+\vspace{6mm}
+
+```{r smoking B2 - set marker, eval=FALSE}
+
+## Reshaping these data
+
+
+```
+
+\vspace{6mm}
+
+If this was within standard $R$ code, it would not be run. $R$ does not run a hash as code, nor anything on a line after a hash, making it perfect for notes and markers. In *Markdown*, a hash (`#`) prior to a line of text represents a heading. It bookmarks your page (see the pull down window below the editor) and when you print a *Markdown* file, it is printed as a heading. There are levels of headings. One hash is the highest and three the lowest. These are represented by different sized fonts when you print your output. 
+
+Once you have done this, load the `reshape2` package, which you should have already installed on your computer. 
+
+As you may recall, currently these data look like:
+
+
+\vspace{6mm}
+
+```{r examine smoking data}
+
+head(smoke.data, 10)
+
+
+```
+
+\vspace{6mm}
+
+The six waves in these data are defined by a variable. We can use the `cast` function from the `reshape2` package to 'cast' data into a different shape. In this example, we are melding our data so that rather than respondents being repeated across multiple rows, each row of our data will represent a distinct respondent, with a separate variable for their response for each wave. 
+
+The `cast` formula has the format: 
+
+\vspace{3mm}
+
+\begin{center}
+
+$x \sim y$
+
+\end{center}
+
+\vspace{3mm}
+
+There are two possible options for the `cast` function: `acast()`, which creates a vector/matrix/array output (which can have multiple dimensions); or `dcast()`, which creates data frame output (which can have at most two dimensions). We can run this function to create a new data frame with the following code: 
+
+```{r loading reshape2, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(reshape2)
+
+
+```
+
+
+\vspace{6mm}
+
+```{r smoking B3 - dcast, eval=FALSE}
+
+dcast(smoke.data, newid ~ wave, value.var="smkreg", na.rm=TRUE)
+
+
+```
+
+\vspace{6mm}
+
+
+From left to right, we specify the data frame we wish the cast, the variable(s) that make up the x-axis, and the variable(s) that make up the y-axis. When we run those code it produces the following dataset (showing the first six observations only): 
+
+
+\vspace{6mm}
+
+```{r testing dcast}
+
+head(dcast(smoke.data, newid ~ wave, value.var="smkreg", na.rm=TRUE))
+
+
+```
+
+\vspace{6mm}
+
+This shows a variable that identifies our respondents, and one each for the six waves of the survey. We can add the other variables from our original by adding these variables to the left of the tilde. Doing this and then examining the first rows of our data provides us with:
+
+\vspace{6mm}
+
+```{r testing dcast 2}
+
+smoke.data2 <- dcast(smoke.data, 
+                     newid + parsmk + sex.1.F. ~ wave, value.var="smkreg", na.rm=TRUE)
+head(smoke.data2)
+
+
+```
+
+\vspace{6mm}
+
+
+When doing this, the order of the variables makes a difference. The first varies slowest, and the last fastest. 
+
+There are several special commands you can also use: '...' represents all other variables not used in the formula and '.' represents no variable, so you can also write the formula for our second run of the cast function $... \sim y$.
+
+You may occasionally use the `cast()` function, but it is highly likely you will use its alternative from the `reshape2` package, the `melt()` function, more regularly. It is highly likely that you will obtain panel data -- like that contained in our surveys on adolescent smoking behaviour -- that has been collected as waves, and with each of the waves entered as a separate column in the dataset. When this occurs, and we want to study these data as we did yesterday, we need to manipulate the data so that it is in the format I provided you the data in originally (in case you were wondering, it did and it had already been manipulated). 
+
+The `melt()` function enables this, by allowing you to 'melt' data so that each row becomes a unique id-variable combination, taking data in wide format and stacks a set of columns into a single column of data. A way to picture this is to examine the first six rows of the newly created `smoke.data2`:
+
+
+\vspace{6mm}
+
+```{r data before melting}
+
+head(smoke.data2)
+
+```
+
+\vspace{6mm}
+
+To make use of the `melt()` function we specify the data frame, the id variable(s), which is left at its existing setting, and the measured variable(s), which are the columns of data to be stacked. The default assumption on measured variables is that it is all columns not specified as id variables (unless otherwise identified). For `smoke.data2` this would be:
+
+\vspace{6mm}
+
+```{r earnings 18 - melting earnings data, eval=FALSE}
+
+melt(smoke.data2, id.vars = "newid", measure.vars = c("1", "2", "3", "4", "5", "6"))
+
+```
+
+\vspace{6mm}
+
+With `newid` specified as our id variable and the recorded smoking behaviour from the six waves of the survey the measure variables. We indicate the latter only because we want to leave `parmsk` and `sex.1.F` out of our new melted dataset for the time being. 
+
+
+```{r prep melted data, echo=FALSE,  warning=FALSE, message=FALSE}
+
+smoke.data3 <- melt(smoke.data2, id.vars = "newid", measure.vars = c("1", "2", "3", "4", "5", "6"))
+
+```
+
+We save this melted data into a new item we name `smoke.data3` and then examine the first six rows. This gives us: 
+
+\vspace{6mm}
+
+```{r view melted data}
+
+head(smoke.data3)
+
+```
+
+\vspace{6mm}
+
+With all observations of smoking behaviour from each of the six waves stacked on each other in the column labelled value, the original labels of the six variables stacked included under `variable`, and `newid` retained in its original format (although now respondents are repeated six times on different rows, once for each of their values recorded in the now stacked wave variables). 
+
+Using these functions, you can reshape just about any data from the (often sub-optimal) format you will often receive it in, into a more efficient arrangement for analysis. 
+
+
+##If you need additional assistance
+
+These additional tasks are not compulsory. They are designed to help those of you without prior experience with $R$ or the methods we are covering in this unit. They will not be set every session; just for some of the early seminars to help you get up to speed and make sure you pass the unit. **Work through these exercises at your own pace to familiarise yourself with these methods.** If you are finding something difficult, please contact us and arrange a time to speak with us. Details are available **[on canvas](https://canvas.sydney.edu.au/courses/2452/pages/unit-information#teachingteam)**.
+
+We will also offer some additional support next week for those who wish to receive further revision.
+

@@ -1,0 +1,70 @@
+---
+title: "Lab 3-2 Solution"
+output: html_notebook
+---
+
+```{r load library}
+library(foreign)
+library(plyr)
+library(ggplot2)
+library(scales)
+library(car)
+library(arm)
+library(reshape2)
+```
+
+# COMPAS (Correctional Offender Management Profiling for Alternative Sanctions) Data
+```{r transform data}
+# Traning data
+compas.data <- read.csv("./Data/compas.csv") 
+# Test data
+compas.data2 <- read.csv("./Data/compas.data2.csv")
+library(pscl)
+
+compas.data$juv_fel_count_cat <- as.character(car::recode(compas.data$juv_fel_count,
+                                                         "c(0,1,2) = 'less';
+                                                          c(3,4,5,6,9,10,13) = 'greater';
+                                                         "))
+compas.data2$juv_fel_count_cat <- as.character(car::recode(compas.data2$juv_fel_count,
+                                                         "c(0,1,2) = 'less';
+                                                          c(3,4,5,6,9,10,13) = 'greater';
+                                                         "))
+```
+
+## Logistic Regression Model from Training Data
+```{r Logistic Regression Model}
+recid.model.1 <- glm(formula = recid ~ race + sex + age_cat + charge_severity + priors_count + juv_fel_count + 
+juv_misd_count + juv_other_count, family = binomial(link = "logit"), data = compas.data)
+
+display(recid.model.1)
+hitmiss(recid.model.1)
+
+```
+
+
+
+
+## Testing Model with Testing Data
+```{r Testing Model with Testing Data}
+compas.data2$pr1 <- invlogit(predict(recid.model.1, compas.data2))
+
+#reoffending above .5 as one, and below .5 as zero,
+compas.data2$pr2 <- ifelse(compas.data2$pr1 > .5, 1, 0)
+print(prop.table(table(compas.data2$recid, compas.data2$pr2), 2))
+# 37.1% of defendants the model predicts will reoffend, did not actually do so.
+
+#By race
+print(prop.table(table(compas.data2$race,compas.data2$pr2), 1))
+#accuracy by race
+print(ddply(compas.data2, .(race), summarize,value = prop.table(table(recid, pr2), 2)))
+
+melt(prop.table(table(compas.data2$recid, compas.data2$pr2), 2))
+table(compas.data2$recid, compas.data2$pr2)
+#By age
+(prop.table(table(compas.data2$age_cat,compas.data2$pr2), 1))
+#accuracy by age
+ddply(compas.data2, .(age_cat), summarize,
+      value = prop.table(table(recid, pr2), 2))
+
+```
+

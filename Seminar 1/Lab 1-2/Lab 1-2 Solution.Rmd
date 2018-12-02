@@ -1,0 +1,218 @@
+---
+title: "Lab 1-2 Solution"
+author: "Kun Zhang"
+date: "3 December 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Dow Jones Data
+```{r initialize}
+dow.data <- read.csv("Data/Dow/Dow30.csv")
+names(dow.data)[2:31] <- c("Apple","American Express","Boeing","Caterpillar",
+                            "Cisco","Chevron","Coca-Cola","DowDuPont",
+                            "Exxon Mobil","General Electric", "Goldman Sachs",
+                            "Home Depot Inc","IBM","Intel","Johnson & Johnson",
+                            "JPMorgan Chase","McDonalds","3M Company","Merck",
+                            "Microsoft Corporation","Nike","Pfizer",
+                            "Procter & Gamble","Travelers Companies Inc",
+                            "UnitedHealth","United Technologies","Visa","Verizon",
+                            "Wal-Mart","Walt Disney")
+
+#head(dow.data)
+
+```
+
+## Example: ggplot data preprocessing
+```{r example ggplot data preprocessing}
+library(reshape2)
+# melt() melts wide-format data into long-format data; measured variable(s) are the columns of data to be stacked
+dow.data.2 <- melt(dow.data, id.vars = "Date",
+                    measure.vars = c("Apple", "American Express", "Boeing",
+                    "Caterpillar", "Cisco", "Chevron"))
+
+# format date for ggplot
+dow.data.2$Date.2 <- as.Date(dow.data.2$Date, "%d/%m/%y")
+
+#rename
+names(dow.data.2)[names(dow.data.2) == 'variable'] <- 'Company' 
+names(dow.data.2)[names(dow.data.2) == 'value'] <- 'Value' 
+```
+
+## Example: ggplot basics
+```{r example ggplot}
+library(ggplot2)
+library(scales)
+
+#aes(x=, y=) define variables to be plotted
+#geom_line() defines line plot features
+#breaks=3 breaks the axis into 3
+#labels=dollar adds dollar signs
+ggplot(dow.data.2, aes(x=Date.2, y=Value, colour=Company)) + 
+  geom_line(alpha=.6, size=1) +
+  labs(title="Value of Dow30", 
+       x="Date",
+       y="Value of stocks") +
+  scale_x_date(labels=date_format("%b-%Y"),breaks=pretty_breaks(13)) +
+  scale_y_continuous(labels=dollar) +
+  theme_bw() +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size=10, face="bold", hjust=.5))
+
+
+```
+
+## Example: ggplot plotting by group
+```{r ggplot plotting by group}
+library(ggplot2)
+library(scales)
+
+#reorder() Reorder Levels of a Factor;The "default" method treats its first argument as a categorical variable, and reorders its levels based on the values of a second variable, usually numeric
+#this is to be used if we want the multiple plots to be placed in ascending order based on their values
+dow.data.2$Company <- reorder(dow.data.2$Company, dow.data.2$Value) 
+
+#aes(x=, y=) define variables to be plotted
+#geom_line() defines line plot features
+#breaks=3 breaks the axis into 3
+#labels=dollar adds dollar signs
+ggplot(dow.data.2, aes(x=Date.2, y=Value, colour=Company)) + 
+  geom_line(alpha=.6, size=1) +
+  labs(title="Value of Dow30", 
+       x="Date",
+       y="Value of stocks") +
+  scale_x_date(labels=date_format("%b-%Y"),breaks=pretty_breaks(3)) +
+  scale_y_continuous(labels=dollar) +
+  theme_bw() +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size=10, face="bold", hjust=.5),
+        legend.position = "none") +
+  facet_wrap( ~ Company) # plot for each Company
+```
+
+***
+
+# Public Opinion Data
+```{r initalize}
+library(dplyr)
+load("./Data/Midterm elections/us_data.Rdata")
+```
+
+## Example: for loop
+```{r example for loop}
+
+# initialize object: empty 7*1 matrix
+us.issue.attitudes <- data.frame(matrix(nrow = 7, ncol = 1))
+
+# quo() quosure/quotation  function captures R code without evaluation, just like expr() and quote()
+issues = c(quo(us.data$fracking), quo(us.data$subsidise.renewables),
+           quo(us.data$fewer.migrants), quo(us.data$tariffs),
+           quo(us.data$tax.cuts.for.bus), quo(us.data$rich.poor.diffs),
+           quo(us.data$spend.more.infrastructure))
+
+# Calculate Proportion
+#<quosure> is referenced as [[]]
+for(i in 1:7){
+  us.issue.attitudes[i,] <- us.data %>%
+  dplyr::group_by(!!issues[[i]]) %>%  # !! takes a single quosure/expression, evaluates it, and inlines the result; same as eval() 
+  dplyr::summarise(sum.val = sum(weights)) %>%
+  mutate(proportion = (sum.val / sum(sum.val)) * 100) %>%
+  dplyr::select(-sum.val) %>%
+  na.omit() %>%
+  rename("response"= names(.)[1]) %>%
+  subset(., response == "Strongly agree" | response == "Agree") %>% #only count toward agrees
+  summarise(proportion = sum(proportion)) %>%
+  dplyr::select(proportion)
+}
+
+# Reformat Result
+us.issue.attitudes <- us.issue.attitudes %>%
+rename("All voters"= names(.)[1]) %>%
+mutate(issues = c("Permit more fracking",
+  "Subsidies for renewable energy sources",
+  "America should accept fewer immigrants",
+  "Tariffs on imports from China will help the economy",
+  "Tax cuts for businesses help grow the economy",
+  "Differences between rich and poor have become too large",
+  "Instead of cutting taxes, government should spend more on infrastructure"))
+
+print(us.issue.attitudes)
+```
+
+## Analysis: Voter Attitude Issues by Party
+Must run the codes above.
+```{r Analysis: Voter Attitude Issues by Party}
+
+# initialize object
+us.issue.attitudes.vote <- data.frame(matrix(nrow = 2, ncol = 7)) #two parties 7 issues
+
+
+for(i in 1:7){
+  us.issue.attitudes.vote[,i] <- us.data %>%
+  dplyr::group_by(vote, !!issues[[i]]) %>%    # !! takes a single expression, evaluates it, and inlines the result 
+  dplyr::summarise(sum.val = sum(weights)) %>%
+  mutate(proportion = (sum.val / sum(sum.val)) * 100) %>%
+  dplyr::select(-sum.val) %>%
+  na.omit() %>%
+  rename("response"= names(.)[2]) %>%
+  subset(c(response == "Strongly agree" | response == "Agree") & c(vote=="Republican"|vote=="Democratic")) %>%
+  dplyr::group_by(vote) %>% 
+  summarise(proportion = sum(proportion)) %>%
+  dplyr::select(proportion)
+}
+
+print(us.issue.attitudes.vote)
+
+
+# Add Labels
+us.issue.attitudes.vote <-data.frame(t(us.issue.attitudes.vote)) %>% # t() means transpose
+  setNames(c("Democratic", "Republican")) %>%
+  mutate(issues = c("Permit more fracking",
+  "Subsidies for renewable energy sources",
+  "America should accept fewer immigrants",
+  "Tariffs on imports from China will help the economy",
+  "Tax cuts for businesses help grow the economy",
+  "Differences between rich and poor have become too large",
+  "Instead of cutting taxes, government should spend more on infrastructure"))
+print(us.issue.attitudes.vote)
+
+# Merge with us.issue.attitudes (All voters)
+us.issue.attitudes.vote.tabs <- merge(us.issue.attitudes, us.issue.attitudes.vote, by ="issues") # merge by matching "issues"
+print(us.issue.attitudes.vote.tabs)
+```
+
+## Plotting: Voter Attitude Issues by Party
+```{r Plotting: Voter Attitude Issues by Party}
+library(reshape2)
+library(ggplot2)
+
+us.issue.attitudes.vote.tabs.2 <- us.issue.attitudes.vote.tabs %>%
+  melt(., id.vars= "issues") %>%
+  mutate(issues = reorder(issues, value)) %>%
+  subset(.,variable == "Democratic" | variable == "Republican" | variable == "All voters")
+
+# Plot Issues by Party Percentage
+ggplot(us.issue.attitudes.vote.tabs.2,
+       aes(x=value/100, y=issues, colour=variable)) +
+  geom_point() + 
+  labs(x = 'Percentage who agreed or strongly agreed' ) +
+  scale_x_continuous(labels = percent) +
+  scale_color_manual(values = c('black', 'blue', 'red')) +
+  theme_bw() +
+  theme(panel.border = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(size = .25, color = 'light grey', linetype = 'dotted'),
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(size=9, vjust=-.75),
+        axis.title.y = element_blank(),
+        axis.text.x = element_text(size=8, vjust=-.25),
+        axis.text.y = element_text(size=8),
+        legend.position="bottom",
+        legend.title = element_blank(), legend.text=element_text(size=6.5),
+        legend.key.height=unit(.5,"line"), legend.key.width=unit(.5,"line"))
+
+```

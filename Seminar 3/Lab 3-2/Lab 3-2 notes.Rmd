@@ -1,0 +1,214 @@
+---
+title: "Seminar 3-2: Predicting outcomes the social world"
+subtitle: "DATA5207: Data Analysis in the Social Sciences - Summer Semester, 2018"
+author: Dr Shaun Ratcliff
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+In the first five seminars of this class, we examined the use of data analysis to understand human behaviour, and how we need to control for confounding factors when trying to understand significant associations between predictors and outcomes. We also covered the use of probability, and linear and logistic regression. In the labs, we covered the analysis of descriptive variables and fitting regression models in $R$. 
+
+This class, we look at predicting outcomes for group and individual behaviours. This has both practical and theoretical values, and is an important goal in researching human behaviour and the social world. We want to understand human behave so we can predict future actions. We may want to use data from past consumer behaviours to predict future purchases. We may also use information on criminal recidivism to predict whether a person convicted of one crime is likely to commit another. 
+
+Prediction is also useful for validating our theories of society. A good theory is falsifiable. If we have a belief about how society works, we should be able to predict certain social outcomes. We can then compare our predictions with the actual outcomes of these events, and observe the rate of error to find weaknesses in our models (theoretical and empirical). 
+
+In this lab, we will use an example from criminology to examine how we can make predictions of human behaviour using data. This will include testing predictive performance and model validation.
+
+
+
+\vspace{6mm}
+
+##Predicting outcomes in human behaviour
+
+This week we use a real dataset from the United States: the COMPAS recidivism data. 
+
+Across the United States, law enforcement officers and courts are increasingly using personal data and models to assess a criminal defendant's probability of reoffending. There are dozens of these models in use, including two leading nationwide tools offered by commercial vendors. The data we use here is a sample of the COMPAS (Correctional Offender Management Profiling for Alternative Sanctions) dataset, created by the company Northpointe, Inc.
+    
+The data, which is available from the week 4 canvas module includes the criminal history, jail and prison time and demographics of defendants from Broward County, Florida, from 2013 and 2014.
+
+The outcome we are interested in measuring is:
+
+- **recid** a binary variable telling us whether the defended reoffends.
+
+The potential predictors available to us for this exercise are: 
+
+- **sex** the gender of each defendent.
+- **age** the age (in years) of each subject.
+- **age_cat** the age of each subject, coded as an ordinal variable.
+- **race** the race or ethnicty of each subject.
+- **juv_fel_count** the number of prior felonies a defendent was charge with as a juvenile.
+- **juv_misd_count** the number of prior misdemeanours a defendent was charge with as a juvenile.
+- **juv_other_count** the number of other prior juvenile charges on the defendent's record.
+- **priors_count** the number of adult priors on the defendent's record.
+- **charge_severity** the severity of the charges made against each subject.
+
+
+We also have a number of study variables in this dataset that are not really relevant to your analysis. 
+
+- **id** the identificiation number of each subject in the dataset.
+- **name** the name of each subject.
+- **first** the first name of each subject.
+- **last** the surname of each subject.
+
+\vspace{6mm}
+
+
+**_Task_**: Using these data, we want to predict the probability that a defendant will reoffend. To do this, you will work in groups of five to select four predictors to use in your model. We will give you approximately an hour to complete this task.
+
+First, spend a few minutes developing a basic theory on why you expect these precictors to be useful, and what you expect to find, and why. Write these down in an RMD file and email this to your tutor.
+
+Once you have done this we will send you the data we are using for this task. You will use what you we have covered so far in this course to conduct a descriptive analysis of the relationship between these four variables and recidivism, and plot your findings using the methods from week 1. You can save time by tasking each member of your group to examine a different independent variable. What do you find, and do these findings match your theories and predictions? 
+
+Then, fit a logistic regression to these data using the predictors you theorised would explain recidivism. You may include interactions if your theory and the data suggest they will be helpful. Plot your regression coefficients and the line from your regression model, and examine how how each of your selected variables predicts recidivism. 
+
+You should write up your theory, discriptive analysis and model, and plot the results from each in a markdown file. Then send the RMD file to your tutor. We will test your model with an out of sample data set.
+
+
+
+##Methods to analyse these data and check predictive accuracy
+
+First we want to load the training data file into $R$:
+
+\vspace{6mm}
+
+
+```{r load COMPAS data, echo=FALSE}
+
+compas.data <- read.csv("Data/compas.csv")
+
+```
+
+\vspace{6mm}
+
+
+Once you have done this, check the data to make sure it is structured the way you assume:
+
+\vspace{6mm}
+
+```{r check COMPAS data, echo=FALSE}
+
+head(compas.data)
+
+```
+
+\vspace{6mm}
+
+We will just fit a basic model here. To better understand your coefficients you may want to standardise your continuous predictors, but for our purposes this will be fine. We aslo load the *arm* package so we may use the *display()* function to view our model paramters. This code, and the results, should look like:
+
+\vspace{6mm}
+
+
+```{r fit model to COMPAS data}
+
+library(arm)
+
+recid.model.1 <- glm(recid ~ race + sex + age_cat + charge_severity + priors_count, 
+                     family = binomial(link = "logit"), data=compas.data)
+
+display(recid.model.1)
+
+compas.data$pr1 <- invlogit(predict(recid.model.1, compas.data))
+
+library(dplyr)
+
+compas.data %>%
+  dplyr::group_by(race) %>% 
+  dplyr::summarise(prob = mean(pr1))
+
+```
+
+\vspace{6mm}
+
+We now want to check the predictive accuracy of our model by making an out of sample prediction. We do this by loading the test data and then using the *predict()* function, wrapped with the inverse logit function (which you may remember converts our coefficients back from the logistic scale to the binomial), to predict the probability that subjects in this file will reoffend: 
+
+\vspace{6mm}
+
+
+```{r check predictive accuracy 1}
+
+
+compas.data2 <- read.csv("Data/compas.data2.csv")
+
+compas.data2$pr1 <- invlogit(predict(recid.model.1, compas.data2))
+
+```
+
+\vspace{6mm}
+
+We then use the *ifelse()* function to run a conditional statement, scoring a defendant with a probability of reoffending above .5 as one, and below .5 a zero, so they match the original dependent variable. We save these values and use the *table()* function to compare our predicted outcomes with the actual recidivism outcomes:
+
+\vspace{6mm}
+
+
+```{r check predictive accuracy 2}
+
+compas.data2$pr2 <- ifelse(compas.data2$pr1 > .5, 1, 0)
+
+prop.table(table(compas.data2$recid, compas.data2$pr2), 2)
+
+
+compas.data2 %>%
+  dplyr::group_by(race) %>% 
+  dplyr::summarise(prob = mean(pr1))
+
+
+```
+
+\vspace{6mm}
+
+The vertical axis of this table is the predicted outcomes, the horizontal the actual. As you can see if you look at the first column, there are no false negatives. All the subjects our model predicts would not reoffend did, and none of those it predicted would reoffend did not. However, there are a large number of false positives. If you look at the second column, you will see that the first figure is 0.37, which indicates 37 per cent  of defendants our model predicts will reoffend, did not actually do so, while 63 per cent of those we predict will reoffend did.
+
+We can also break these predictions by race/ethnicity and age. The results of doing this show how we obtain different predictions for different demographic groups, and that the rate of false positives are not necessarily equal across all groups.
+
+
+\vspace{6mm}
+
+
+```{r check predictive accuracy 3}
+
+library(plyr)
+
+#By race
+
+prop.table(table(compas.data2$race,compas.data2$pr2), 1)
+
+  #accuracy by race
+
+ddply(compas.data2, .(race), summarize,  
+      value.0.0 = prop.table(table(recid, pr2), 2)[1,1], 
+      value.0.1 = prop.table(table(recid, pr2), 2)[1,2],       
+      value.1.0 = prop.table(table(recid, pr2), 2)[2,1],    
+      value.1.1 = prop.table(table(recid, pr2), 2)[2,2])
+
+
+#By age
+prop.table(table(compas.data2$age_cat,compas.data2$pr2), 1)
+#accuracy by age
+ddply(compas.data2, .(age_cat), summarize,  
+      value.0.0 = prop.table(table(recid, pr2), 2)[1,1], 
+      value.0.1 = prop.table(table(recid, pr2), 2)[1,2],       
+      value.1.0 = prop.table(table(recid, pr2), 2)[2,1],    
+      value.1.1 = prop.table(table(recid, pr2), 2)[2,2])
+```
+
+
+##The ethics involved in using these models and data
+
+The readings I set for this week discussed the ethical issues concerning some of the data and methods we use. Once we have fit and examined our models, we will discuss their ethical and practical implications. Should they be used for making bail and sentencing decisions? What is the rationale for your view on this?
+
+
+
+
+##Additional tasks
+
+The additional tasks document saved in canvas contain exercises which involve revising the methods learned so far. These are not compulsory. We will not mark you on these, and we will not check that you have done the work. They are designed to help those of you without prior experience with $R$ or the methods we are covering in this unit. They will not be set every seminar; just the first few to help you get up to speed and make sure you pass the unit. 
+
+Work through these at your own pace before the next lab to familiarise yourself with these methods. If you are finding something difficult, please contact us and arrange a time to speak with us. Details are available **[on canvas](https://canvas.sydney.edu.au/courses/2452/pages/unit-information#teachingteam)**.
+

@@ -1,0 +1,173 @@
+---
+title: "Lab 1+ Solution Part2"
+author: "Kun Zhang"
+date: "5 December 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Earning Data
+```{r initialize}
+library(foreign)
+earnings.data <- read.dta("./Data/Earnings/earnings.dta") #load dta 
+
+
+```
+
+## Exampe: Data Processing using recode() and cut() 
+```{r Data Processing using recode() and cut() }
+#Recode numerical $race to meaningful factors and stored in $race2 
+library(car)
+earnings.data$race2 <- as.factor(recode(earnings.data$race,
+                                "'1'='White';
+                                '2'='Black';
+                                c('3','4')='Other';
+                                '9'=NA"))
+head(earnings.data)
+#Add "Hispanic" 
+levels(earnings.data$race2)[4] <- "Hispanic"
+earnings.data$race2[earnings.data$hisp == "1"] <- "Hispanic"
+
+#Recode gender
+earnings.data$gender <- recode(earnings.data$sex, 
+                              "'2' = 'Female';
+                              '1' = 'Male'")
+
+#Recode age; the survey was conducted in 1991
+earnings.data$age <- 91 - earnings.data$yearbn
+earnings.data$age <- recode(earnings.data$age, "'-8' = '92'") # One respondent was born in 1899
+
+#Convert income and height into quintiles
+earnings.data$earn.quintiles <- cut(earnings.data$earn,
+                                    breaks=c(quantile(earnings.data$earn,
+                                                      probs = seq(0, 1, by = 0.20), 
+                                                      na.rm=TRUE)), #remove NA
+                                    labels=c("0-20","20-40","40-60","60-80","80-100"),
+                                    include.lowest=TRUE)
+
+earnings.data$height.quintiles <- cut(earnings.data$height,
+                                    breaks=c(quantile(earnings.data$height,
+                                                      probs = seq(0, 1, by = 0.20), 
+                                                      na.rm=TRUE)), #allow NA
+                                    labels=c("Shortest quintile",
+                                             "20-40th percentile",
+                                             "40-60th percentile",
+                                             "60-80th percentile",
+                                             "Tallest quintile"),
+                                    include.lowest=TRUE)
+head(earnings.data)
+```
+
+## Example: R Function 
+```{r Example: R Function}
+calculate.95.ci.means <- function(x){
+  # calculate 95 CI
+  # returns (mean, low, high)
+  n <- table(is.na(x))[1]   #the N of our data
+  se <- sd(x, na.rm=TRUE) / sqrt(n) #calculate the standard error
+  estimate <- mean(x, na.rm=TRUE) #the mean value of our data
+  int.95 <- estimate + qt(c(.025,.975), n-1)*se #obtain 95% confidende intervals
+  result <- c(estimate, int.95) # combine estimate (mean of x) and CIs
+  return(result) #return this result
+}
+calculate.95.ci.means(earnings.data$earn)
+
+```
+
+## Average income by height and race
+```{r Average income by height and race}
+library(ggplot2)
+library(scales)
+library(plyr)
+
+earnings_race.height_means <- ddply(earnings.data, .(race2,height.quintiles), summarize,
+                                   mean=calculate.95.ci.means(earn)[1],
+                                   lower.ci=calculate.95.ci.means(earn)[2],
+                                   upper.ci=calculate.95.ci.means(earn)[3])
+print(earnings_race.height_means)
+
+#Reorder race categories by earnings
+earnings_race.height_means$race2 <- reorder(earnings_race.height_means$race2,
+                                            earnings_race.height_means$mean)
+
+
+# Omit NA and plot
+ggplot(na.omit(earnings_race.height_means), aes(x = race2, y = mean)) +
+  geom_point(alpha=.6, size=1, group=1) +
+  geom_errorbar(aes(ymin = lower.ci, ymax = upper.ci), width=0, alpha = .1, group=1) +
+  labs(title = "Average income by height and race",
+       x = "Race and ethnicity",
+       y = "Mean annual earnings") +
+  scale_y_continuous(labels = dollar) +
+  coord_cartesian(ylim = c(0,60000)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(colour="grey", size=0.4, linetype = "dashed"),
+        axis.text.x = element_text(size=10, angle=90, hjust=1, vjust=.5),
+        axis.text.y = element_text(size=10),
+        plot.title = element_text(size=14, face="bold", hjust=.5)) +
+  facet_wrap(~ height.quintiles, nrow = 1) #nrow=1 all graphs are placed in 1 row
+
+```
+
+## Income distribution by height and race
+```{r Income distribution by height and race}
+# Caclulate the CI of % of people in j earning quintile; j can be 1~5 
+calculate.95.ci.prop <- function(x, j){ #how the function reads
+  estimate <- table(x)[j] / sum(table(x)) #the proportion
+  se <- sqrt(estimate * (1-estimate) / length(x)) #calculate the standard error
+  int.95 <- estimate + qnorm(c(.025,.975))*se #obtain 95% confidence intervals
+  result <- c(estimate, int.95) #combine estimate with CIs
+  return(result) #return the results of the function
+}
+calculate.95.ci.prop(earnings.data$earn.quintiles, 1)
+
+
+calculate.95.ci.prop <- function(x){
+  estimate <- table(x) / sum(table(x))
+  se <- sqrt(estimate * (1-estimate) / sum(table(x)))
+  uci <- estimate + qnorm(.975)*se #obtain upper 95% confidence intervals
+  lci <- estimate + qnorm(.025)*se #obtain lower 95% confidence intervals
+  int.95 <- data.frame(levels(x)) #create a new data frame based on the levels in x
+  #bind the estimate (the proportions of x) with the lci and uci and add to our new data frame
+  int.95[,c(2:4)] <- cbind(estimate,lci,uci) #bind/merge by column
+  names(int.95) <- c("Categories", "Proportion", "Lower CI", "Upper CI")  #rename the columns of our data frame
+  return(int.95) #return the results of the function
+}
+# calculate.95.ci.prop(earnings.data$earn.quintiles)
+# calculate.95.ci.prop(earnings.data$height.quintiles)
+
+(earnings_race.height_props<-ddply(earnings.data, .(race2,height.quintiles), summarize,
+                                  earnings = calculate.95.ci.prop(earn.quintiles)[,1],
+                                  proportion = calculate.95.ci.prop(earn.quintiles)[,2],
+                                  lci = calculate.95.ci.prop(earn.quintiles)[,3],
+                                  uci = calculate.95.ci.prop(earn.quintiles)[,4])) #() assign and print
+
+#only classify white and others
+# earnings_race.height_props$race2 <- factor(earnings_race.height_props$race2, c("White", "Other"), order=TRUE)
+
+ggplot(na.omit(earnings_race.height_props), aes(x = earnings, y = proportion)) +
+  geom_point(alpha=.6, size=1) +
+  geom_errorbar(aes(ymin = lci, ymax = uci), width=0, alpha = .1) +
+  labs(title = "Distribution of individual annual earnings by height and race",
+       x = "Earnings quintile",
+       y = "Proportion in each quintile") +
+  scale_y_continuous(labels = percent, breaks = c(.2,.4)) +
+  coord_cartesian(ylim = c(0,.5)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text.x = element_text(size=10, angle=90, hjust=1, vjust=.5),
+        axis.text.y = element_text(size=10),
+        plot.title = element_text(size=14, face="bold", hjust=.5),
+        strip.text.y = element_text(size=5)) +
+  facet_grid(height.quintiles ~ race2)
+
+```
+
+
+
+

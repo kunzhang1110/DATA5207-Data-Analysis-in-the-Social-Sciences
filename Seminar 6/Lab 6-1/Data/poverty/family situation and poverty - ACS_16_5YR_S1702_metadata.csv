@@ -1,0 +1,603 @@
+GEO.id,Id
+GEO.id2,Id2
+GEO.display-label,Geography
+HC01_EST_VC01,All families  - Total; Estimate; Families
+HC01_MOE_VC01,All families  - Total; Margin of Error; Families
+HC02_EST_VC01,All families  - Percent below poverty level; Estimate; Families
+HC02_MOE_VC01,All families  - Percent below poverty level; Margin of Error; Families
+HC03_EST_VC01,Married-couple families  - Total; Estimate; Families
+HC03_MOE_VC01,Married-couple families  - Total; Margin of Error; Families
+HC04_EST_VC01,Married-couple families  - Percent below poverty level; Estimate; Families
+HC04_MOE_VC01,Married-couple families  - Percent below poverty level; Margin of Error; Families
+HC05_EST_VC01,"Female householder, no husband present  - Total; Estimate; Families"
+HC05_MOE_VC01,"Female householder, no husband present  - Total; Margin of Error; Families"
+HC06_EST_VC01,"Female householder, no husband present  - Percent below poverty level; Estimate; Families"
+HC06_MOE_VC01,"Female householder, no husband present  - Percent below poverty level; Margin of Error; Families"
+HC01_EST_VC02,All families  - Total; Estimate; With related children of householder under 18 years
+HC01_MOE_VC02,All families  - Total; Margin of Error; With related children of householder under 18 years
+HC02_EST_VC02,All families  - Percent below poverty level; Estimate; With related children of householder under 18 years
+HC02_MOE_VC02,All families  - Percent below poverty level; Margin of Error; With related children of householder under 18 years
+HC03_EST_VC02,Married-couple families  - Total; Estimate; With related children of householder under 18 years
+HC03_MOE_VC02,Married-couple families  - Total; Margin of Error; With related children of householder under 18 years
+HC04_EST_VC02,Married-couple families  - Percent below poverty level; Estimate; With related children of householder under 18 years
+HC04_MOE_VC02,Married-couple families  - Percent below poverty level; Margin of Error; With related children of householder under 18 years
+HC05_EST_VC02,"Female householder, no husband present  - Total; Estimate; With related children of householder under 18 years"
+HC05_MOE_VC02,"Female householder, no husband present  - Total; Margin of Error; With related children of householder under 18 years"
+HC06_EST_VC02,"Female householder, no husband present  - Percent below poverty level; Estimate; With related children of householder under 18 years"
+HC06_MOE_VC02,"Female householder, no husband present  - Percent below poverty level; Margin of Error; With related children of householder under 18 years"
+HC01_EST_VC03,All families  - Total; Estimate; With related children of householder under 18 years - With related children of householder under 5 years
+HC01_MOE_VC03,All families  - Total; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years
+HC02_EST_VC03,All families  - Percent below poverty level; Estimate; With related children of householder under 18 years - With related children of householder under 5 years
+HC02_MOE_VC03,All families  - Percent below poverty level; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years
+HC03_EST_VC03,Married-couple families  - Total; Estimate; With related children of householder under 18 years - With related children of householder under 5 years
+HC03_MOE_VC03,Married-couple families  - Total; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years
+HC04_EST_VC03,Married-couple families  - Percent below poverty level; Estimate; With related children of householder under 18 years - With related children of householder under 5 years
+HC04_MOE_VC03,Married-couple families  - Percent below poverty level; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years
+HC05_EST_VC03,"Female householder, no husband present  - Total; Estimate; With related children of householder under 18 years - With related children of householder under 5 years"
+HC05_MOE_VC03,"Female householder, no husband present  - Total; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years"
+HC06_EST_VC03,"Female householder, no husband present  - Percent below poverty level; Estimate; With related children of householder under 18 years - With related children of householder under 5 years"
+HC06_MOE_VC03,"Female householder, no husband present  - Percent below poverty level; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years"
+HC01_EST_VC04,All families  - Total; Estimate; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years
+HC01_MOE_VC04,All families  - Total; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years
+HC02_EST_VC04,All families  - Percent below poverty level; Estimate; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years
+HC02_MOE_VC04,All families  - Percent below poverty level; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years
+HC03_EST_VC04,Married-couple families  - Total; Estimate; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years
+HC03_MOE_VC04,Married-couple families  - Total; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years
+HC04_EST_VC04,Married-couple families  - Percent below poverty level; Estimate; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years
+HC04_MOE_VC04,Married-couple families  - Percent below poverty level; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years
+HC05_EST_VC04,"Female householder, no husband present  - Total; Estimate; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years"
+HC05_MOE_VC04,"Female householder, no husband present  - Total; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years"
+HC06_EST_VC04,"Female householder, no husband present  - Percent below poverty level; Estimate; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years"
+HC06_MOE_VC04,"Female householder, no husband present  - Percent below poverty level; Margin of Error; With related children of householder under 18 years - With related children of householder under 5 years and 5 to 17 years"
+HC01_EST_VC05,All families  - Total; Estimate; With related children of householder under 18 years - With related children of householder 5 to 17 years
+HC01_MOE_VC05,All families  - Total; Margin of Error; With related children of householder under 18 years - With related children of householder 5 to 17 years
+HC02_EST_VC05,All families  - Percent below poverty level; Estimate; With related children of householder under 18 years - With related children of householder 5 to 17 years
+HC02_MOE_VC05,All families  - Percent below poverty level; Margin of Error; With related children of householder under 18 years - With related children of householder 5 to 17 years
+HC03_EST_VC05,Married-couple families  - Total; Estimate; With related children of householder under 18 years - With related children of householder 5 to 17 years
+HC03_MOE_VC05,Married-couple families  - Total; Margin of Error; With related children of householder under 18 years - With related children of householder 5 to 17 years
+HC04_EST_VC05,Married-couple families  - Percent below poverty level; Estimate; With related children of householder under 18 years - With related children of householder 5 to 17 years
+HC04_MOE_VC05,Married-couple families  - Percent below poverty level; Margin of Error; With related children of householder under 18 years - With related children of householder 5 to 17 years
+HC05_EST_VC05,"Female householder, no husband present  - Total; Estimate; With related children of householder under 18 years - With related children of householder 5 to 17 years"
+HC05_MOE_VC05,"Female householder, no husband present  - Total; Margin of Error; With related children of householder under 18 years - With related children of householder 5 to 17 years"
+HC06_EST_VC05,"Female householder, no husband present  - Percent below poverty level; Estimate; With related children of householder under 18 years - With related children of householder 5 to 17 years"
+HC06_MOE_VC05,"Female householder, no husband present  - Percent below poverty level; Margin of Error; With related children of householder under 18 years - With related children of householder 5 to 17 years"
+HC01_EST_VC09,All families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone
+HC01_MOE_VC09,All families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone
+HC02_EST_VC09,All families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone
+HC02_MOE_VC09,All families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone
+HC03_EST_VC09,Married-couple families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone
+HC03_MOE_VC09,Married-couple families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone
+HC04_EST_VC09,Married-couple families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone
+HC04_MOE_VC09,Married-couple families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone
+HC05_EST_VC09,"Female householder, no husband present  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone"
+HC05_MOE_VC09,"Female householder, no husband present  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone"
+HC06_EST_VC09,"Female householder, no husband present  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone"
+HC06_MOE_VC09,"Female householder, no husband present  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - White alone"
+HC01_EST_VC10,All families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone
+HC01_MOE_VC10,All families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone
+HC02_EST_VC10,All families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone
+HC02_MOE_VC10,All families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone
+HC03_EST_VC10,Married-couple families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone
+HC03_MOE_VC10,Married-couple families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone
+HC04_EST_VC10,Married-couple families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone
+HC04_MOE_VC10,Married-couple families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone
+HC05_EST_VC10,"Female householder, no husband present  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone"
+HC05_MOE_VC10,"Female householder, no husband present  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone"
+HC06_EST_VC10,"Female householder, no husband present  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone"
+HC06_MOE_VC10,"Female householder, no husband present  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Black or African American alone"
+HC01_EST_VC11,All families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone
+HC01_MOE_VC11,All families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone
+HC02_EST_VC11,All families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone
+HC02_MOE_VC11,All families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone
+HC03_EST_VC11,Married-couple families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone
+HC03_MOE_VC11,Married-couple families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone
+HC04_EST_VC11,Married-couple families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone
+HC04_MOE_VC11,Married-couple families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone
+HC05_EST_VC11,"Female householder, no husband present  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone"
+HC05_MOE_VC11,"Female householder, no husband present  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone"
+HC06_EST_VC11,"Female householder, no husband present  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone"
+HC06_MOE_VC11,"Female householder, no husband present  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - American Indian and Alaska Native alone"
+HC01_EST_VC12,All families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone
+HC01_MOE_VC12,All families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone
+HC02_EST_VC12,All families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone
+HC02_MOE_VC12,All families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone
+HC03_EST_VC12,Married-couple families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone
+HC03_MOE_VC12,Married-couple families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone
+HC04_EST_VC12,Married-couple families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone
+HC04_MOE_VC12,Married-couple families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone
+HC05_EST_VC12,"Female householder, no husband present  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone"
+HC05_MOE_VC12,"Female householder, no husband present  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone"
+HC06_EST_VC12,"Female householder, no husband present  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone"
+HC06_MOE_VC12,"Female householder, no husband present  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Asian alone"
+HC01_EST_VC13,All families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone
+HC01_MOE_VC13,All families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone
+HC02_EST_VC13,All families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone
+HC02_MOE_VC13,All families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone
+HC03_EST_VC13,Married-couple families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone
+HC03_MOE_VC13,Married-couple families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone
+HC04_EST_VC13,Married-couple families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone
+HC04_MOE_VC13,Married-couple families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone
+HC05_EST_VC13,"Female householder, no husband present  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone"
+HC05_MOE_VC13,"Female householder, no husband present  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone"
+HC06_EST_VC13,"Female householder, no husband present  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone"
+HC06_MOE_VC13,"Female householder, no husband present  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Native Hawaiian and Other Pacific Islander alone"
+HC01_EST_VC14,All families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone
+HC01_MOE_VC14,All families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone
+HC02_EST_VC14,All families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone
+HC02_MOE_VC14,All families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone
+HC03_EST_VC14,Married-couple families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone
+HC03_MOE_VC14,Married-couple families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone
+HC04_EST_VC14,Married-couple families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone
+HC04_MOE_VC14,Married-couple families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone
+HC05_EST_VC14,"Female householder, no husband present  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone"
+HC05_MOE_VC14,"Female householder, no husband present  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone"
+HC06_EST_VC14,"Female householder, no husband present  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone"
+HC06_MOE_VC14,"Female householder, no husband present  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Some other race alone"
+HC01_EST_VC15,All families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races
+HC01_MOE_VC15,All families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races
+HC02_EST_VC15,All families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races
+HC02_MOE_VC15,All families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races
+HC03_EST_VC15,Married-couple families  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races
+HC03_MOE_VC15,Married-couple families  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races
+HC04_EST_VC15,Married-couple families  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races
+HC04_MOE_VC15,Married-couple families  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races
+HC05_EST_VC15,"Female householder, no husband present  - Total; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races"
+HC05_MOE_VC15,"Female householder, no husband present  - Total; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races"
+HC06_EST_VC15,"Female householder, no husband present  - Percent below poverty level; Estimate; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races"
+HC06_MOE_VC15,"Female householder, no husband present  - Percent below poverty level; Margin of Error; RACE AND HISPANIC OR LATINO ORIGIN - Families with a householder who is-- - Two or more races"
+HC01_EST_VC17,All families  - Total; Estimate; Hispanic or Latino origin (of any race)
+HC01_MOE_VC17,All families  - Total; Margin of Error; Hispanic or Latino origin (of any race)
+HC02_EST_VC17,All families  - Percent below poverty level; Estimate; Hispanic or Latino origin (of any race)
+HC02_MOE_VC17,All families  - Percent below poverty level; Margin of Error; Hispanic or Latino origin (of any race)
+HC03_EST_VC17,Married-couple families  - Total; Estimate; Hispanic or Latino origin (of any race)
+HC03_MOE_VC17,Married-couple families  - Total; Margin of Error; Hispanic or Latino origin (of any race)
+HC04_EST_VC17,Married-couple families  - Percent below poverty level; Estimate; Hispanic or Latino origin (of any race)
+HC04_MOE_VC17,Married-couple families  - Percent below poverty level; Margin of Error; Hispanic or Latino origin (of any race)
+HC05_EST_VC17,"Female householder, no husband present  - Total; Estimate; Hispanic or Latino origin (of any race)"
+HC05_MOE_VC17,"Female householder, no husband present  - Total; Margin of Error; Hispanic or Latino origin (of any race)"
+HC06_EST_VC17,"Female householder, no husband present  - Percent below poverty level; Estimate; Hispanic or Latino origin (of any race)"
+HC06_MOE_VC17,"Female householder, no husband present  - Percent below poverty level; Margin of Error; Hispanic or Latino origin (of any race)"
+HC01_EST_VC18,"All families  - Total; Estimate; White alone, not Hispanic or Latino"
+HC01_MOE_VC18,"All families  - Total; Margin of Error; White alone, not Hispanic or Latino"
+HC02_EST_VC18,"All families  - Percent below poverty level; Estimate; White alone, not Hispanic or Latino"
+HC02_MOE_VC18,"All families  - Percent below poverty level; Margin of Error; White alone, not Hispanic or Latino"
+HC03_EST_VC18,"Married-couple families  - Total; Estimate; White alone, not Hispanic or Latino"
+HC03_MOE_VC18,"Married-couple families  - Total; Margin of Error; White alone, not Hispanic or Latino"
+HC04_EST_VC18,"Married-couple families  - Percent below poverty level; Estimate; White alone, not Hispanic or Latino"
+HC04_MOE_VC18,"Married-couple families  - Percent below poverty level; Margin of Error; White alone, not Hispanic or Latino"
+HC05_EST_VC18,"Female householder, no husband present  - Total; Estimate; White alone, not Hispanic or Latino"
+HC05_MOE_VC18,"Female householder, no husband present  - Total; Margin of Error; White alone, not Hispanic or Latino"
+HC06_EST_VC18,"Female householder, no husband present  - Percent below poverty level; Estimate; White alone, not Hispanic or Latino"
+HC06_MOE_VC18,"Female householder, no husband present  - Percent below poverty level; Margin of Error; White alone, not Hispanic or Latino"
+HC01_EST_VC20,All families  - Total; Estimate; Householder worked
+HC01_MOE_VC20,All families  - Total; Margin of Error; Householder worked
+HC02_EST_VC20,All families  - Percent below poverty level; Estimate; Householder worked
+HC02_MOE_VC20,All families  - Percent below poverty level; Margin of Error; Householder worked
+HC03_EST_VC20,Married-couple families  - Total; Estimate; Householder worked
+HC03_MOE_VC20,Married-couple families  - Total; Margin of Error; Householder worked
+HC04_EST_VC20,Married-couple families  - Percent below poverty level; Estimate; Householder worked
+HC04_MOE_VC20,Married-couple families  - Percent below poverty level; Margin of Error; Householder worked
+HC05_EST_VC20,"Female householder, no husband present  - Total; Estimate; Householder worked"
+HC05_MOE_VC20,"Female householder, no husband present  - Total; Margin of Error; Householder worked"
+HC06_EST_VC20,"Female householder, no husband present  - Percent below poverty level; Estimate; Householder worked"
+HC06_MOE_VC20,"Female householder, no husband present  - Percent below poverty level; Margin of Error; Householder worked"
+HC01_EST_VC21,"All families  - Total; Estimate; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC01_MOE_VC21,"All families  - Total; Margin of Error; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC02_EST_VC21,"All families  - Percent below poverty level; Estimate; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC02_MOE_VC21,"All families  - Percent below poverty level; Margin of Error; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC03_EST_VC21,"Married-couple families  - Total; Estimate; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC03_MOE_VC21,"Married-couple families  - Total; Margin of Error; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC04_EST_VC21,"Married-couple families  - Percent below poverty level; Estimate; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC04_MOE_VC21,"Married-couple families  - Percent below poverty level; Margin of Error; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC05_EST_VC21,"Female householder, no husband present  - Total; Estimate; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC05_MOE_VC21,"Female householder, no husband present  - Total; Margin of Error; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC06_EST_VC21,"Female householder, no husband present  - Percent below poverty level; Estimate; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC06_MOE_VC21,"Female householder, no husband present  - Percent below poverty level; Margin of Error; Householder worked - Householder worked full-time, year-round in the past 12 months"
+HC01_EST_VC23,All families  - Total; Estimate; Householder 65 years and over
+HC01_MOE_VC23,All families  - Total; Margin of Error; Householder 65 years and over
+HC02_EST_VC23,All families  - Percent below poverty level; Estimate; Householder 65 years and over
+HC02_MOE_VC23,All families  - Percent below poverty level; Margin of Error; Householder 65 years and over
+HC03_EST_VC23,Married-couple families  - Total; Estimate; Householder 65 years and over
+HC03_MOE_VC23,Married-couple families  - Total; Margin of Error; Householder 65 years and over
+HC04_EST_VC23,Married-couple families  - Percent below poverty level; Estimate; Householder 65 years and over
+HC04_MOE_VC23,Married-couple families  - Percent below poverty level; Margin of Error; Householder 65 years and over
+HC05_EST_VC23,"Female householder, no husband present  - Total; Estimate; Householder 65 years and over"
+HC05_MOE_VC23,"Female householder, no husband present  - Total; Margin of Error; Householder 65 years and over"
+HC06_EST_VC23,"Female householder, no husband present  - Percent below poverty level; Estimate; Householder 65 years and over"
+HC06_MOE_VC23,"Female householder, no husband present  - Percent below poverty level; Margin of Error; Householder 65 years and over"
+HC01_EST_VC25,All families  - Total; Estimate; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months
+HC01_MOE_VC25,All families  - Total; Margin of Error; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months
+HC02_EST_VC25,All families  - Percent below poverty level; Estimate; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months
+HC02_MOE_VC25,All families  - Percent below poverty level; Margin of Error; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months
+HC03_EST_VC25,Married-couple families  - Total; Estimate; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months
+HC03_MOE_VC25,Married-couple families  - Total; Margin of Error; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months
+HC04_EST_VC25,Married-couple families  - Percent below poverty level; Estimate; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months
+HC04_MOE_VC25,Married-couple families  - Percent below poverty level; Margin of Error; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months
+HC05_EST_VC25,"Female householder, no husband present  - Total; Estimate; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months"
+HC05_MOE_VC25,"Female householder, no husband present  - Total; Margin of Error; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months"
+HC06_EST_VC25,"Female householder, no husband present  - Percent below poverty level; Estimate; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months"
+HC06_MOE_VC25,"Female householder, no husband present  - Percent below poverty level; Margin of Error; Family received -- - Supplemental Security Income (SSI) and/or cash public assistance income in the past 12 months"
+HC01_EST_VC26,All families  - Total; Estimate; Family received -- - Social security income in the past 12 months
+HC01_MOE_VC26,All families  - Total; Margin of Error; Family received -- - Social security income in the past 12 months
+HC02_EST_VC26,All families  - Percent below poverty level; Estimate; Family received -- - Social security income in the past 12 months
+HC02_MOE_VC26,All families  - Percent below poverty level; Margin of Error; Family received -- - Social security income in the past 12 months
+HC03_EST_VC26,Married-couple families  - Total; Estimate; Family received -- - Social security income in the past 12 months
+HC03_MOE_VC26,Married-couple families  - Total; Margin of Error; Family received -- - Social security income in the past 12 months
+HC04_EST_VC26,Married-couple families  - Percent below poverty level; Estimate; Family received -- - Social security income in the past 12 months
+HC04_MOE_VC26,Married-couple families  - Percent below poverty level; Margin of Error; Family received -- - Social security income in the past 12 months
+HC05_EST_VC26,"Female householder, no husband present  - Total; Estimate; Family received -- - Social security income in the past 12 months"
+HC05_MOE_VC26,"Female householder, no husband present  - Total; Margin of Error; Family received -- - Social security income in the past 12 months"
+HC06_EST_VC26,"Female householder, no husband present  - Percent below poverty level; Estimate; Family received -- - Social security income in the past 12 months"
+HC06_MOE_VC26,"Female householder, no husband present  - Percent below poverty level; Margin of Error; Family received -- - Social security income in the past 12 months"
+HC01_EST_VC29,All families  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate
+HC01_MOE_VC29,All families  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate
+HC02_EST_VC29,All families  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate
+HC02_MOE_VC29,All families  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate
+HC03_EST_VC29,Married-couple families  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate
+HC03_MOE_VC29,Married-couple families  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate
+HC04_EST_VC29,Married-couple families  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate
+HC04_MOE_VC29,Married-couple families  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate
+HC05_EST_VC29,"Female householder, no husband present  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate"
+HC05_MOE_VC29,"Female householder, no husband present  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate"
+HC06_EST_VC29,"Female householder, no husband present  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate"
+HC06_MOE_VC29,"Female householder, no husband present  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Less than high school graduate"
+HC01_EST_VC30,All families  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)
+HC01_MOE_VC30,All families  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)
+HC02_EST_VC30,All families  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)
+HC02_MOE_VC30,All families  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)
+HC03_EST_VC30,Married-couple families  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)
+HC03_MOE_VC30,Married-couple families  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)
+HC04_EST_VC30,Married-couple families  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)
+HC04_MOE_VC30,Married-couple families  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)
+HC05_EST_VC30,"Female householder, no husband present  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)"
+HC05_MOE_VC30,"Female householder, no husband present  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)"
+HC06_EST_VC30,"Female householder, no husband present  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)"
+HC06_MOE_VC30,"Female householder, no husband present  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - High school graduate (includes equivalency)"
+HC01_EST_VC31,"All families  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC01_MOE_VC31,"All families  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC02_EST_VC31,"All families  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC02_MOE_VC31,"All families  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC03_EST_VC31,"Married-couple families  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC03_MOE_VC31,"Married-couple families  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC04_EST_VC31,"Married-couple families  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC04_MOE_VC31,"Married-couple families  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC05_EST_VC31,"Female householder, no husband present  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC05_MOE_VC31,"Female householder, no husband present  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC06_EST_VC31,"Female householder, no husband present  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC06_MOE_VC31,"Female householder, no husband present  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Some college, associate's degree"
+HC01_EST_VC32,All families  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher
+HC01_MOE_VC32,All families  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher
+HC02_EST_VC32,All families  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher
+HC02_MOE_VC32,All families  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher
+HC03_EST_VC32,Married-couple families  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher
+HC03_MOE_VC32,Married-couple families  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher
+HC04_EST_VC32,Married-couple families  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher
+HC04_MOE_VC32,Married-couple families  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher
+HC05_EST_VC32,"Female householder, no husband present  - Total; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher"
+HC05_MOE_VC32,"Female householder, no husband present  - Total; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher"
+HC06_EST_VC32,"Female householder, no husband present  - Percent below poverty level; Estimate; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher"
+HC06_MOE_VC32,"Female householder, no husband present  - Percent below poverty level; Margin of Error; EDUCATIONAL ATTAINMENT OF HOUSEHOLDER - Bachelor's degree or higher"
+HC01_EST_VC35,All families  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child
+HC01_MOE_VC35,All families  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child
+HC02_EST_VC35,All families  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child
+HC02_MOE_VC35,All families  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child
+HC03_EST_VC35,Married-couple families  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child
+HC03_MOE_VC35,Married-couple families  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child
+HC04_EST_VC35,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child
+HC04_MOE_VC35,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child
+HC05_EST_VC35,"Female householder, no husband present  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child"
+HC05_MOE_VC35,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child"
+HC06_EST_VC35,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child"
+HC06_MOE_VC35,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No child"
+HC01_EST_VC36,All families  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children
+HC01_MOE_VC36,All families  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children
+HC02_EST_VC36,All families  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children
+HC02_MOE_VC36,All families  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children
+HC03_EST_VC36,Married-couple families  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children
+HC03_MOE_VC36,Married-couple families  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children
+HC04_EST_VC36,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children
+HC04_MOE_VC36,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children
+HC05_EST_VC36,"Female householder, no husband present  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children"
+HC05_MOE_VC36,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children"
+HC06_EST_VC36,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children"
+HC06_MOE_VC36,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 children"
+HC01_EST_VC37,All families  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children
+HC01_MOE_VC37,All families  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children
+HC02_EST_VC37,All families  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children
+HC02_MOE_VC37,All families  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children
+HC03_EST_VC37,Married-couple families  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children
+HC03_MOE_VC37,Married-couple families  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children
+HC04_EST_VC37,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children
+HC04_MOE_VC37,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children
+HC05_EST_VC37,"Female householder, no husband present  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children"
+HC05_MOE_VC37,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children"
+HC06_EST_VC37,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children"
+HC06_MOE_VC37,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 children"
+HC01_EST_VC38,All families  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children
+HC01_MOE_VC38,All families  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children
+HC02_EST_VC38,All families  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children
+HC02_MOE_VC38,All families  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children
+HC03_EST_VC38,Married-couple families  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children
+HC03_MOE_VC38,Married-couple families  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children
+HC04_EST_VC38,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children
+HC04_MOE_VC38,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children
+HC05_EST_VC38,"Female householder, no husband present  - Total; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children"
+HC05_MOE_VC38,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children"
+HC06_EST_VC38,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children"
+HC06_MOE_VC38,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF RELATED CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more children"
+HC01_EST_VC41,All families  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder
+HC01_MOE_VC41,All families  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder
+HC02_EST_VC41,All families  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder
+HC02_MOE_VC41,All families  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder
+HC03_EST_VC41,Married-couple families  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder
+HC03_MOE_VC41,Married-couple families  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder
+HC04_EST_VC41,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder
+HC04_MOE_VC41,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder
+HC05_EST_VC41,"Female householder, no husband present  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder"
+HC05_MOE_VC41,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder"
+HC06_EST_VC41,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder"
+HC06_MOE_VC41,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - No own child of the householder"
+HC01_EST_VC42,All families  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder
+HC01_MOE_VC42,All families  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder
+HC02_EST_VC42,All families  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder
+HC02_MOE_VC42,All families  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder
+HC03_EST_VC42,Married-couple families  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder
+HC03_MOE_VC42,Married-couple families  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder
+HC04_EST_VC42,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder
+HC04_MOE_VC42,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder
+HC05_EST_VC42,"Female householder, no husband present  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder"
+HC05_MOE_VC42,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder"
+HC06_EST_VC42,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder"
+HC06_MOE_VC42,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 1 or 2 own children of the householder"
+HC01_EST_VC43,All families  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder
+HC01_MOE_VC43,All families  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder
+HC02_EST_VC43,All families  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder
+HC02_MOE_VC43,All families  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder
+HC03_EST_VC43,Married-couple families  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder
+HC03_MOE_VC43,Married-couple families  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder
+HC04_EST_VC43,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder
+HC04_MOE_VC43,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder
+HC05_EST_VC43,"Female householder, no husband present  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder"
+HC05_MOE_VC43,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder"
+HC06_EST_VC43,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder"
+HC06_MOE_VC43,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 3 or 4 own children of the householder"
+HC01_EST_VC44,All families  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder
+HC01_MOE_VC44,All families  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder
+HC02_EST_VC44,All families  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder
+HC02_MOE_VC44,All families  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder
+HC03_EST_VC44,Married-couple families  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder
+HC03_MOE_VC44,Married-couple families  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder
+HC04_EST_VC44,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder
+HC04_MOE_VC44,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder
+HC05_EST_VC44,"Female householder, no husband present  - Total; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder"
+HC05_MOE_VC44,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder"
+HC06_EST_VC44,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder"
+HC06_MOE_VC44,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF OWN CHILDREN OF THE HOUSEHOLDER UNDER 18 YEARS - 5 or more own children of the householder"
+HC01_EST_VC47,All families  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 2 people
+HC01_MOE_VC47,All families  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 2 people
+HC02_EST_VC47,All families  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 2 people
+HC02_MOE_VC47,All families  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 2 people
+HC03_EST_VC47,Married-couple families  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 2 people
+HC03_MOE_VC47,Married-couple families  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 2 people
+HC04_EST_VC47,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 2 people
+HC04_MOE_VC47,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 2 people
+HC05_EST_VC47,"Female householder, no husband present  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 2 people"
+HC05_MOE_VC47,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 2 people"
+HC06_EST_VC47,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 2 people"
+HC06_MOE_VC47,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 2 people"
+HC01_EST_VC48,All families  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people
+HC01_MOE_VC48,All families  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people
+HC02_EST_VC48,All families  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people
+HC02_MOE_VC48,All families  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people
+HC03_EST_VC48,Married-couple families  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people
+HC03_MOE_VC48,Married-couple families  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people
+HC04_EST_VC48,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people
+HC04_MOE_VC48,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people
+HC05_EST_VC48,"Female householder, no husband present  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people"
+HC05_MOE_VC48,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people"
+HC06_EST_VC48,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people"
+HC06_MOE_VC48,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 3 or 4 people"
+HC01_EST_VC49,All families  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people
+HC01_MOE_VC49,All families  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people
+HC02_EST_VC49,All families  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people
+HC02_MOE_VC49,All families  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people
+HC03_EST_VC49,Married-couple families  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people
+HC03_MOE_VC49,Married-couple families  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people
+HC04_EST_VC49,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people
+HC04_MOE_VC49,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people
+HC05_EST_VC49,"Female householder, no husband present  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people"
+HC05_MOE_VC49,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people"
+HC06_EST_VC49,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people"
+HC06_MOE_VC49,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 5 or 6 people"
+HC01_EST_VC50,All families  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 7 or more people
+HC01_MOE_VC50,All families  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 7 or more people
+HC02_EST_VC50,All families  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 7 or more people
+HC02_MOE_VC50,All families  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 7 or more people
+HC03_EST_VC50,Married-couple families  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 7 or more people
+HC03_MOE_VC50,Married-couple families  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 7 or more people
+HC04_EST_VC50,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 7 or more people
+HC04_MOE_VC50,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 7 or more people
+HC05_EST_VC50,"Female householder, no husband present  - Total; Estimate; NUMBER OF PEOPLE IN FAMILY - 7 or more people"
+HC05_MOE_VC50,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 7 or more people"
+HC06_EST_VC50,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF PEOPLE IN FAMILY - 7 or more people"
+HC06_MOE_VC50,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF PEOPLE IN FAMILY - 7 or more people"
+HC01_EST_VC53,All families  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - No workers
+HC01_MOE_VC53,All families  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - No workers
+HC02_EST_VC53,All families  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - No workers
+HC02_MOE_VC53,All families  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - No workers
+HC03_EST_VC53,Married-couple families  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - No workers
+HC03_MOE_VC53,Married-couple families  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - No workers
+HC04_EST_VC53,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - No workers
+HC04_MOE_VC53,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - No workers
+HC05_EST_VC53,"Female householder, no husband present  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - No workers"
+HC05_MOE_VC53,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - No workers"
+HC06_EST_VC53,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - No workers"
+HC06_MOE_VC53,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - No workers"
+HC01_EST_VC54,All families  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - 1 worker
+HC01_MOE_VC54,All families  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - 1 worker
+HC02_EST_VC54,All families  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - 1 worker
+HC02_MOE_VC54,All families  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - 1 worker
+HC03_EST_VC54,Married-couple families  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - 1 worker
+HC03_MOE_VC54,Married-couple families  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - 1 worker
+HC04_EST_VC54,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - 1 worker
+HC04_MOE_VC54,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - 1 worker
+HC05_EST_VC54,"Female householder, no husband present  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - 1 worker"
+HC05_MOE_VC54,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - 1 worker"
+HC06_EST_VC54,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - 1 worker"
+HC06_MOE_VC54,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - 1 worker"
+HC01_EST_VC55,All families  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - 2 workers
+HC01_MOE_VC55,All families  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - 2 workers
+HC02_EST_VC55,All families  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - 2 workers
+HC02_MOE_VC55,All families  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - 2 workers
+HC03_EST_VC55,Married-couple families  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - 2 workers
+HC03_MOE_VC55,Married-couple families  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - 2 workers
+HC04_EST_VC55,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - 2 workers
+HC04_MOE_VC55,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - 2 workers
+HC05_EST_VC55,"Female householder, no husband present  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - 2 workers"
+HC05_MOE_VC55,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - 2 workers"
+HC06_EST_VC55,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - 2 workers"
+HC06_MOE_VC55,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - 2 workers"
+HC01_EST_VC56,All families  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - 3 or more workers
+HC01_MOE_VC56,All families  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - 3 or more workers
+HC02_EST_VC56,All families  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - 3 or more workers
+HC02_MOE_VC56,All families  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - 3 or more workers
+HC03_EST_VC56,Married-couple families  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - 3 or more workers
+HC03_MOE_VC56,Married-couple families  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - 3 or more workers
+HC04_EST_VC56,Married-couple families  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - 3 or more workers
+HC04_MOE_VC56,Married-couple families  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - 3 or more workers
+HC05_EST_VC56,"Female householder, no husband present  - Total; Estimate; NUMBER OF WORKERS IN FAMILY - 3 or more workers"
+HC05_MOE_VC56,"Female householder, no husband present  - Total; Margin of Error; NUMBER OF WORKERS IN FAMILY - 3 or more workers"
+HC06_EST_VC56,"Female householder, no husband present  - Percent below poverty level; Estimate; NUMBER OF WORKERS IN FAMILY - 3 or more workers"
+HC06_MOE_VC56,"Female householder, no husband present  - Percent below poverty level; Margin of Error; NUMBER OF WORKERS IN FAMILY - 3 or more workers"
+HC01_EST_VC59,All families  - Total; Estimate; INCOME DEFICIT - Mean income deficit for families (dollars)
+HC01_MOE_VC59,All families  - Total; Margin of Error; INCOME DEFICIT - Mean income deficit for families (dollars)
+HC02_EST_VC59,All families  - Percent below poverty level; Estimate; INCOME DEFICIT - Mean income deficit for families (dollars)
+HC02_MOE_VC59,All families  - Percent below poverty level; Margin of Error; INCOME DEFICIT - Mean income deficit for families (dollars)
+HC03_EST_VC59,Married-couple families  - Total; Estimate; INCOME DEFICIT - Mean income deficit for families (dollars)
+HC03_MOE_VC59,Married-couple families  - Total; Margin of Error; INCOME DEFICIT - Mean income deficit for families (dollars)
+HC04_EST_VC59,Married-couple families  - Percent below poverty level; Estimate; INCOME DEFICIT - Mean income deficit for families (dollars)
+HC04_MOE_VC59,Married-couple families  - Percent below poverty level; Margin of Error; INCOME DEFICIT - Mean income deficit for families (dollars)
+HC05_EST_VC59,"Female householder, no husband present  - Total; Estimate; INCOME DEFICIT - Mean income deficit for families (dollars)"
+HC05_MOE_VC59,"Female householder, no husband present  - Total; Margin of Error; INCOME DEFICIT - Mean income deficit for families (dollars)"
+HC06_EST_VC59,"Female householder, no husband present  - Percent below poverty level; Estimate; INCOME DEFICIT - Mean income deficit for families (dollars)"
+HC06_MOE_VC59,"Female householder, no husband present  - Percent below poverty level; Margin of Error; INCOME DEFICIT - Mean income deficit for families (dollars)"
+HC01_EST_VC62,All families  - Total; Estimate; TENURE - Owner occupied
+HC01_MOE_VC62,All families  - Total; Margin of Error; TENURE - Owner occupied
+HC02_EST_VC62,All families  - Percent below poverty level; Estimate; TENURE - Owner occupied
+HC02_MOE_VC62,All families  - Percent below poverty level; Margin of Error; TENURE - Owner occupied
+HC03_EST_VC62,Married-couple families  - Total; Estimate; TENURE - Owner occupied
+HC03_MOE_VC62,Married-couple families  - Total; Margin of Error; TENURE - Owner occupied
+HC04_EST_VC62,Married-couple families  - Percent below poverty level; Estimate; TENURE - Owner occupied
+HC04_MOE_VC62,Married-couple families  - Percent below poverty level; Margin of Error; TENURE - Owner occupied
+HC05_EST_VC62,"Female householder, no husband present  - Total; Estimate; TENURE - Owner occupied"
+HC05_MOE_VC62,"Female householder, no husband present  - Total; Margin of Error; TENURE - Owner occupied"
+HC06_EST_VC62,"Female householder, no husband present  - Percent below poverty level; Estimate; TENURE - Owner occupied"
+HC06_MOE_VC62,"Female householder, no husband present  - Percent below poverty level; Margin of Error; TENURE - Owner occupied"
+HC01_EST_VC63,All families  - Total; Estimate; TENURE - Renter Occupied
+HC01_MOE_VC63,All families  - Total; Margin of Error; TENURE - Renter Occupied
+HC02_EST_VC63,All families  - Percent below poverty level; Estimate; TENURE - Renter Occupied
+HC02_MOE_VC63,All families  - Percent below poverty level; Margin of Error; TENURE - Renter Occupied
+HC03_EST_VC63,Married-couple families  - Total; Estimate; TENURE - Renter Occupied
+HC03_MOE_VC63,Married-couple families  - Total; Margin of Error; TENURE - Renter Occupied
+HC04_EST_VC63,Married-couple families  - Percent below poverty level; Estimate; TENURE - Renter Occupied
+HC04_MOE_VC63,Married-couple families  - Percent below poverty level; Margin of Error; TENURE - Renter Occupied
+HC05_EST_VC63,"Female householder, no husband present  - Total; Estimate; TENURE - Renter Occupied"
+HC05_MOE_VC63,"Female householder, no husband present  - Total; Margin of Error; TENURE - Renter Occupied"
+HC06_EST_VC63,"Female householder, no husband present  - Percent below poverty level; Estimate; TENURE - Renter Occupied"
+HC06_MOE_VC63,"Female householder, no husband present  - Percent below poverty level; Margin of Error; TENURE - Renter Occupied"
+HC01_EST_VC66,All families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level
+HC01_MOE_VC66,All families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level
+HC02_EST_VC66,All families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level
+HC02_MOE_VC66,All families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level
+HC03_EST_VC66,Married-couple families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level
+HC03_MOE_VC66,Married-couple families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level
+HC04_EST_VC66,Married-couple families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level
+HC04_MOE_VC66,Married-couple families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level
+HC05_EST_VC66,"Female householder, no husband present  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level"
+HC05_MOE_VC66,"Female householder, no husband present  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level"
+HC06_EST_VC66,"Female householder, no husband present  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level"
+HC06_MOE_VC66,"Female householder, no husband present  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 50 percent of poverty level"
+HC01_EST_VC67,All families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level
+HC01_MOE_VC67,All families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level
+HC02_EST_VC67,All families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level
+HC02_MOE_VC67,All families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level
+HC03_EST_VC67,Married-couple families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level
+HC03_MOE_VC67,Married-couple families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level
+HC04_EST_VC67,Married-couple families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level
+HC04_MOE_VC67,Married-couple families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level
+HC05_EST_VC67,"Female householder, no husband present  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level"
+HC05_MOE_VC67,"Female householder, no husband present  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level"
+HC06_EST_VC67,"Female householder, no husband present  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level"
+HC06_MOE_VC67,"Female householder, no husband present  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 125 percent of poverty level"
+HC01_EST_VC68,All families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level
+HC01_MOE_VC68,All families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level
+HC02_EST_VC68,All families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level
+HC02_MOE_VC68,All families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level
+HC03_EST_VC68,Married-couple families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level
+HC03_MOE_VC68,Married-couple families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level
+HC04_EST_VC68,Married-couple families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level
+HC04_MOE_VC68,Married-couple families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level
+HC05_EST_VC68,"Female householder, no husband present  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level"
+HC05_MOE_VC68,"Female householder, no husband present  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level"
+HC06_EST_VC68,"Female householder, no husband present  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level"
+HC06_MOE_VC68,"Female householder, no husband present  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 150 percent of poverty level"
+HC01_EST_VC69,All families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level
+HC01_MOE_VC69,All families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level
+HC02_EST_VC69,All families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level
+HC02_MOE_VC69,All families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level
+HC03_EST_VC69,Married-couple families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level
+HC03_MOE_VC69,Married-couple families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level
+HC04_EST_VC69,Married-couple families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level
+HC04_MOE_VC69,Married-couple families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level
+HC05_EST_VC69,"Female householder, no husband present  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level"
+HC05_MOE_VC69,"Female householder, no husband present  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level"
+HC06_EST_VC69,"Female householder, no husband present  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level"
+HC06_MOE_VC69,"Female householder, no husband present  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 185 percent of poverty level"
+HC01_EST_VC70,All families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level
+HC01_MOE_VC70,All families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level
+HC02_EST_VC70,All families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level
+HC02_MOE_VC70,All families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level
+HC03_EST_VC70,Married-couple families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level
+HC03_MOE_VC70,Married-couple families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level
+HC04_EST_VC70,Married-couple families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level
+HC04_MOE_VC70,Married-couple families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level
+HC05_EST_VC70,"Female householder, no husband present  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level"
+HC05_MOE_VC70,"Female householder, no husband present  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level"
+HC06_EST_VC70,"Female householder, no husband present  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level"
+HC06_MOE_VC70,"Female householder, no husband present  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 200 percent of poverty level"
+HC01_EST_VC71,All families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level
+HC01_MOE_VC71,All families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level
+HC02_EST_VC71,All families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level
+HC02_MOE_VC71,All families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level
+HC03_EST_VC71,Married-couple families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level
+HC03_MOE_VC71,Married-couple families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level
+HC04_EST_VC71,Married-couple families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level
+HC04_MOE_VC71,Married-couple families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level
+HC05_EST_VC71,"Female householder, no husband present  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level"
+HC05_MOE_VC71,"Female householder, no husband present  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level"
+HC06_EST_VC71,"Female householder, no husband present  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level"
+HC06_MOE_VC71,"Female householder, no husband present  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 300 percent of poverty level"
+HC01_EST_VC72,All families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level
+HC01_MOE_VC72,All families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level
+HC02_EST_VC72,All families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level
+HC02_MOE_VC72,All families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level
+HC03_EST_VC72,Married-couple families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level
+HC03_MOE_VC72,Married-couple families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level
+HC04_EST_VC72,Married-couple families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level
+HC04_MOE_VC72,Married-couple families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level
+HC05_EST_VC72,"Female householder, no husband present  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level"
+HC05_MOE_VC72,"Female householder, no husband present  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level"
+HC06_EST_VC72,"Female householder, no husband present  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level"
+HC06_MOE_VC72,"Female householder, no husband present  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 400 percent of poverty level"
+HC01_EST_VC73,All families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level
+HC01_MOE_VC73,All families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level
+HC02_EST_VC73,All families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level
+HC02_MOE_VC73,All families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level
+HC03_EST_VC73,Married-couple families  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level
+HC03_MOE_VC73,Married-couple families  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level
+HC04_EST_VC73,Married-couple families  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level
+HC04_MOE_VC73,Married-couple families  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level
+HC05_EST_VC73,"Female householder, no husband present  - Total; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level"
+HC05_MOE_VC73,"Female householder, no husband present  - Total; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level"
+HC06_EST_VC73,"Female householder, no husband present  - Percent below poverty level; Estimate; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level"
+HC06_MOE_VC73,"Female householder, no husband present  - Percent below poverty level; Margin of Error; ALL FAMILIES WITH INCOME BELOW THE FOLLOWING POVERTY RATIOS - 500 percent of poverty level"

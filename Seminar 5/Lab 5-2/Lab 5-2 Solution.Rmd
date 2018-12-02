@@ -1,0 +1,107 @@
+---
+title: "Lab 5-2 Solution"
+author: "Kun Zhang"
+date: "12 December 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r initialization}
+library(dplyr)
+wvs.dat <- read.csv("./Data/au.edu.anu.ada.ddi.01252_F1.csv")
+dim(wvs.dat)
+```
+
+```{r define functions to recode variables}
+
+
+recode_likert4 <- function(my_var) {
+  as.numeric(as.character(recode(my_var,
+                                  '1' = '4',
+                                   '2' = '3',
+                                   '3' = '2',
+                                   '4' = '1',
+                                  '-2' = NULL)))
+}
+
+recode_likert10 <- function(my_var) {
+    as.numeric(as.character(recode(my_var,
+                                  '1' = '10',
+                                   '2' = '9',
+                                   '3' = '8',
+                                   '4' = '7',
+                                   '5' = '6',
+                                   '6' = '5',
+                                   '7' = '4',
+                                   '8' = '3',
+                                   '9' = '2',
+                                   '10' = '1',
+                                  '-2' = NULL)))
+}
+
+recode_to_notnull <- function(my_var) {
+  as.numeric(as.character(recode(my_var,
+                                 '-2' = NULL,
+                                 .default = my_var)))
+}
+
+```
+
+```{r recode and cleanup}
+
+wvs.dat$happiness <- recode_likert4(wvs.dat$V10)
+wvs.dat$health <- recode_likert4(wvs.dat$V11)
+wvs.dat$finances <- recode_to_notnull(wvs.dat$V59)
+wvs.dat$satisfaction <- recode_to_notnull(wvs.dat$V23)
+wvs.dat$freedom <- recode_to_notnull(wvs.dat$V55)
+
+```
+
+## PRC Example
+```{r scree plot}
+# A Scree Plot is a simple line segment plot that shows the fraction of total variance in the data as explained or represented by each PC.
+
+ir.pca <- prcomp(na.omit(wvs.dat[,c("happiness",
+                                    "health",
+                                    "finances", 
+                                    "satisfaction",
+                                    "freedom")])) 
+plot(ir.pca, type = "l") # variance latent variable ~ variance
+```
+## Factor Analysis Example
+```{r factor analysis example}
+library(psych)
+library(ggplot2)
+fa.fit <- fa(wvs.dat[,c("happiness",
+                         "health",
+                         "finances", 
+                         "satisfaction",
+                         "freedom")], 
+             nfactors=1, rotate="varimax")
+
+fa.fit
+# MR1: is the factor load
+# h2: how latent traits drives the observed variable
+# u2: uniqueness u2 = 1 - h2
+
+wvs.dat$life.quality <- fa.fit$scores
+head(wvs.dat$life.quality)
+
+ggplot(wvs.dat, aes(life.quality)) + 
+  geom_histogram()
+
+
+```
+
+
+
+
+
+
+
+
+

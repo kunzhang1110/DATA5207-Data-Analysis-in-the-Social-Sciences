@@ -1,0 +1,232 @@
+---
+title: "Seminar 2-2:Linear Regression"
+subtitle: "DATA5207: Data Analysis in the Social Sciences - Summer Semester, 2018"
+author: "Nick James"
+date: "12/11/2018"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+--- 
+
+```{r results='hide', include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+##Overview
+  
+\vspace{3mm} 
+
+We have seen in the lectures that linear regression can be applied to model a relationship between a set of covariates and some dependent variable. Before applying linear regression it is important to note some of the limitations of the linear regression model. The include: 
+
+1. That a linear relationship exists between our covariates and the dependent variable we have chosen to model.
+
+2. The assumption that our errors are normally distributed (homoscedasticity).
+
+3. Without additional modifications such as regularization measures, we may overfit (L1 & L2 regularization methods as well as Elastic Net in later weeks). This notebook demonstrates the type of experiments we can run with linear regression when applied to problems within finance.
+ 
+\vspace{3mm}
+
+We begin by loading our data:
+ 
+\vspace{3mm}
+
+```{r results='hide', message=FALSE, warning=FALSE}
+
+data <- read.csv("Data/finance/EconomicDataSummerSchool.csv", header=TRUE)
+data2 <- read.csv("Data/finance/BoujeeCapital.csv", header=TRUE)
+
+```
+
+\vspace{3mm}
+
+##Exploratory Data Analysis
+
+\vspace{3mm}
+
+More often than not, the first thing we do when we have a data-driven problem is plot the data we have and visually inspect any notable trends or patterns. Once we have formulated some hypothesis as to the phenomenology of our problem, we choose an algorithm we think is appropriate & select variables that we would like to experiment with. If we spot patterns between variables that appear to be linear, linear regression is a good algorithm to start with.
+
+\vspace{3mm}
+
+The first variable pairing we explore is AUD/USD (the strength of the Australian dollar) vs BHP share price. Let us think through the effects of a strong AUD.
+
+\vspace{3mm}
+
+1) A strong AUD should improve purchasing power, thus expenses denominated in foreign currencies will be less expensive.
+
+2) Our exports are comparatively more expensive...do you think this would impact BHP's share price? 
+3) Higher AUD is generally accompanied by strong GDP growth for an economy.
+
+\vspace{3mm} 
+ 
+Let us plot various macroecoomic variables against each other to see if we can identify patterns:
+
+\vspace{3mm}
+
+###BHP Share Price vs AUD/USD Currency
+
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(arm)
+library(ggplot2)
+
+x1 = data$AUD.USD 
+x2 = data$BHP.Share.Price
+plot(x1, x2, xlab="AUD:USD", ylab="BHP Share Price")
+abline(lm(x2~x1))
+title("Effect of currency vs BHP Share Price")
+```
+
+\vspace{3mm}
+
+### BHP Share Price vs Inflation
+
+```{r}
+x3 = data$Inflation
+x4 = data$BHP.Share.Price
+plot(x3, x4)
+title("Effect of Australian GDP Growth vs BHP Share Price")
+```
+
+\vspace{3mm}
+
+**Task:** Discuss the following questions in groups: 
+
+1. Do you think the impact of the AUD vs the Yuan would have an impact on BHP's share price? 
+2. If so what sort of effects? Would the AUD:CNY capture any other latent factors concerning Australia's exports into China?
+
+\vspace{3mm}
+
+### BHP Share Price vs AUD:CNY Currency
+
+```{r results='hide', message=FALSE, warning=FALSE}
+x5 = data$AUD.CNY.Growth
+x6 = data$BHP.Share.Price
+plot(x5, x6)
+title("Aussie/Yuan vs BHP Share Price")
+```
+
+\vspace{3mm}
+
+**Task:** Below you can see the distribution of various economic factors. Do these lead to any insights? Plot some more features independently and discuss in groups any thoughts you may have. Try to tie these back to some of the economic criteria we discussed in lectures.
+
+\vspace{3mm}
+### Density plots displaying economic features
+```{r results='hide', message=FALSE, warning=FALSE}
+# Plot Distribution of BHP Share Price
+plot(density(x1), main="Distribution of AUD:USD Share Price", ylab="Frequency", xlab = "Currency")
+plot(density(x2), main="Distribution of BHP Share Price", ylab="Frequency", xlab = "Share Price")
+plot(density(x3), main="Australian Inflation Rate", ylab="Frequency", xlab = "Inflation Rate")
+plot(density(x5), main="Distribution of AUD:CNY Growth", ylab="Frequency", xlab = "AUD:CNY")
+```
+
+\vspace{3mm}
+
+##Regression Analysis 1: Fitting a simple model to these data
+
+Let us run a small regression based on the first two variables. That is, regress BHP's share price against the strength of the AUD. 
+
+You can do this with the following code:
+
+\vspace{3mm}
+
+```{r, warning=FALSE}
+model1 <- lm(x2 ~ x1)
+display(model1)
+plot(model1)
+```
+
+\vspace{3mm}
+
+**Task:** Discuss any relevant concerns you have in the strength of this relationship? Do you think it is simply a cause and effect relationship, or do you think currency may be a good representation of some other latent factor? Remember the distinction between correlation and causation, and proving causation is a non-trivial task. In the example below we are using `x2` as our dependent variable and everyting on the right of our `~` refer to our independent variables. We can use groups of covariates to try and construct a model with as much explanatory power as possible.
+
+We can diagnose our model with these plots. 
+
+1) \textbf{Residuals vs Leverage plot}: This type of plot helps us detect outliers in our data. There is no scientific definition of an outlier - it is a matter of judgment. If a point significantly influences model fit (has large leverage) and is not approximated well by the model (has a large residual) it could be considered an outlier.
+2) \textbf{Q-Q Plot}: One of the assumptions of the linear regression model is that our errors are normally distributed. If our data falls roughly in line with the 45 degree straight line, our errors are approximately normal.
+3) \textbf{Scale-Location plot}: This is also referred to as the Spread-Location plot. The plot demonstrates whether residuals have a consistent spread across the range of predictors. This is a measurement of homoscedasticity in the data. If you see a horizontal line with consistently spread points that is a sign that the model has approximately homoscedastic errors.
+4) \textbf{Residuals vs Leverage}: This plot helps us find influential cases in the data. The most impactful areas are at the top right and bottom right corner - these spots can heavily influence the regression line. If the cases are outside of the Cook's distance scores - they are highly influential to the regression results. That is, the regression results would be impacted if we were to remove those cases.
+
+\vspace{3mm}
+
+**Task:** Explore Various Economic Relationships with your own linear regression. For instance: 'BHP's share price is driven by commodity prices'. In the examples above (the plots on pages 2-4, inclusive), we have plotted various variables against one another. Using some economic intuition, replicate these by generating some of your own plots with different variables and see if you can draw some insights from the data. Run supporting linear regression analysis to see if there are any meaningful findings in the data.
+
+
+\vspace{3mm}
+
+## Regression Analysis 2: BHP Share Price
+
+**Task:** Run a multivariate regression with a maximum of five covariates. Use your common sense and economic intuition to try and gauge which covariates will have the highest impact on your dependent variable. Once you have done this, run some analysis with different dependent variables. There is an example of a linear regression implementation below:
+
+\vspace{3mm}
+
+```{r}
+y = data$BHP.Share.Price
+x1 = data$Unemployment.Rate 
+x2 = data$AUD.USD
+x3 = data$Crude.oil..average
+x4 = data$Iron.ore..cfr.spot 
+x5 = data$Gold
+
+model1 <- lm(y ~ x1 + x2 + x3 + x4 + x5)
+display(model1)
+plot(model1)
+```
+
+\vspace{3mm} 
+
+##Regression Analysis 3: Hedge Fund Returns
+
+\vspace{3mm} 
+In our lectures, we discussed a concept known as style drift, where a fund manager deviates from their stated financial objectives.
+
+Are there any instances where not having a high-level of correlation with your benchmark would be considered a good thing? Think about this concept in terms of a portfolio of investments. 
+
+Analyse this hedge fund's returns with regard to various indices, and discuss the results among your groups. Run some analyses and try to interpret your results as a group. In doing so, take note of the following:
+
+
+\vspace{6mm}
+
+1) A hedge fund is an investment vehicle designed to have an implicit 'hedge' against markets. You are paying higher fees for this investment product because it is negatively correlated with a) other investment products and b) the market/benchmark.
+
+2) \textbf{'beta'} - which is a measure of systematic risk is the slope of this curve. 
+
+3) \textbf{'alpha'} - the outperformance or underperformance of the fund can be interpreted as the y-intercept. If it is above the origin, our hedge fund is providing excess returns, if it is below the origin the fund is providing negative returns.
+
+### Boujee Capital vs Managed Futures Index
+I am using a real hedge fund's monthly return data and comparing them to the managed futures index, which is their respective benchmark. The returns of our hedge fund are our dependent variable, and the independent variable is the index itself. If we were running this hedge fund we would like to say, "we outperform the benchmark (high level of alpha) and the performance of the benchmark has very little to do with our monthly returns (low beta, or correlation to the market)." This is indeed highly unusual and unfortunately after investors and potential investors loss of faith - most hedge funds shutter (close) after three or four years of operations.
+
+\vspace{6mm}
+```{r results='hide', message=FALSE, warning=FALSE}
+
+index_returns <- data2$Managed.Futures 
+hf_returns <- data2$Boujee.Capital
+
+plot(density(index_returns), main="Index Returns Histogram", ylab="Frequency", xlab = "Index Returns")
+plot(density(hf_returns), main="Hedge Fund Returns Histogram", ylab="Frequency", xlab = "Hedge Fund Returns")
+model2 <- lm(hf_returns ~ index_returns)
+display(model2)
+plot(model2)
+```
+
+**Task:** Interpret this hedge fund's returns against the benchmark provided. What does the shape of the distribution tell us about their monthly return profiles? What does the beta and alpha imply about the hedge fund's returns? Would you invest in this hedge fund?
+
+```{r results='hide', message=FALSE, warning=FALSE}
+plot(index_returns, hf_returns)
+abline(lm(hf_returns~index_returns))
+title("Analysis of hedge fund returns")
+```
+
+##Additional tasks
+
+The additional tasks document saved in canvas contain exercises which involve revising the methods learned so far, and looking at fitting more complex linear regression models. These allow us to create a better approximation of reality in our models. They also look at graphing the regression line of our interactions, and the model coefficients, to make our results clearly understandable. 
+
+These are not compulsory. We will not mark you on these, and we will not check that you have done the work. They are designed to help those of you without prior experience with $R$ or the methods we are covering in this unit. They will not be set every seminar; just a few to help you get up to speed and make sure you pass the unit. 
+
+Work through these at your own pace before the next lab to familiarise yourself with these methods. If you are finding something difficult, please contact us and arrange a time to speak. Details are available **[on canvas](https://canvas.sydney.edu.au/courses/2452/pages/unit-information#teachingteam)**. We will also offer some additional support during an additional workshop next week.
+
+ 
+
+
+

@@ -1,0 +1,9 @@
+{
+    "path" : "~/Dropbox/Academia/Teaching/ACSPRI/Summer 2018/Data/Earnings",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

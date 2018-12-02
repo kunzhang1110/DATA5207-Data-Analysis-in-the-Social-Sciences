@@ -1,0 +1,164 @@
+---
+title: "Lab 6-2 Solution"
+author: "Kun Zhang"
+date: "13 December 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# The Role of Economic Class in American Politics
+## Introduction
+The role of economic class in American politics
+
+This data journal investigates the role of economic class voters in American politics, where it has been claimed by Thomas Frank, that the parties of American politics such as Democratic and Republic are supported by voters based on their economic status. Working and lower-middle class white voters supports Republican Party, whereas, minority voters and middle class white professionals in big cities more likely to choose Democratic Party. 
+
+The report is to demonstrate the role of economic class in American politics while considering the economic status of voters which includes income, social class, work status and occupation of the voters
+
+
+## Data analysis
+In order to explore whether economic class plays a role in the voting choice for Democratic Party or Republic Party,relevant variables are selected from the dataset to analyze this question. The variables considered to be related to the economic class include social class, work status,income and occupation. Categories included in each variable is summerized in the code
+
+A linear regression model is established to model the relationship between choice of Party(Democrat/Republican) and the selected independent variables.It can be seen that the 4 variables have impacts on respondents' choices.For example, work status of unemployed or occupation of student have negative impact on the dependent variable, meaning that it will reduce the degree of "strongly agree to select democratics". 
+
+## Factor Analysis
+We want to to have a measure to represent the socioeconomical class of the respondent. We use indicators "income category", "social class", and "educational level" and try to explore the hidden feature "social score". 
+The PCA analysis reveals that one latent variable is sufficient for the three columns' data. The MR1 values of the model suggests that each indicator contributes in a similar way. At last, with the "social score" in average being 0.016, the distribution is relatively skewed to the right.
+
+
+# Analyzing the role of economic class in American politics
+```{r initialization}
+library(Hmisc)
+library(car)
+
+load("Data/data.rda")
+raw.data <- data.frame(data)
+
+# change column names
+for (i in 1:length(raw.data)){
+  names(raw.data)[i] = attr(raw.data[,i],"label")
+  }
+
+head(names(raw.data))
+head(data)
+
+table(raw.data$`ELECTION: Vote for President- Major Parties`)
+
+```
+# Data processing
+```{r }
+raw.data$party <- recode(as.numeric(raw.data$`PARTISANSHIP: Party Identification of Respondent- 7-point Scale`), " 0 = NA " )
+
+raw.data$work.status.numeric <- recode(as.numeric(raw.data$`DEMOGRAPHICS: Respondent - Work Status 5-category`), " 9 = NA " )
+raw.data$work.status <- recode(as.numeric(unlist(raw.data$work.status.numeric)),
+                          " 1 = 'Employed' ;
+                            2 = 'Not employed';
+                            3 = 'Retired' ;
+                            4 = 'Homemakers' ;
+                            5 = 'Student' ;
+                            9 = NA " )
+
+raw.data$occupation <- recode(as.numeric(raw.data$`DEMOGRAPHICS: Respondent - Occupation Group 6-category`),
+                          " 1 = 'Professional and managerial' ;
+                            2 = 'Workers' ;
+                            3 = 'Workers' ;
+                            4 = 'Laborers' ;
+                            5 = 'Laborers' ;
+                            6 = 'Homemakers' ;
+                            0 =  NA " )
+
+raw.data$income <- recode(as.numeric(raw.data$`DEMOGRAPHICS: Respondent Family - Income Group`), " 0 = NA " )
+raw.data$social.class <- recode(as.numeric(raw.data$`DEMOGRAPHICS: Respondent - Average or Upper Middle/Working Class`), " 9 = NA " )
+
+
+
+linear.model <- lm(party ~ work.status + income + social.class + occupation,data=raw.data)
+
+library(arm)
+display(linear.model)
+
+```
+
+```{r plot}
+library(ggplot2)
+library(labeling)
+raw.data.no.na.party = subset(raw.data,!is.na(party))
+
+ggplot(subset(raw.data.no.na.party,!is.na(social.class)), aes(social.class ,fill=factor(party))) + geom_bar() + ggtitle('Social Class')
+
+ggplot(subset(raw.data.no.na.party,!is.na(income)), aes(income ,fill=factor(party))) + geom_bar() + ggtitle('Income')
+
+
+# Plot coefficients
+coef.linear.model <- data.frame(coef(linear.model))
+se.linear.model <- data.frame(se.coef(linear.model))
+
+coef.linear.model$one.se.upper <- coef.linear.model[,1] + se.linear.model[,1]
+coef.linear.model$one.se.lower <- coef.linear.model[,1] - se.linear.model[,1]
+coef.linear.model$two.se.upper <- coef.linear.model[,1] + se.linear.model[,1] *2
+coef.linear.model$two.se.lower <- coef.linear.model[,1] - se.linear.model[,1] *2
+coef.linear.model$vars <- as.factor(variable.names(linear.model)) 
+
+
+# Plot
+ggplot(coef.linear.model, aes(x = coef.linear.model., y = vars)) +
+  geom_point(alpha=1, colour="black", size=2.3) +   
+  geom_errorbarh(aes(xmin=one.se.lower,xmax=one.se.upper), height=0,size=.75) +
+  geom_errorbarh(aes(xmin=two.se.lower,xmax=two.se.upper), height=0,size=.25) +
+  geom_vline(xintercept=0, colour="black", size = .5) + # vline() vertica line
+  labs(x = "Coefficient values", y = "Regression coefficients") + 
+  theme_bw() +
+  theme(panel.border = element_blank(), 
+      panel.grid.major.x = element_blank(), 
+      panel.grid.major.y = element_line(colour="light grey", size=0.1), 
+      panel.grid.minor = element_blank(), 
+      legend.position="none", 
+      title = element_text(size=13, face="bold"), 
+      strip.background = element_blank(), 
+      axis.title.x = element_text(size=12, face="bold", vjust=-.75), 
+      axis.title.y = element_text(size=12, face="bold", vjust=1.5), 
+      axis.text.x = element_text(size=10, vjust=-.25), 
+      axis.text.y = element_text(size=8.5), 
+      axis.ticks.y=element_blank())
+
+```
+
+# Factor Analysis
+We want to to have a measure to represent the socioeconomical class of the respondent. We use indicators "income category", "social class", and "educational level" and try to explore the hidden feature "social score". 
+The PCA analysis reveals that one latent variable is sufficient for the three columns' data. The MR1 values of the model suggests that each indicator contributes in a similar way. At last, with the "social score" in average being 0.016, the distribution is relatively skewed to the right.
+
+```{r factory analysis}
+raw.data$education <- recode(as.numeric(unlist(data[89])),
+                " 1 = 1 ;
+                  2 = 2 ;
+                  3 = 3 ;
+                  4 = 3 ;
+                  5 = 3 ;
+                  6 = 4 ;
+                  else = NA " )
+
+ir.pca <- prcomp(na.omit(raw.data[,c("income",
+                                    "social.class",
+                                    "education")
+                                  ])) 
+
+
+plot(ir.pca, type = "l") # variance latent variable ~ variance
+
+library(psych)
+
+fa.fit <- fa(raw.data[,c("income","social.class","education")], 
+             nfactors=1)
+
+fa.fit
+
+raw.data$social.score <- fa.fit$scores
+table(raw.data$social.score)
+mean(raw.data$social.score, na.rm=T)
+plot(table(raw.data$social.score))
+
+```

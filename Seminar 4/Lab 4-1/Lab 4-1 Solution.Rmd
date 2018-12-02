@@ -1,0 +1,91 @@
+---
+title: "Lab 4-1 Solution"
+author: "Kun Zhang"
+date: "11 December 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Crime Data
+```{r load library and data}
+library(foreign)
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(car)
+library(arm)
+library(reshape2)
+crime.data <- read.csv("Data/NSW_Crime_data_clean.csv")
+
+```
+
+## Data Visualisation
+```{r data visulisation}
+names(crime.data)
+hist(crime.data$Murder)
+hist(crime.data$Robbery.without.a.weapon)
+hist(crime.data$Break...Enter..Dwelling.)
+hist(crime.data$Motor.Vehicle.Theft)
+hist(crime.data$Fraud)
+
+# x-y transformation
+plot(crime.data$Median_mortgage_repay_monthly, crime.data$Fraud)
+
+# log-log transformation
+log.mortgage <- log(crime.data$Median_mortgage_repay_monthly)
+log.fraud <- log(crime.data$Fraud)
+plot(log.mortgage, log.fraud)
+
+# x-log transformation
+plot(crime.data$Median_mortgage_repay_monthly,log.fraud)
+```
+
+
+## Model Construction
+```{r Model 1}
+linear.model.1 <- lm(Fraud ~ crime.data$Median_mortgage_repay_monthly + crime.data$Median_rent_weekly + crime.data$Median_tot_hhd_inc_weekly + crime.data$Average_household_size, data=crime.data)
+display(linear.model.1)
+plot(linear.model.1 )
+
+coef.linear.model.1 <- data.frame(coef(linear.model.1))
+se.linear.model.1 <- data.frame(se.coef(linear.model.1))
+(coef.linear.model.1$vars <- as.factor(variable.names(linear.model.1)))
+
+coef.linear.model.1$one.se.upper <- coef.linear.model.1[,1] + se.linear.model.1[,1]
+coef.linear.model.1$one.se.lower <- coef.linear.model.1[,1] - se.linear.model.1[,1]
+coef.linear.model.1$two.se.upper <- coef.linear.model.1[,1] + se.linear.model.1[,1] *2
+coef.linear.model.1$two.se.lower <- coef.linear.model.1[,1] - se.linear.model.1[,1] *2
+
+# Plot
+ggplot(coef.linear.model.1, aes(x = coef.linear.model.1., y = vars)) +
+  geom_point(alpha=1, colour="black", size=2.3) +   
+  geom_errorbarh(aes(xmin=one.se.lower,xmax=one.se.upper), height=0,size=.75) +
+  geom_errorbarh(aes(xmin=two.se.lower,xmax=two.se.upper), height=0,size=.25) +
+  geom_vline(xintercept=0, colour="black", size = .5) + # vline() vertica line
+  labs(x = "Coefficient values", y = "Regression coefficients") + 
+  theme_bw() +
+  theme(panel.border = element_blank(), 
+      panel.grid.major.x = element_blank(), 
+      panel.grid.major.y = element_line(colour="light grey", size=0.1), 
+      panel.grid.minor = element_blank(), 
+      legend.position="none", 
+      title = element_text(size=13, face="bold"), 
+      strip.background = element_blank(), 
+      axis.title.x = element_text(size=12, face="bold", vjust=-.75), 
+      axis.title.y = element_text(size=12, face="bold", vjust=1.5), 
+      axis.text.x = element_text(size=10, vjust=-.25), 
+      axis.text.y = element_text(size=8.5), 
+      axis.ticks.y=element_blank())
+```
+
+
+## Model Explanation
+From the Residuals vs Fitted plot, we can see that most data fit within the line with few exceptions being data on row 8 and 56. The Q-Q plot reveals that most data points fall within the 45-degree line, indicating that our error is normal. We can see the spread of the points on Scale-Location roughly in a consistent manner, showing that our model presents approximately homoscedastic errors. It can be observed that some of the cases have more influence on the model, but the affect is not significant. 
+
+

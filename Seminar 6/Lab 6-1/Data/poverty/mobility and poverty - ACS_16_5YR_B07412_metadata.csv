@@ -1,0 +1,43 @@
+GEO.id,Id
+GEO.id2,Id2
+GEO.display-label,Geography
+HD01_VD01,Estimate; Total living in area 1 year ago:
+HD02_VD01,Margin of Error; Total living in area 1 year ago:
+HD01_VD03,Estimate; Total living in area 1 year ago: - Below 100 percent of the poverty level
+HD02_VD03,Margin of Error; Total living in area 1 year ago: - Below 100 percent of the poverty level
+HD01_VD04,Estimate; Total living in area 1 year ago: - 100 to 149 percent of the poverty level
+HD02_VD04,Margin of Error; Total living in area 1 year ago: - 100 to 149 percent of the poverty level
+HD01_VD05,Estimate; Total living in area 1 year ago: - At or above 150 percent of the poverty level
+HD02_VD05,Margin of Error; Total living in area 1 year ago: - At or above 150 percent of the poverty level
+HD01_VD06,Estimate; Total living in area 1 year ago: - Same house:
+HD02_VD06,Margin of Error; Total living in area 1 year ago: - Same house:
+HD01_VD07,Estimate; Total living in area 1 year ago: - Same house: - Below 100 percent of the poverty level
+HD02_VD07,Margin of Error; Total living in area 1 year ago: - Same house: - Below 100 percent of the poverty level
+HD01_VD08,Estimate; Total living in area 1 year ago: - Same house: - 100 to 149 percent of the poverty level
+HD02_VD08,Margin of Error; Total living in area 1 year ago: - Same house: - 100 to 149 percent of the poverty level
+HD01_VD09,Estimate; Total living in area 1 year ago: - Same house: - At or above 150 percent of the poverty level
+HD02_VD09,Margin of Error; Total living in area 1 year ago: - Same house: - At or above 150 percent of the poverty level
+HD01_VD10,Estimate; Total living in area 1 year ago: - Moved within same county:
+HD02_VD10,Margin of Error; Total living in area 1 year ago: - Moved within same county:
+HD01_VD11,Estimate; Total living in area 1 year ago: - Moved within same county: - Below 100 percent of the poverty level
+HD02_VD11,Margin of Error; Total living in area 1 year ago: - Moved within same county: - Below 100 percent of the poverty level
+HD01_VD12,Estimate; Total living in area 1 year ago: - Moved within same county: - 100 to 149 percent of the poverty level
+HD02_VD12,Margin of Error; Total living in area 1 year ago: - Moved within same county: - 100 to 149 percent of the poverty level
+HD01_VD13,Estimate; Total living in area 1 year ago: - Moved within same county: - At or above 150 percent of the poverty level
+HD02_VD13,Margin of Error; Total living in area 1 year ago: - Moved within same county: - At or above 150 percent of the poverty level
+HD01_VD14,Estimate; Total living in area 1 year ago: - Moved to different county within same state:
+HD02_VD14,Margin of Error; Total living in area 1 year ago: - Moved to different county within same state:
+HD01_VD15,Estimate; Total living in area 1 year ago: - Moved to different county within same state: - Below 100 percent of the poverty level
+HD02_VD15,Margin of Error; Total living in area 1 year ago: - Moved to different county within same state: - Below 100 percent of the poverty level
+HD01_VD16,Estimate; Total living in area 1 year ago: - Moved to different county within same state: - 100 to 149 percent of the poverty level
+HD02_VD16,Margin of Error; Total living in area 1 year ago: - Moved to different county within same state: - 100 to 149 percent of the poverty level
+HD01_VD17,Estimate; Total living in area 1 year ago: - Moved to different county within same state: - At or above 150 percent of the poverty level
+HD02_VD17,Margin of Error; Total living in area 1 year ago: - Moved to different county within same state: - At or above 150 percent of the poverty level
+HD01_VD18,Estimate; Total living in area 1 year ago: - Moved to different state:
+HD02_VD18,Margin of Error; Total living in area 1 year ago: - Moved to different state:
+HD01_VD19,Estimate; Total living in area 1 year ago: - Moved to different state: - Below 100 percent of the poverty level
+HD02_VD19,Margin of Error; Total living in area 1 year ago: - Moved to different state: - Below 100 percent of the poverty level
+HD01_VD20,Estimate; Total living in area 1 year ago: - Moved to different state: - 100 to 149 percent of the poverty level
+HD02_VD20,Margin of Error; Total living in area 1 year ago: - Moved to different state: - 100 to 149 percent of the poverty level
+HD01_VD21,Estimate; Total living in area 1 year ago: - Moved to different state: - At or above 150 percent of the poverty level
+HD02_VD21,Margin of Error; Total living in area 1 year ago: - Moved to different state: - At or above 150 percent of the poverty level

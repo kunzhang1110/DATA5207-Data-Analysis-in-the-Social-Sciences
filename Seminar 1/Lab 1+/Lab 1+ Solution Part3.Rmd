@@ -1,0 +1,33 @@
+---
+title: "Lab 1+ Solution Part3"
+author: "Kun Zhang"
+date: "5 December 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Smoking Data Reshaping
+```{r initialize}
+library(plyr)
+smoke.data <- read.csv("./Data/Smoking/smoke_data.csv", head=TRUE, sep=",", na.strings=" ") #na.strings = " " blank
+
+```
+
+## Reshaping
+Note that smoke.data3 has more data than smoke.data because it incorporates NA data that are not present in smoke.data. For example, a person may only have participated in wave 3. In smoke.data, the wave 3 data is not presented, but it is presented in smoke.data as smoke.data2 adds NA values. The total smkreg data in smoke.data2 size is 1760*6 = 10560, larger than 8730 in smoke.data.
+```{r Reshaping}
+library(reshape2)
+(smoke.data)
+#dcast: expand wave; ...spread operator
+(smoke.data2 <- dcast(smoke.data, ...~ wave, value.var="smkreg", na.rm=TRUE))
+#melt: shrink wave
+(smoke.data3 <-melt(smoke.data2, id.vars = c("newid","sex.1.F.","parsmk"), measure.vars = c("1", "2", "3", "4", "5", "6")))
+```
+
+
+

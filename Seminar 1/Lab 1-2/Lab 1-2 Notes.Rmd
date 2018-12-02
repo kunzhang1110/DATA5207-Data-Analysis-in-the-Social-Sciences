@@ -1,0 +1,686 @@
+---
+title: "Seminar 1-2: Visualising social science data"
+subtitle: "DATA5207: Data Analysis in the Social Sciences - Summer Semester, 2018"
+author: Dr Shaun Ratcliff
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+##Visualising data
+
+In the previous section, we looked at some patterns in data on the rates of smoking amongst Australian adolescents. We found that as we dig deeper into data, patterns become harder to interpret when presented in tabular format. Using a different data set we are now going to look at different ways to present your data.
+
+An alternative to tables is data visualisation. $R$ has several functions for making graphs. The base $R$ software comes with a built in function `plot()`. As its name suggests, this plots your data. However, these are not always the best graphs. To make the kinds of graphs we want to use for our reports, publications and other work, we will use another package, `ggplot2`. This is one of the most elegant and versatile packages for graphing data in $R$, and I would argue produces some of the best graphs of any statistical software packages available. `ggplot()` implements a grammar of graphics: a coherent system for creating any type of graph; meaning you can do more, faster, by learning a single system and using it in several ways. We also want to load the `scales` package, which is useful for labelling our plots. 
+
+\vspace{3mm}
+
+##Creating a line graph with ggplot
+
+The package `ggplot2` should already be installed on your system. If it has not installed, do so now using the `install.packages()` function. We then use the `library()` command to open the package. 
+
+Once you have done this, we are going to use data from the Dow30 (commonly referred to as just the "Dow," or the "Dow Jones Industrial Average", this is an index of the stock price of 30 American companies developed as a simple way of tracking US market performance) collected between January 2007 and December 2010. These data are saved in the file Dow30, saved in the canvas module for week 1. 
+
+Once you have saved these data in a folder that you make your working directory (or in which you set up a project) load these data with the code:
+
+\vspace{6mm}
+
+```{r dow 1 - loading dow data}
+
+dow.data <- read.csv("Data/Dow/Dow30.csv")
+
+```
+
+\vspace{6mm}
+
+As you can see when you view these data, along with the data that it was recorded, each stock price is included as a column:
+
+\vspace{6mm}
+
+```{r dow 2 - view dow data}
+
+head(dow.data)
+
+```
+
+\vspace{6mm}
+
+Before we start, a few points about `ggplot()`. It cannot use variables with numeric names. Similarly, if we try and load a dataset with numbered columns, $R$ adds an 'X' in front of the number. As you can see when you view the column names for our dataset using the `names()` function, they are now labelled 'X1', 'X2'. We can fix this quite easily, though. 
+
+Not only can we view the names of variables in a data file using the `names()` command, we can use this to edit them. The ability to rename variables is a useful one, for a variety of reasons beyond the technical. You may be preparing data to share with a colleague, or a table or graph that is going to be placed into a report, and the default labels could look less than professional. This will often be the case when you acquire a dataset and begin working with it, as the creators of these datasets may (understandably) not have been overly concerned about presentation when collecting it. When we use it for work we are going to be sharing with others, or even for publication, we do care. To view the variable names in the table, run it through the `names()` function, with the code:
+
+
+\vspace{6mm}
+
+```{r dow 3 - recode Dow data}
+
+names(dow.data)[2:31] <- c("Apple","American Express","Boeing","Caterpillar",
+                           "Cisco","Chevron","Coca-Cola","DowDuPont",
+                           "Exxon Mobil","General Electric", "Goldman Sachs",
+                           "Home Depot Inc","IBM","Intel","Johnson & Johnson",
+                           "JPMorgan Chase","McDonalds","3M Company","Merck",
+                           "Microsoft Corporation","Nike","Pfizer",
+                           "Procter & Gamble","Travelers Companies Inc",
+                           "UnitedHealth","United Technologies","Visa","Verizon",
+                           "Wal-Mart","Walt Disney")
+
+```
+
+\vspace{6mm}
+
+By following the `name()` function with a set of brackets including '2:31', we specify that we wish to recode rows 2-31, and not row 1 (row 1 is the variable `Date` and its name does not need to be changed).  
+
+An additional constraint encountered when using `ggplot()` is that it cannot handle the data in its current format. `ggplot()` requires a single column for the data that makes the y-axis, and another column for the x-axis. Presently, we have a seperate column (or variable) for each company. We wish to change this so that our data containts a single column for the value of the stock and another identifying the company the stock belongs to. We do this with the `reshape2` package. This provides functionality that allows us to avoid having to hack data around in a spreadsheet prior to importing it into $R$ for analysis.
+
+`reshape2` provides us with two functions, `cast` and `melt`. The former takes long-format data and casts it into wide-format data. There are two possible options for the `cast` function: `acast()`, which creates a vector/matrix/array output (which can have multiple dimensions); or `dcast()`, which creates data frame output (which can have at most two dimensions). The latter melts wide-format data into long-format data. `melt()` is arguably the more frequently used of the two functions, and that is what we will look at here.
+
+
+To make use of the `melt()`function we specify the data frame, the id variable(s), which is left at its existing setting, and the measured variable(s), which are the columns of data to be stacked. The default assumption on measured variables is that it is all columns not specified as id variables (unless otherwise identified). For `dow.data` this would be:
+
+
+\vspace{6mm}
+
+```{r dow 4 - melting dow data}
+
+library(reshape2)
+
+dow.data.2 <- melt(dow.data, id.vars = "Date", 
+                   measure.vars = c("Apple", "American Express", "Boeing", 
+                                    "Caterpillar", "Cisco", "Chevron"))
+
+```
+
+\vspace{6mm}
+
+We specify `Year` as our id variable, and the first six companies in the dataset as the measure variables. The id variable(s) is (or are) those variables we do not wish to melt. They remain unchanged. The measure variables are those that we wish to stack on top of each other to form a new, melted variable. We indicate the latter only because we want to leave the remaining 24 companies out of our new melted dataset for the time being. 
+
+Using this function,  we take data in wide format and stack a set of columns into a single vector in a new dataframe, identified by a second vector that consists of the names of the former  variable. A way to picture this is to examine the first six rows of the newly created `dow.data.2`:
+
+```{r dow 5 - viewing first rows of dow.data.2}
+
+head(dow.data.2)
+
+```
+
+
+With all observations on the share price from each of the six companies stacked on each other in the column labelled value, the original labels of the six variables stacked included under `variable`, their values listed in `value` and `Date` retained in its original format.
+
+Using these functions, you can reshape just about any data from the (often sub-optimal) format you will often receive it in, into a more efficient arrangement for analysis. 
+
+Lastly, $R$ is able to recognise calendar dates and treat them appropriately (for visualisation and other purposes). We just need to tell $R$ the variable `Date` should be treated as a date and not a string vector. We do this using the `as.Date()` function with the syntax:
+
+```{r converting var date to actual date, warning=FALSE}
+
+dow.data.2$Date.2 <- as.Date(dow.data.2$Date, "%d/%m/%y")
+
+```
+
+Here we have specified the source of the original `Date` vector, and its format  (day/month/year) and where we would like to store the new vector coded by $R$ as a calendar date. 
+
+Once we have done this, we can begin the process of creating our graph.
+
+First, call the `ggplot2` package:
+
+\vspace{6mm}
+
+```{r call ggplot2 package, message = FALSE}
+
+library(ggplot2)
+
+```
+
+\vspace{6mm}
+
+Then, enter the following code into $R$:  
+
+
+\vspace{6mm}
+
+```{r dow 6 -  empty plot, eval=FALSE}
+
+ggplot(dow.data.2, aes(x = Date.2, y = value))
+
+```
+
+\vspace{6mm}
+
+Here the function `ggplot()` tells $R$ that we want to plot the data described within the parentheses. From the left, we first list the data frame from which we are sourcing the information for our visualisation. The information within `aes()` is the data to be plotted, with the item before the comma the data frame to be graphed along the x-axis (I have labelled this with 'x =' for clarity, but this is unnecessary and ggplot will assume the first variable is the x axis) and after the comma the variable for the y-axis (which I have again labelled but unless otherwise told, $R$ will also assume). 
+
+When you run this syntax, it will give you something that looks like this:
+
+
+\vspace{6mm}
+
+
+```{r dow 7 - graphing empty dow plot, echo=FALSE,  warning=FALSE, message=FALSE, fig.height=4, fig.width=4, fig.align="center"}
+
+ggplot(dow.data.2, aes(x = Date.2, y = value))
+
+```
+
+
+\vspace{6mm}
+
+
+There are some problems here. We are only provided with the background of the graph, with no data. The formatting is not fantastic, either. We can improve this with a few lines of code (which I have annotated with descriptions following the hash to explain what each line of code does):
+
+\vspace{6mm}
+
+```{r dow 8 - filled plot, eval=FALSE}
+
+ggplot(dow.data.2, aes(x = Date.2, y = value, colour=variable)) + 
+  geom_line(alpha=.6, size=1) + 
+  labs(title = "Value of Dow30", 
+       y = "Value of stocks", 
+       x = "Date") + 
+  scale_y_continuous(labels = dollar) +
+  scale_x_date(labels = date_format("%b-%Y"), breaks=pretty_breaks(3)) +
+  theme_bw() + 
+  theme(axis.text = element_text(size=10), 
+        plot.title = element_text(size=10, face="bold", hjust=.5))  
+
+```
+
+\vspace{6mm}
+
+
+We have added `geom_line()` to our code. This creates and specifies the attributes of the line for our graph. Additionally, in the `aes()` command in the first line of code, we specify that ggplot should colour each category of `variable` (where we have stored the name of each stock) with a different shade.
+
+We have also specified labels for our title and axes with `labs()`. 
+
+In addition, we have directed `ggplot()` to treat the labels for the y-axis as 'dollars' with the `labels` command in `scale_y_continuous()`. The `labels` function is from the `scales` package, which we also need to call: 
+
+\vspace{6mm}
+
+```{r call scales package, message = FALSE}
+
+library(scales)
+
+```
+
+\vspace{6mm}
+
+`scale_y_continuous()` can also be used to place specific limits to the y-axis with the `limits` command, and locates the precise points of axis breaks with `breaks=`. For this plot I have not used these commands for this line of code. `scale_x_date()` specifies that the x-axis is a calendar date. Within `date_format()` I have specified "%b-%Y". The 'b' here orders $R$ to spell out the month, rather than use numerals (for which we would use 'm'). An upper case 'Y' results in the full year being written out, while a lower case 'y' would have had $R$ print out the last two digits of the year only. Within this line of code I have also used `pretty_breaks` to specify that I wish to use three breaks (approximately), at points selected by $R$. `theme_bw()` removes the grey background of the default settings, and within `theme()` we edit the axis plot title text, specifying font size, whether it is bold, and adjusting its position if needed.
+
+The addition symbol at the end of each line of code tells $R$ that the next line is a continuation of the same command. This gives us:
+
+\vspace{6mm}
+
+
+```{r dow 9 - filled plot2,  echo=FALSE,  warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+
+library(scales)
+
+ggplot(dow.data.2, aes(x = Date.2, y = value, colour=variable)) + 
+  geom_line(alpha=.6, size=1) + 
+  labs(title = "Value of Dow30", 
+       y = "Value of stocks", 
+       x = "Date") + 
+  scale_y_continuous(labels = dollar) +
+  scale_x_date(labels = date_format("%b-%Y"), breaks=pretty_breaks(3)) +
+  theme_bw() + 
+  theme(axis.text = element_text(size=10), 
+        plot.title = element_text(size=10, face="bold", hjust=.5))  
+
+```
+
+
+\vspace{6mm}
+
+
+There is more we could do with this to improve it further, but it's a good start, showing some clear trends. We will spend more time on plotting our results during the semester Before we move on, though, don’t forget to save your editor file. 
+
+
+\vspace{3mm}
+
+###Plotting by groups
+
+
+We will generally want to add further complexity to our analysis. One improvement we can make is the use of facets, rather than colours, to signify different stock.  
+
+We can do this using the `facet_wrap()` command. The first argument of facet wrap is a formula, which we create with a tilde (~) followed by the name of the variable with which we intend to subset our data. In this context, a formula is a data structure in $R$ and not a synonym for an equation. The variable that we pass to this command should be discrete. We do this with an additional line of code at the end of the syntax we have used so far to make our graph. It should look like:
+
+
+```{r dow 10a - facet wrap, eval=FALSE}
+
+facet_wrap( ~ variable)
+
+```
+
+
+When we plot these, though, we will want to make sure our variables are correctly ordered. `ggplot()` orders categories using its own internal logic -- which is usually alphabetical -- unless instructed otherwise (through the specific ordering of varliables). We ensure our variables are plotting the way we want. There are a number of ways to do this. The best for our current purposes is to order the stocks, saved as levels of `variable`, by their value, stored (coincidentally) in the vector `value`. We can do this using the `reorder()` function, with the code:
+
+\vspace{6mm}
+
+```{r dow 10b - ordering variables}
+
+dow.data.2$variable <- reorder(dow.data.2$variable, dow.data.2$value)
+
+```
+
+\vspace{6mm}
+
+
+Within the parentheses we first specify the variable we wish to reorder (this needs to be a factor), separated by the vector with which we wish to reorder it by (which must be of the same length). In this case, we order the new values to be stored over the originals. This re-orders the stocks of the companies stored within `variable` from that with the lowest value to the highest. No variables are re-written, but $R$ stores the order value with the string values of this variable. 
+
+Once we have done this, we can re-run the syntax for our graph, which should now look like this:
+
+\vspace{6mm}
+
+
+```{r dow 10c - filled plot with facet wrap, fig.height=4, fig.width=8}
+
+ggplot(dow.data.2, aes(x = Date.2, y = value, colour=variable)) + 
+  geom_line(alpha=.6, size=1) + 
+  labs(title = "Value of Dow30", 
+       y = "Value of stocks\n", 
+       x = "\nDate") + 
+  scale_y_continuous(labels = dollar) +
+  scale_x_date(labels = date_format("%b-%Y"), breaks=pretty_breaks(3)) +
+  theme_bw() + 
+  theme(axis.text = element_text(size=10), 
+        plot.title = element_text(size=10, face="bold", hjust=.5),
+        legend.position = "none") +
+  facet_wrap( ~ variable)
+
+```
+
+
+\vspace{6mm}
+
+
+In addition to the use of facets, two additional changes have been made to this code. We have removed the legend (now that we are using labelled facets, it is no longer needed) with `legend.position = "none"`. Further, I have added an `\n` in the x and y-axis title. This tells `ggplot()` to add a line at that point in the text. This creates some additional space for these labels, but is particularly useful if you have a long title that you wish to split over multiple lines.
+
+
+\vspace{6mm}
+
+##American voters attitudes towards key issues
+
+```{r loading data, include=FALSE, cache=FALSE}
+
+load("Data/Midterm elections/us_data.RData")
+
+
+```
+
+Next we return to they survey data collected during the 2018 American midterm elections. 
+
+As we found this morning, besides vote choice, our respondents were asked their opinions on the following statements: 
+
+- The government should permit more hydraulic fracturing (or fracking) as a means of increasing the production of natural gas and oil
+- The government should offer financial subsidies for renewable energy sources, such as solar and wind
+- America should accept fewer immigrants
+- Tariffs (i.e., levies or fees) on products imported from China will help the American economy
+- Tax cuts for businesses help grow the economy
+- The differences between the rich and poor have become too large
+- Instead of cutting taxes, the government should spend more on infrastructure such as roads, bridges, tunnels, railways, airports and dams
+
+\vspace{6mm}
+
+These are all five-point Likert scales, from `strongly agree` to `strongly disagree`. 
+
+This morning we examined one of these issues. Now, we are going to write code to examine all seven. 
+
+To do this we are going to use *for loops*. These are control flow statements that can be used to specify iteration, allowing code to be executed repeatedly with a single command. They are coded in a similar way to functions, with programming commands placed within braces `{ }` that instruct $R$ to run a function on a loop until all iterations are completed.
+
+This technique can be very useful when we have repeated identical processes that we want to undertake. It saves us writing multiple instances of similar code. Rather, we set up the command once and instruct it to loop until finished. 
+
+This is useful for tasks like this, where we have seven different items we want to examine that are coded identically. Rather than writing the code to look at them seven different times, we write once within the *for loop* and then let it run. The more iterations of the analysis you need to conduct, the greater the value of running the loop.
+
+We need to load the `dplyr` package:
+
+\vspace{6mm}
+
+```{r loading dplyr, message=FALSE, warning=FALSE}
+
+library(dplyr)
+
+
+```
+
+\vspace{6mm}
+
+We then use the quosure function, `quo()`, to capture $R$ code without running it:
+
+\vspace{6mm}
+
+```{r prep issues}
+
+issues <- c(quo(us.data$fracking), quo(us.data$subsidise.renewables),
+            quo(us.data$fewer.migrants), quo(us.data$tariffs),
+            quo(us.data$tax.cuts.for.bus), quo(us.data$rich.poor.diffs),
+            quo(us.data$spend.more.infrastructure))
+
+```
+
+\vspace{6mm}
+
+We will use this within our *for loop* to call each item seperately.
+
+We then create an object within which we will store the output from our loop. We specify a `matrix` with seven rows and one column (one row for each of our seven items), and then wrap this in a command to convert the matrix into a data frame:
+
+\vspace{6mm}
+
+```{r item within which to store for loop output}
+
+us.issue.attitudes <- data.frame(matrix(nrow = 7, ncol = 1))
+
+```
+
+\vspace{6mm}
+
+We then write our *for loop*. We specify that each run is for `i` in runs 1 to 7, with the programming for these loops located within the braces: 
+
+\vspace{6mm}
+
+```{r prepping US attitudes towards different issues}
+
+
+for(i in 1:7){
+  
+us.issue.attitudes[i,] <- us.data %>% 
+  dplyr::group_by(!!issues[[i]]) %>%
+  dplyr::summarise(sum.val = sum(weights)) %>% 
+  mutate(proportion = (sum.val / sum(sum.val)) * 100) %>%
+  dplyr::select(-sum.val) %>% 
+  na.omit() %>% 
+  rename("response"= names(.)[1]) %>%
+  subset(., response == "Strongly agree" | response == "Agree") %>%
+  summarise(proportion = sum(proportion)) %>%
+  dplyr::select(proportion)
+}
+
+```
+
+\vspace{6mm}
+
+As you can see, our programming looks a lot like what code used this morning. We group our data by `issues`, calculate the proportions. We rename the first column `response` and then use the `subset` function to extract the figures for `Agree` and `Strongly agree`, which we sum (so that we have the proportion of respondents that either agree or strongly agree with each proportion. We then use the `select` function to just extract those respondents that agree with each proposition. 
+
+This should provide you with results that look like this (showing the first six rows only): 
+
+\vspace{6mm}
+
+```{r print these results}
+
+head(us.issue.attitudes)
+
+```
+
+\vspace{6mm}
+
+We then use the following code to provide informative labels for the results: 
+
+\vspace{6mm}
+
+```{r edit US attitudes towards different issues}
+
+
+us.issue.attitudes <- us.issue.attitudes %>%
+  rename("All voters"= names(.)[1]) %>% 
+  mutate(issues = c("Permit more fracking",
+"Subsidies for renewable energy sources",
+"America should accept fewer immigrants",
+"Tariffs on imports from China will help the economy",
+"Tax cuts for businesses help grow the economy",
+"Differences between rich and poor have become too large",
+"Instead of cutting taxes, government should spend more on infrastructure"))
+
+```
+
+\vspace{6mm}
+
+We use the  `rename` function to rename the first column `All voters` by extracting within this the name of the first column with `names(.)[1]`, and then providing a new value on the left-hand of the equals sign. 
+
+This gives us:
+
+\vspace{6mm}
+
+```{r print tidied results}
+
+print(us.issue.attitudes)
+
+```
+
+\vspace{6mm}
+
+###Adding some complexity to this analysis
+
+We can add some additional sophistication to our analysis with small changes to this code. In this instance, we are going to examine attitudes towards each of these issues by respondents' vote intention at the midterm elections. 
+
+To do this, copy and paste your code into a new $R$ chunk, as I have done below. We then only need to make a few changes to this code. First, I rename the item within which we will store our results, by adding `.vote` to the end of it. We will want to be able to call both sets of results, so do not want to write over the first set. Within our   `matrix` function on the same line of code, we want to specify that the data frame should have five rows. One for each possible vote intention.
+
+Then, within the `group_by` command, add add `vote` before `issues`, as I have done below. This specifies we are grouping respondends by both how they say they will vote, and their position on each issue. 
+
+You will then notice after we `subset` resopondents by `Agree` and `Strongly agree`, we again `group_by(vote)` and `sum` the proportion of voters for each party that agreed with each proposition provided to them.  
+
+```{r add vote to this, echo=FALSE}
+
+
+us.issue.attitudes.vote <- data.frame(matrix(ncol = 7, nrow = 5))
+
+for(i in 1:7){
+  
+us.issue.attitudes.vote[,i] <- 
+  us.data %>% 
+  dplyr::group_by(vote, !!issues[[i]]) %>%
+    dplyr::summarise(sum.val = sum(weights)) %>% 
+  mutate(proportion = (sum.val / sum(sum.val)) * 100) %>%
+  select(-sum.val) %>% 
+  na.omit() %>% 
+  rename("response"= names(.)[2]) %>%
+  subset(., response == "Strongly agree" | response == "Agree") %>%
+  group_by(vote) %>% 
+  summarise(proportion = sum(proportion)) %>%
+  select(proportion)
+  }
+
+
+```
+
+Our loop runs through this process for all seven issues and saved the results in `us.issue.attitudes.vote`. Check to make sure your results are saved here. If they are, you should have:
+
+\vspace{6mm}
+
+```{r print vote results}
+
+print(us.issue.attitudes.vote)
+
+```
+
+\vspace{6mm}
+
+
+We then combine the analysis that includes vote with our previous set of results using the `merge()` function. Within this, we use piping to connect a set of commands to mutate our data within the merge. 
+
+First we use the `t()` function to transpose our dataset from the last analysis. This shifts the frame so the rows become columns and the columns rows. We then name each of the new columns with the `setNames()` function, to identify the vote intention each represents (you can tell the order by looking at how they appear when you run one set of analysis on these data). Then, we create an `issues` variable to match the one we made for the first set of results. Once we have done this editing, we finish by specifying that we want to merge this new edited dataset with our first set of results using the `issues` variable. We do this by specifying `by = "issues"` on the last line of code. 
+
+\vspace{6mm}
+
+
+```{r combine these}
+
+us.issue.attitudes.vote.tabs <- merge(us.issue.attitudes,
+data.frame(t(us.issue.attitudes.vote)) %>%
+  setNames(c("Democratic", "Republican", "Other", "Not sure", "Not voting")) %>%
+  mutate(issues = c("Permit more fracking",
+"Subsidies for renewable energy sources",
+"America should accept fewer immigrants",
+"Tariffs on imports from China will help the economy",
+"Tax cuts for businesses help grow the economy",
+"Differences between rich and poor have become too large",
+"Instead of cutting taxes, government should spend more on infrastructure")),
+by = "issues") 
+
+```
+
+\vspace{6mm}
+
+When you have done this, your results should look like: 
+
+\vspace{6mm}
+
+```{r print finalised vote results}
+
+head(us.issue.attitudes.vote.tabs)
+
+```
+
+\vspace{6mm}
+
+###Graphing our results
+
+We are now ready to graph our results. We will use a dot plot showing the proportion of all voters, Democrats and Republics who agree or strongly agree with each proposition. Our y-axis will be each issue, our x-axis the proproportion providing a response in the affirmative. As above, we use `ggplot` to do this.
+
+We need to start by using the `melt()` function from the `reshape2` package to rearrange our data for graphing.
+
+We need to do this, because each possible vote option is a separate column in the dataset, and for us to visualise this in `ggplot` we need a single column for results, and another column for party. 
+
+The `melt()` function enables this, by allowing you to 'melt' data so that each row becomes a unique id-variable combination, taking data in wide format and stacks a set of columns into a single column of data.
+
+To make use of the `melt()` function, first we load the `reshape2` package: 
+
+\vspace{6mm}
+
+```{r load reshape2 package, message=FALSE}
+
+library(reshape2)
+
+```
+
+\vspace{6mm}
+
+Once we have done this, we specify the data frame, the id variable(s), which is left at its existing setting, and the measured variable(s), which are the columns of data to be stacked. The default assumption on measured variables is that it is all columns not specified as id variables (unless otherwise identified). For these data, this would be:
+
+\vspace{6mm}
+
+```{r melting our data 1, eval=FALSE}
+
+melt(us.issue.attitudes.vote.tabs, id.vars= "issues") 
+
+```
+
+\vspace{6mm}
+
+This gives you the following (here I am just showing the first six rows):
+
+```{r melting our data 2, echo=FALSE}
+
+head(melt(us.issue.attitudes.vote.tabs, id.vars= "issues") )
+
+```
+
+\vspace{6mm}
+
+Once we have done this, we want to add to the command using piping.
+
+We reorder the variable `issues` by `value`, as we did above. Then we `subset` our data frame so we only include the results for Democratic and Republican voters, and all voters. 
+
+We also want to move the call on the data frame and add this to the set of piping, so that you have the following code:
+
+
+\vspace{6mm}
+
+```{r fulling piped melt 1, eval=FALSE}
+
+us.issue.attitudes.vote.tabs %>% 
+       melt(., id.vars= "issues") %>% 
+         mutate(issues = reorder(issues, value)) %>%
+         subset(., 
+              variable == "Democratic" | variable ==  "Republican" | variable ==  "All voters")
+
+```
+
+\vspace{6mm}
+
+When you run this you should get (again just showing the first six rows): 
+
+
+```{r fulling piped melt 2, message=FALSE}
+
+head(us.issue.attitudes.vote.tabs %>% 
+       melt(., id.vars= "issues") %>% 
+         mutate(issues = reorder(issues, value)) %>%
+         subset(., 
+              variable == "Democratic" | variable ==  "Republican" | variable ==  "All voters"))
+
+```
+
+\vspace{6mm}
+
+Once we have done this, we want to graph our data. You do this with the following code. First by calling `ggplot()`. Then we include our code to melt and mutate the data. Then in the aesthetics function (`aes`) we specify that the variable `issues` is the y-axis, `value` the x-axis (which is a percentage so we divide this by 100), and that we want to colour our points by `variable`, which represents the issues which voters were asked about. 
+
+We then add the `geom_point()` function to this code, telling $R$ that we wish to represent our data with dot points. Your code and graph should then look like this:
+
+\vspace{6mm}
+
+```{r graphing our results 1}
+
+
+ggplot(us.issue.attitudes.vote.tabs %>% 
+       melt(., id.vars= "issues") %>% 
+         mutate(issues = reorder(issues, value)) %>%
+         subset(., 
+              variable == "Democratic" | variable ==  "Republican" | variable ==  "All voters"), 
+aes(y = issues, x = value / 100, colour = variable)) + 
+  geom_point()
+
+```
+
+\vspace{6mm}
+
+There are still a few problems with this graph, though. What do you think we could do to improve it?
+
+\newpage
+
+If your ideas included the dimensions of the plot --- the horizontal layout is terrible, with the overly-large font and the legend providing too little space for the visualisation in between --- the colours of our points are not intuitive and the labels are defaults from our data and mostly unhelpful. 
+
+We can fix this with a few additions to our code. These are show below with the finished product:
+
+\vspace{6mm}
+
+```{r graphing our results 2, fig.align="centre"}
+
+ggplot(us.issue.attitudes.vote.tabs %>% 
+       melt(., id.vars= "issues") %>% 
+         mutate(issues = reorder(issues, value)) %>%
+         subset(., 
+              variable == "Democratic" | variable ==  "Republican" | variable ==  "All voters"), 
+       aes(y = issues, x = value / 100, colour = variable)) + 
+  geom_point() + 
+  labs(x = 'Percentage who agreed or strongly agreed' ) +
+  scale_x_continuous(labels = percent) +
+  scale_color_manual(values = c('black', 'blue', 'red')) +
+  theme_bw() +
+  theme(panel.border = element_blank(), 
+        panel.grid.major.y = element_line(size = .25, color = 'light grey', linetype = 'dotted'), 
+        panel.grid.major.x = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.title.x = element_text(size=9, vjust=-.75), 
+        axis.title.y = element_blank(), 
+        axis.text.x = element_text(size=8, vjust=-.25), 
+        axis.text.y = element_text(size=8),
+        legend.position="bottom",
+        legend.title = element_blank(), legend.text=element_text(size=6.5), 
+        legend.key.height=unit(.5,"line"), legend.key.width=unit(.5,"line"))
+
+```
+
+
+We now have a completed graph for these results. We have fixed the problems identified above by reducing the size of our axis labels while making sure those on the horizontal are clearly marked as percentages. We have recoded our axis titles, moved the legend under the plot and specified the colours used in the visualisation.
+
+
+\vspace{6mm}
+
+##Additional tasks
+
+The additional tasks document saved in canvas contains exercises which involve revising the material covered in the day 1 seminars. This includes more complex descriptive analyses using survey data to understand earnings in the United States. We also look at graphing these results.
+
+These tasks are not compulsory. We will not mark you on these, and we will not check that you have done the work. They are designed to help those of you without prior experience with $R$ or the methods we are covering in this unit. They will not be set every day. We will only provide these additional tasks for the early sessions, to help you get up to speed and make sure you pass the unit. 
+
+Work through these at your own pace to familiarise yourself with these methods. If you are finding something difficult, we will also offer some additional support next week for those who wish to receive further revision.
+

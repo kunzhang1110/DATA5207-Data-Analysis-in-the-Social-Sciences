@@ -1,0 +1,251 @@
+---
+title: "Lab 6-1 Solution"
+author: "Kun Zhang"
+date: "13 December 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#
+```{r initialization}
+poverty.data <- read.csv(
+  "Data/poverty/poverty data - ACS_16_5YR_S1702_with_ann.csv",
+  skip = 1, header = T)
+dim(poverty.data)
+
+drugs.mort.data <- read.table(
+  "Data/mortality/Drugs and alcohol Cause of Death, 1999-2016.txt",
+  sep = '\t', header = T)
+dim(drugs.mort.data)
+
+names(poverty.data)[3]
+names(drugs.mort.data)[2]
+
+```
+
+
+```{r merge data}
+library(dplyr)
+library(plyr)
+
+patterns <- c(" County| Parish| city")
+
+# merge columns
+county.data <- merge(
+  poverty.data %>%
+    mutate(below.poverty.rate = All.families....Percent.below.poverty.level..Margin.of.Error..Families) %>%
+    dplyr::select(Id2, below.poverty.rate), 
+  drugs.mort.data %>%
+    rename(replace=c("County.Code" = "Id2")) %>%
+    rename(replace=c("Crude.Rate" = "mortality.rate")) %>%
+    mutate(county = gsub(patterns, "", County)) %>%
+    dplyr::select(Id2, county, mortality.rate),
+  by="Id2")
+
+head(county.data)
+
+# change "unreliabe" to NA
+county.data <- county.data %>%
+  mutate(mortality.rate = ifelse(mortality.rate == "Unreliable", NA, mortality.rate) %>%
+           as.numeric(as.character(mortality.rate)))
+```
+
+```{r Correlation plots, warning=FALSE, fig.height=10, fig.width=10}
+library(ggplot2)
+library(scales)
+
+# plotting jitters (points + noises) 
+ggplot(county.data, aes(y=mortality.rate, x=(below.poverty.rate / 100))) +
+  geom_jitter(size = .5, alpha = .25, width = .01, height = .5) +
+  stat_smooth(se=FALSE, fullrange=TRUE) + # Aids the eye in seeing patterns in the presence of overplotting
+  labs(title = "County-level drug/alcohol related mortality rate\nversus poverty rate",
+       y = "Drug/alcohol related mortality rate\n(per 100,000 population)\n",
+       x = "Families below poverty level (%)") +
+  scale_x_continuous(labels = percent) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(colour="grey", size=0.4),
+        panel.grid.minor = element_blank(),
+        legend.position="none",
+        plot.title = element_text(size=12, face="bold", vjust=2.7, hjust=.5),
+        strip.text.x = element_text(size=13, vjust=1),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size=13, vjust=-.75),
+        axis.title.y = element_text(size=13, vjust=1.5),
+        axis.text.x = element_text(size=9, vjust=-.25),
+        axis.text.y = element_text(size=9, hjust=1))
+
+# split the "Bullock, AL" by , and only choose AL
+county.data$state <- sapply(strsplit(as.character(county.data$county) , "\\, ") , "[" , 2)
+
+
+# reorder states by correlation order
+state.order <- ddply(county.data, .(state), summarize,
+                     correlation = cor(mortality.rate, below.poverty.rate, use='pairwise'))
+county.data <- left_join(county.data, state.order)
+county.data$state <- reorder(county.data$state, county.data$correlation)
+county.data <- county.data[order(county.data$state),]
+
+
+ggplot(county.data, aes(y=mortality.rate, x=(below.poverty.rate / 100))) +
+  geom_jitter(size = .5, alpha = .25, width = .01, height = .5) +
+  stat_smooth(se=FALSE, fullrange=TRUE) + # Aids the eye in seeing patterns in the presence of overplotting
+  labs(title = "County-level drug/alcohol related mortality rate\nversus poverty rate",
+       y = "Drug/alcohol related mortality rate\n(per 100,000 population)\n",
+       x = "Families below poverty level (%)") +
+  scale_x_continuous(labels = percent) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(colour="grey", size=0.4),
+        panel.grid.minor = element_blank(),
+        legend.position="none",
+        plot.title = element_text(size=12, face="bold", vjust=2.7, hjust=.5),
+        strip.text.x = element_text(size=13, vjust=1),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size=13, vjust=-.75),
+        axis.title.y = element_text(size=13, vjust=1.5),
+        axis.text.x = element_text(size=9, vjust=-.25),
+        axis.text.y = element_text(size=9, hjust=1)) +
+  facet_wrap(~state)
+
+```
+
+## regression
+```{r Regression plots}
+library(arm)
+opioids.data <- read.csv("Data/opioids/opioids prescribing rates.csv")
+
+
+
+county.data <- merge(
+  county.data %>%
+    mutate(z.poverty = scale(below.poverty.rate)),
+  opioids.data %>%
+    mutate(county = ï..County) %>%
+    mutate(z.opiates = scale(X2016.Prescribing.Rate)) %>%
+    dplyr::select(county, z.opiates, X2016.Prescribing.Rate),
+  by = "county")
+
+head(county.data)
+
+
+# Linear model - Poisson
+mortality.model.1 <- glm(mortality.rate ~ z.poverty + z.opiates,
+                         family=poisson(link = log),
+                         data=county.data)
+mortality.model.2 <- glmer(mortality.rate ~ z.poverty + z.opiates + (1 | state),
+                           family=poisson(link = log),
+                           data=county.data)
+
+display(mortality.model.1)
+display(mortality.model.2)
+
+mortality.model.2.intercepts <- cbind(ranef(mortality.model.2)$state, se.ranef(mortality.model.2)$state)
+
+#Use model to get results
+#California
+exp(coef(mortality.model.2)$state['CA','(Intercept)'] + #intercept for California
+      coef(mortality.model.2)$state['CA','z.opiates'] * c(-1, 1)) #coefficient for opiate use
+
+# New mexico
+exp(coef(mortality.model.2)$state['NM','(Intercept)'] + #intercept for New Mexico
+      coef(mortality.model.2)$state['NM','z.opiates'] * c(-1, 1)) #coefficient for opiate use
+
+```
+This shows mortality rate due to opiates and poverty was higher in New Mexico
+
+
+# Interactive Map
+```{r Interactive Map initialization}
+#load shape files
+library(rgdal)
+us.shape.1 <- readOGR("./Data/US shapefiles","cb_2016_us_county_20m")
+us.shape.2 <- spTransform(us.shape.1, CRS("+init=epsg:4326"))
+
+#load shape file's matching file
+fip.concordance <- read.csv("Data/fips concordance.csv")
+
+#data manuipulation
+us.shape.2 <- merge(us.shape.2,
+                    fip.concordance %>%
+                      mutate(STATEFP = ifelse(Numeric.code >= 0 & Numeric.code <= 9,
+                                              paste0(0 , Numeric.code), 
+                                              Numeric.code)) %>%
+                      rename(replace=c("Alpha.code" = "state")),
+                    by="STATEFP")
+us.shape.2$county <- paste0(us.shape.2$NAME, ", ", us.shape.2$state)
+us.shape.2$county <- gsub("Doña Ana, NM", "Dona Ana, NM", us.shape.2$county)
+us.shape.2$county <- gsub("LaSalle, LA", "La Salle, LA", us.shape.2$county)
+us.shape.2$county <- gsub("Oglala Lakota, SD", "Oglala, SD", us.shape.2$county)
+us.shape.2$county[is.na(us.shape.2$below.poverty.rate)]
+
+#merge county data with spatial data
+us.shape.2 <- merge(us.shape.2,county.data %>%
+                      dplyr::select(county, below.poverty.rate, mortality.rate, X2016.Prescribing.Rate),
+                    by="county", duplicateGeoms = TRUE)
+
+```
+
+## Poverty Map
+```{r Poverty Map}
+library(leaflet)
+library(maps)
+library(leaflet.minicharts)
+
+# create color pallete
+pal.dat <- colorNumeric(
+  palette = "Reds",
+  domain = us.shape.2$below.poverty.rate,
+  na.color = "#CCCCCC")
+
+
+poverty.map <- leaflet() %>%
+  addProviderTiles("CartoDB.Positron", options= providerTileOptions(opacity = 0.99)) %>%
+  addPolygons(data = us.shape.2,
+              stroke = FALSE, fillOpacity = 0.5, smoothFactor = 0.5,
+              color = ~pal.dat(below.poverty.rate)) %>%
+  clearBounds() %>%
+  addLegend("bottomright", pal = pal.dat, values = us.shape.2$below.poverty.rate,
+            title = "Below the poverty rate", bins = 5, opacity = 1,
+            labFormat = labelFormat(suffix = '%', between = ', ')) %>%
+  syncWith("mortality.maps")
+
+setView(poverty.map, -98.35, 39.50, 4)
+```
+
+## Mortality Map
+```{r Mortality Map}
+pal.dat <- colorNumeric(
+  palette = "Purples",
+  domain = us.shape.2$mortality.rate,
+  na.color = "#CCCCCC")
+
+mortality.map <- leaflet() %>%
+  addProviderTiles("CartoDB.Positron",
+                   options= providerTileOptions(opacity = 0.99)) %>%
+  addPolygons(data = us.shape.2,
+              stroke = FALSE, fillOpacity = 0.5, smoothFactor = 0.5,
+              color = ~pal.dat(mortality.rate)) %>%
+  clearBounds() %>%
+  addLegend("bottomright", pal = pal.dat, values = us.shape.2$mortality.rate,
+            title = "Drug/alcohol related mortality (per 100,000 people)", bins = 5,
+            opacity = 1,
+            labFormat = labelFormat(suffix = ' deaths', between = ', ')) %>%
+  syncWith("mortality.maps")
+
+
+library(manipulateWidget)
+combineWidgets(
+  setView(poverty.map, -98.35, 39.50, 4),
+  setView(mortality.map, -98.35, 39.50, 4)
+)
+```
+
+
+
+
+
+

@@ -1,0 +1,7 @@
+*.pdf
+*.docx
+*.tmp
+*.ipynb
+/Textbook
+/Project/_Archive
+

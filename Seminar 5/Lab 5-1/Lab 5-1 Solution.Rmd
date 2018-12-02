@@ -1,0 +1,154 @@
+---
+title: "Illcit Drug Survey"
+author: "Kun Zhang"
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction 
+The survey is designed for the purpose of measuring the use of illicit drugs in Australia population. In particular, we are interested the percentage of population using illicit drugs and what factors that may affect it.
+
+
+\vspace{6mm}
+
+## Survey details and limitations
+We are using multi-modes to conduct the survey including the use of mail, online and phone. We are not using in-person mode because social desirability bias issues and non-responsive due to privacy and legal concerns.
+
+The consideration of the design of the survey includes the following:
+* The cost of the survey
+* Responsive rate
+* Measurement errors
+* Misreporting
+  
+The sample size is set to be around 100 people for each age group(15-20,21-25,25-30,30-40,over 40)
+  
+Other questions to increase the utility may include:
+* Whether the respodent is addicted to a specific medicine.
+* Whether the respondent is addicted to cigarrete.
+* Whether the respondent has previous medical history of being mentally disordered.
+
+
+\vspace{6mm}
+
+## Section A: About Yourself
+
+**Question 1** What is your gender?
+
+1. Male
+2. Female
+3. Other (please specify)
+
+\vspace{6mm}
+
+**Question 2**
+
+When were you born? Just the year will do
+
+\vspace{6mm}
+
+**Question 3**
+
+Are you currently ...
+(Please select only **ONE**)
+
+1. Married
+2. Living together as married
+3. Divorced
+4. Separated
+5. Widowed
+6. Single 
+
+\vspace{6mm}
+
+**Question 4**
+What is your highest non-school qualification? (Please select only **ONE**)
+
+1. No non-school qualification
+2. Certification I
+3. Certification II
+4. Certification III
+5. Certification IV
+6. Diploma
+7. Advanced Diploma or Associate Degree
+8. Bachelor Degree (including Honours)
+9. Graudate Diploma or Graduate Certification
+10. Masters' Degree
+11. Doctoral Degree
+
+\vspace{6mm}
+
+
+## Section B:
+**Question 5**
+Have you used any of the drugs listed below in the past?
+
+1. Cocaine
+2. MDMA/Ecstasy
+3. GHB
+4. Hallucinogens
+5. Heroin
+  
+**Question 6**
+Have you used any of the drugs listed below in the past?
+
+1. Cannabis (Marijuana)
+2. Inhalants
+  
+**Explaination**
+
+Question 5 and 6 are designed to seperated by what so called hard-drug and soft-drug.
+  
+**Question 7**
+Do you usually smoke cigarettes?
+
+* Yes
+* No
+  
+**Explaination**
+Question 7: There might be a correlation between weed smoking and cigarette smoking.
+
+**Question 8**
+Do you know other people havhing used drugs before?
+
+a. No one around me has taken illicit drugs;
+b. I know 1-2 people who have taken illicit drugs;
+c. I know 3-5 people who have taken illicit drugs;
+d. I know over 5 people who ahve taken illicit drugs.
+  
+**Question 9**
+For the people who you know take illicit drugs, do they have friends taking illicit drugs as well?
+
+a. None of their friends takes illicit drugs;
+b. 1-2 of their friends take illicit drugs;
+c. 3-5 of their friends take illicit drugs;
+d. More than 5 of their friends take illicit drugs.
+  
+**Question 10**
+Do you have done any illegal behaviour to pay for the drug?
+
+1.	Rob
+2.	Steal
+3.	Defraud
+  
+**Question 11**
+Do you have done any illegal or anti-social behaviour after drugging?
+
+1. Rob
+2. Steal
+3. Defraud
+4. Make anti-social remarks
+5. Suicide
+
+**Question 12**
+What is your socioeconomic status?
+
+1. Upper class 
+2. Middle class 
+3. Working class 
+4. Below Poverty line

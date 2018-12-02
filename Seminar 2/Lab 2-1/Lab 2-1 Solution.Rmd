@@ -1,0 +1,125 @@
+---
+title: "Lab 2-1 Solution"
+author: "Kun Zhang"
+date: "5 December 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Earning Data
+```{r initialize}
+library(foreign)
+earnings.data <- read.dta("./Data/Earnings/earnings.dta") #load dta 
+#Recode numerical $race to meaningful factors and stored in $race2 
+library(car)
+earnings.data$race2 <- as.factor(car::recode(earnings.data$race,
+                                "'1'='White';
+                                '2'='Black';
+                                c('3','4')='Other';
+                                '9'=NA"))
+head(earnings.data)
+#Add "Hispanic" 
+levels(earnings.data$race2)[4] <- "Hispanic"
+earnings.data$race2[earnings.data$hisp == "1"] <- "Hispanic"
+
+#Recode gender
+earnings.data$gender <- car::recode(earnings.data$sex, 
+                              "'2' = 'Female';
+                              '1' = 'Male'")
+
+#Recode age; the survey was conducted in 1991
+earnings.data$age <- 91 - earnings.data$yearbn
+earnings.data$age <- car::recode(earnings.data$age, "'-8' = '92'") # One respondent was born in 1899
+
+#Convert income and height into quintiles
+earnings.data$earn.quintiles <- cut(earnings.data$earn,
+                                    breaks=c(quantile(earnings.data$earn,
+                                                      probs = seq(0, 1, by = 0.20), 
+                                                      na.rm=TRUE)), #remove NA
+                                    labels=c("0-20","20-40","40-60","60-80","80-100"),
+                                    include.lowest=TRUE)
+
+earnings.data$height.quintiles <- cut(earnings.data$height,
+                                    breaks=c(quantile(earnings.data$height,
+                                                      probs = seq(0, 1, by = 0.20), 
+                                                      na.rm=TRUE)), #allow NA
+                                    labels=c("Shortest quintile",
+                                             "20-40th percentile",
+                                             "40-60th percentile",
+                                             "60-80th percentile",
+                                             "Tallest quintile"),
+                                    include.lowest=TRUE)
+```
+
+# Linear Regression 
+```{r Linear Regression}
+# Histogram of Earnings by height quintiles
+library(ggplot2)
+library(labeling)
+ggplot(earnings.data[!is.na(earnings.data$height.quintiles),], aes(earn)) + #select rows where height.quintiles is not NA
+  geom_histogram() +
+  labs(title = "Earnings by height quintiles", x = "Annual earnings", y = "Density") +
+  scale_x_continuous(labels = dollar, breaks = c(0,100000)) +
+  facet_wrap(~ height.quintiles)
+
+# Linear Prediction model
+library(arm)
+display(earnings.model.1 <- lm(earn ~ height, data = earnings.data))
+pred.data <- data.frame(height = c(66, 72, 78))
+(predict(earnings.model.1, pred.data, interval="predict", level=.95))
+
+# set "White" as its baseline level -> "White" sets to 0
+levels(earnings.data$race2) #["Black"    "Other"    "White"    "Hispanic"]
+earnings.data$race2 <- relevel(as.factor(earnings.data$race2), ref = "White")
+levels(earnings.data$race2) #["White"    "Black"    "Other"    "Hispanic"]
+
+
+# standardize height and age only
+earnings.data$z.height <- scale(earnings.data$height, scale = (sd(earnings.data$height, na.rm=TRUE) * 2))
+z.age <-earnings.data$z.age <- scale(earnings.data$age, scale = (sd(earnings.data$age, na.rm=TRUE) * 2))
+z.height <-earnings.data$z.height
+
+
+earnings.model.2 <- lm(earn ~ z.height + race2 + gender + z.age,
+data = earnings.data)
+display(earnings.model.2)
+
+# Task use binary race3
+library(dplyr)
+earnings.data$race3 <- dplyr::recode_factor(earnings.data$race2, "White"="White",
+                                     .default = "Other")
+levels(earnings.data$race3)
+earnings.model.2b <- lm(earn ~ z.height + race3 + gender + z.age,
+data = earnings.data)
+display(earnings.model.2b)
+
+#earnings for a person with (66,72,78) height, White(0), mean age, Female, mean age
+coef(earnings.model.2)[1] + coef(earnings.model.2)[2] *
+  ((c(66, 72, 78) - attr(earnings.data$z.height, 'scaled:center')) / #standardize (66, 72, 78)
+     attr(earnings.data$z.age, 'scaled:scale'))
+
+```
+
+# Linear Regression: Interaction
+```{r Linear Regression: Interaction}
+# interaction variable z.height:gender
+earnings.model.3 <- lm(earn ~ z.height + race2 + gender + z.age +
+                         z.height * gender,
+                       data = earnings.data)
+display(earnings.model.3)
+
+#earnings for a person with (66,72,78) height, White(0), mean age, Male (1), mean age
+# Y=??0+??1A+??2B+??3AB+??;...+ 3033.99*z.height*1
+coef(earnings.model.3)[1] + coef(earnings.model.3)[2] *
+  ((c(66, 72, 78) - attr(earnings.data$z.height, 'scaled:center')) / #standardize (66, 72, 78)
+     attr(earnings.data$z.height, 'scaled:scale')) +
+  coef(earnings.model.3)[8] *((c(66, 72, 78) - attr(earnings.data$z.height, 'scaled:center')) /
+                                attr(earnings.data$z.height, 'scaled:scale'))*1
+  
+```

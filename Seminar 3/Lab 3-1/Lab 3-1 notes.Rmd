@@ -1,0 +1,812 @@
+---
+title: "Seminar 3-1: Understanding the probability of real world problems"
+subtitle: "DATA5207: Data Analysis in the Social Sciences - Summer Semester, 2018"
+author: Dr Shaun Ratcliff
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r prep survey data, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(foreign)
+library(plyr)
+library(ggplot2)
+library(scales)
+library(arm)
+library(reshape2)
+library(dplyr)
+
+
+survey.data <- read.csv("Data/Public opinion - Australia/survey.data_messed_up.csv")
+  #names(survey.data)
+
+#Education 
+  #prop.table(table(survey.data$Education_all, survey.data$Year) ,2)
+
+survey.data$Education_all <- recode(survey.data$Education_all, 
+                                    'Did not finish highschool' = 'Some schooling',  
+                                    'Completed HS' = 'High school',
+                                    .default = levels(survey.data$Education_all))
+
+survey.data$education <- survey.data$Education_all
+levels(survey.data$education) <- c("High school",
+                                   "Some school",
+                                   "Some tertiary",
+                                   "University")
+
+
+# Vote 
+
+  #prop.table(table(survey.data$Vote_allparties, survey.data$Year),2)
+
+survey.data$Vote_allparties <- recode(survey.data$Vote_allparties, 
+                                      'ALP' = 'Labor',
+                                      'Labor' = 'Labor',
+                                      'Liberals and Country Party'  = 'Coalition', 
+                                      'Coalition' = 'Coalition', 
+                                      'LNP' = 'Coalition',
+                                      .default = 'Other')
+
+
+survey.data$vote.major <- as.numeric(as.character(recode(survey.data$Vote_allparties,
+                                                         'Coalition' = '1',
+                                                         'Labor' = '0',
+                                                         .default = NULL)))
+
+  #prop.table(table(survey.data$vote.major, survey.data$Year),2)
+
+
+#Birthplace
+
+  #prop.table(table(survey.data$Birthplace, survey.data$Year),2)
+
+survey.data$Birthplace <- recode(survey.data$Birthplace, 
+                                 'Overseas' = 'Other',
+                                 .default = levels(survey.data$Birthplace))
+
+
+#Income 
+
+survey.data$income.quintiles <- cut(survey.data$income_percentile, 
+                                    5, labels = c(10,30,50,70,90)) # this is to recode into quintiles
+
+survey.data$z.income <- scale(survey.data$income_percentile,
+       scale = (sd(survey.data$income_percentile, na.rm=TRUE)*2)
+       )
+ 
+
+#Age standardised
+
+survey.data$z.age <- scale(survey.data$Age_year,
+       scale = (sd(survey.data$Age_year, na.rm=TRUE)*2)
+       )
+
+```
+
+So far, we have covered descriptive variables and linear regression. The latter treats the outcomes we are trying to measure and understand as linear processes. Many (perhaps most) social science issues are not linear, however, but instead involve probabilities or non-linear outcomes. In the lecture we discussed how logistic regression can be useful tools for understanding these problems. In this lab we will use logistic regression models fit to survey data to predict the probabilities of vote choices in Australian federal elections. We will then plot the predicted probabilities from these models to better understand the results. 
+
+\vspace{6mm}
+
+##Learning logistic regression
+
+
+Today we will look at logistic regression as a tool to understand vote choice. Logistic regression is the most appropriate method here as (in a two-party race) a voter’s partisan choice is a discrete outcome. You either vote for a particular party or candidate, or you do not. The best way to measure this outcome is as a probability. Based on what we know about a voter (their age, education, gender, birthplace) what is the probability they will vote for the Coalition or the Labor Party? Logistic regression lets us predict this by estimating the likelihood of an outcome on the logistic scale. We can then use the coefficients from these models to predict the chance of an outcome occurring conditional on the predictors included in the model.
+
+
+
+###Fitting logistic regressions: vote choice models 
+
+Let's start by fitting some logistic regression models in $R$ using the public opinion data we used last week.
+
+These public option data, taken from the Australian Election Study, include information we can use for this exercise for the years from 1993 to 2010 (there are other years in these data, but they do not include all the variables with which we are interested). Using this, we can estimate the probabilities of an outcome occurring. In this case, we will use these data to estimate the probability that a citizen will vote a particular way. 
+
+To make a probabalistic prediction, logistic regression requires a binary dependent variable; that is, coded 0 or 1. Before we move forward, we need to recode vote choice -- which begins in our data as a factor -- as a binary outcome. To do this, load the `dplyr` package and use the `recode()` function to recode the existing `Vote_allparties`. We code Labor as 0 and the Coalition as 1, with other possible outcomes recoded as missing (`NULL`). We will save the output from this coding in a new variable called `vote.major`, which you can do with the syntax: 
+
+\vspace{6mm}
+
+```{r vote 1 - recode major party voting, warning=FALSE}
+
+library(dplyr)
+
+survey.data$vote.major <- as.numeric(as.character(recode(survey.data$Vote_allparties, 
+                             'Coalition' = '1',
+                             'Labor' = '0',
+                             .default = NULL)))
+
+```
+
+\vspace{6mm}
+
+You want to wrap the recode syntax in `as.numeric(as.character())` to command $R$ to treat this as a numeric variable while retaining the character coding we assigned to it. 
+
+We can now use this new variable to examine voter behaviour at Australian federal elections.
+
+\vspace{3mm}
+
+**_Task_**: In our analysis, we want to use household income (standardised), gender, education and birthplace as our predictors, and vote as the outcome we are measuring. Take the syntax you wrote previously and use this as the basis for coding your data for this task, and quickly conduct a descriptive analysis of these data. What do you find? Following this exercise, what do you expect to find when you fit a regression to these data? 
+
+Once you have examined some trends, we will fit a regression to all these data, and then move to separate regressions for each year a survey was conducted. We fit logistic regression models using the `glm()` function. Here, `glm` stands for generalised linear regression. These models are a flexible generalisation of ordinary linear regression that allows for response variables that have error distribution models other than a normal distribution. These model types include linear regression, logistic regression and Poisson regression. GLMs generalise linear regression by allowing the model to be related to the response variable via a link function, such as the logit link for logistic regression, which we use below. These link functions allow for non-linear outcomes (such as probabilities) to be modelled. 
+
+As with the `lm()` function, `glm()` is derived from the `lme4` package. We can fit our first model using the following code:
+
+\vspace{6mm}
+
+```{r vote 2 - for model to major party vote}
+
+fit.vote.major.1 <- glm(vote.major ~ z.income + Gender + education + Birthplace,
+                        family=binomial(link="logit"),  data=survey.data)
+
+```
+
+\vspace{6mm}
+
+Here, we set the `family` as `binomial` and the `link` as `logit`. This tells $R$ that we are measuring a binary outcome (with observations either zero or one) and the variable is on the logistic scale, which is a non-linear distribution bounded by zero and one (you cannot have a probably below zero per cent or higher than 100). 
+
+As we have done with previous regressions, we can print our results with the `display()` function, which provides us with: 
+
+\vspace{6mm}
+
+```{r vote 3 - results from major party vote model}
+
+display(fit.vote.major.1)
+
+```
+
+\vspace{6mm}
+
+The meanings of each aspect of this output are largely the same as before, although now all of our coefficients are on the logistic scale, and consequently are more difficult to interpret directly. You should try interpreting the coefficients from this model, though, to see if you can understand what they mean. 
+
+The major exception to the similarity between output provided by `display()` when used for linear regression and logistic, is the diagnostics. Parts of this printout are similar -- `n =` shows the number of observations used in the model, `k =` the number of parameters -- but other aspects of the display differ. For logistic regression and similar models using discrete data, it does not necessarily make sense to calculate residual standard deviation and $R^2$. This is for generally the same reason that these models are not fit with least squares, the squared error is not the best mathematical measure of model error. Rather than receiving the *residual sd* and *$R$-Squared*, we obtain *residual deviance* and *null deviance* (and their difference). 
+
+Deviance is a measure of error. It is a generalization of the idea of using the sum of squares of residuals used in ordinary least squares regression to cases where model-fitting is achieved with maximum likelihood (such as logistic regression). The lower the reported deviance, the better the model fit. If we add a predictor to our model that is random noise, we would expect the deviance to on average to decrease by one. When we add a predictor that is more informative, we expect deviance to decrease by more than one, on average. 
+
+The null deviance reported in our model diagnostics represents the null model: a model predicting our outcome with only the constant term included. The residual deviance is the null deviance minus the model deviance. In our model the residual deviance is 16,691.1 and the null deviance is 16,847. If our predictors provide more than random noise, we would expect the difference to be larger than $k$ = 7, the number of parameters in our model. In this case, the difference (which our model output tells us) is 156.6, indicating they do offer some (potentially) useful information. 
+
+Now that we have fit a relatively simple logistic regression in $R$, we can look at running some more complex processes. For instance, we can better take into account the structure of our data. Here we have fit a single model to a number of survey that were conducted during election campaigns over more than two decades. So far, we have been treating these surveys as a single sample, which they are not. We can add some sophistication to this analysis by fitting separate models to each of these surveys.
+
+
+\vspace{3mm}
+
+###Studying repeated surveys by sub-setting our data within regressions
+
+Rather than fitting a single model to your entire dataset, fitting it repeatedly to each dataset separately and then displaying the results together can be a very useful technique. In our context, this would mean running a separate model on the survey data from each year the Australian Election Study was conducted, and then plotting the estimated coefficients over time.
+
+Columbia political scientist and statistician Andrew Gelman, whom I have already mentioned, calls this technique the 'secret weapon'. This is because it seems to be done much less often than it could or should be (this is discussed in *Data Analysis Using Regression and Multilevel/Hierarchical Models*, including in the reading list). One reason the secret weapon can be useful is that trends (over time, or between groups) become much more visible than if you fit a single model to all of your data, or displayed your results in a series of tables.  
+
+There are a number of ways to divide you data by year, but by far the easiest is to use the subset feature within the `glm()` function to fit our regression separately for each of the years we have data available (not all of the predictors we want to use in these models are available for every year). Therefore, we need to make sure we have a variable for `Year`, the coding of which we will next to confirm before we run our analysis (which can be done using the table function). We then tell $R$ we wish to only use a subset of our data with the `subset` command, identifying the variable `Year` and category `1993` as those we wish to restrict our analysis to. We do this by coding our regression with the syntax:
+
+\vspace{6mm}
+
+```{r vote 6 - run regression for 1993 data only}
+
+fit.vote.major.1993 <- glm(vote.major ~ z.income  + Gender + education + Birthplace,
+                           family=binomial(link="logit"), 
+                           subset=Year==1993,  
+                           data=survey.data) 
+
+```
+
+\vspace{6mm}
+
+
+We save the output from our model into a new item we call `fit.vote.major.1993` and display this, which should provide:
+
+\vspace{6mm}
+
+```{r vote 7 - print regression output for 1993}
+
+display(fit.vote.major.1993)
+
+```
+
+\vspace{6mm}
+
+**_Task_**: Fit this model to the surveys collected in 1996, 1998, 2001, 2004 and 2010. 
+
+
+```{r vote 8 - prep vote models by year, echo=FALSE, warning=FALSE, message=FALSE}
+
+fit.vote.major.1996 <- glm(vote.major ~ z.income + z.age + Birthplace + Education_all + Urban, 
+                       family = binomial(link="logit"), subset=Year==1996, data = survey.data)
+#display(fit.vote.major.1996)
+
+fit.vote.major.1998 <- glm(vote.major ~ z.income + z.age + Birthplace + Education_all + Urban, 
+                       family = binomial(link="logit"), subset=Year==1998, data = survey.data)
+#display(fit.vote.major.1998)
+
+fit.vote.major.2001 <- glm(vote.major ~ z.income + z.age + Birthplace + Education_all + Urban, 
+                       family = binomial(link="logit"), subset=Year==2001, data = survey.data)
+#display(fit.vote.major.2001)
+
+fit.vote.major.2004 <- glm(vote.major ~ z.income + z.age + Birthplace + Education_all + Urban, 
+                       family = binomial(link="logit"), subset=Year==2004, data = survey.data)
+#display(fit.vote.major.2004)
+
+fit.vote.major.2007 <- glm(vote.major ~ z.income + z.age + Birthplace + Education_all + Urban, 
+                       family = binomial(link="logit"), subset=Year==2007, data = survey.data)
+#display(fit.vote.major.2007)
+
+fit.vote.major.2010 <- glm(vote.major ~ z.income + z.age + Birthplace + Education_all + Urban, 
+                       family = binomial(link="logit"), subset=Year==2010, data = survey.data)
+#display(fit.vote.major.2010)
+
+```
+
+Once you have fit these models for each year, we can better understand their output by plotting the coefficients as a time series. To do this we first extract coefficient data from the models and use this to create a new data frame:
+
+
+\vspace{6mm}
+
+```{r vote 9 - extract coefficient data from our models, warning=FALSE}
+
+fit.vote.major.coefs <- data.frame(rbind(summary(fit.vote.major.1993)$coefficients[,1],
+                                         summary(fit.vote.major.1996)$coefficients[,1],
+                                         summary(fit.vote.major.1998)$coefficients[,1],
+                                         summary(fit.vote.major.2001)$coefficients[,1],
+                                         summary(fit.vote.major.2004)$coefficients[,1],
+                                         summary(fit.vote.major.2007)$coefficients[,1],
+                                         summary(fit.vote.major.2010)$coefficients[,1])) 
+
+```
+
+\vspace{6mm}
+
+This provides us with a data frame with seven columns, one for each variable in these models; and seven rows, one for each model. We then add year information to this and stack the variable-columns with the `melt()` function to produce a dataset that has three columns: for the year of the survey, the variable, and for coefficient values: 
+
+\vspace{6mm}
+
+```{r vote 9 - add year values and stack data}
+
+fit.vote.major.coefs$year <- as.numeric(c(1993,1996,1998,2001,2004,2007,2010))
+fit.vote.major.coefs <- melt(fit.vote.major.coefs, id.vars="year") 
+
+```
+
+\vspace{6mm}
+
+(We stack these data so we can plot our coefficient values for publication.)
+
+This process is repeated for the standard error data from the models:
+
+\vspace{6mm}
+
+```{r vote 10 - extract and process standard errors, warning=FALSE}
+
+#extract and combine standard errors
+
+se.fit.vote.major.coefs <- data.frame(rbind(summary(fit.vote.major.1993)$coefficients[,2],
+                                            summary(fit.vote.major.1996)$coefficients[,2],
+                                            summary(fit.vote.major.1998)$coefficients[,2],
+                                            summary(fit.vote.major.2001)$coefficients[,2],
+                                            summary(fit.vote.major.2004)$coefficients[,2],
+                                            summary(fit.vote.major.2007)$coefficients[,2],
+                                            summary(fit.vote.major.2010)$coefficients[,2]
+                                            ))  
+
+#melt data to stack columns
+
+fit.vote.major.coefs$se <- melt(se.fit.vote.major.coefs)[,2] 
+
+
+```
+
+\vspace{6mm}
+
+We then use these data to add standard error values to the data frame containing our coefficient values:
+
+\vspace{6mm}
+
+```{r vote 11 - extract and process standard errors}
+
+fit.vote.major.coefs$upper.ci <- fit.vote.major.coefs$value + fit.vote.major.coefs$se 
+fit.vote.major.coefs$lower.ci <- fit.vote.major.coefs$value - fit.vote.major.coefs$se
+
+```
+
+\vspace{6mm}
+
+
+Finally, we re-label the variables from our model: 
+
+
+\vspace{6mm}
+
+```{r vote 12 - relabel variables from model}
+
+levels(fit.vote.major.coefs$variable) <- c("Intercept", 
+                                           "Household income", 
+                                           "Age", 
+                                           "Born overseas",
+                                           "Ed = Some school",  
+                                           "Ed = Some tertiary", 
+                                           "Ed = University", 
+                                           "Urban resident")
+
+```
+
+\vspace{6mm}
+
+We are then ready to plot the coefficient, using the following syntax:
+
+
+
+\vspace{6mm}
+
+```{r vote 13 - code to plot vote coefficients by year, eval=FALSE}
+
+ggplot(fit.vote.major.coefs, aes(year, value)) + 
+  geom_point(alpha=1, colour="black", size=2) +   
+  geom_errorbar(aes(ymin=lower.ci,ymax=upper.ci),width=0) +
+  labs(x = "Year", y = "Logistic regression coefficients") +
+  scale_x_continuous(breaks=c(1995, 2005), limits=c(1990,2010)) +
+  scale_y_continuous(breaks=c(-.5, 0, .5),minor_breaks=c(0.0001)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.minor.y = element_line(colour="grey", size=0.25), 
+        legend.position="none", 
+        strip.text.x = element_text(size=11, vjust=.5), 
+        strip.background = element_blank(), 
+        axis.title.x = element_text(size=13, face="bold", vjust=-.75), 
+        axis.title.y = element_text(size=13, face="bold", vjust=1.5), 
+        axis.text.x = element_text(size=9, vjust=1), 
+        axis.text.y = element_text(size=9, hjust=1)) +
+  facet_wrap( ~ variable, nrow=2) 
+
+
+```
+
+\vspace{6mm}
+
+
+This should provide you with:
+
+\vspace{6mm}
+
+```{r vote 14 - plotting vote coefficients by year, echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width=6, fig.align="center"}
+
+ggplot(fit.vote.major.coefs, aes(year, value)) + 
+  geom_point(alpha=1, colour="black", size=2) +   
+  geom_errorbar(aes(ymin=lower.ci,ymax=upper.ci),width=0) +
+  labs(x = "Year", y = "Logistic regression coefficients") +
+  scale_x_continuous(breaks=c(1995, 2005), limits=c(1990,2010)) +
+  scale_y_continuous(breaks=c(-.5, 0, .5),minor_breaks=c(0.0001)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.minor.y = element_line(colour="grey", size=0.25), 
+        legend.position="none", 
+        strip.text.x = element_text(size=11, vjust=.5), 
+        strip.background = element_blank(), 
+        axis.title.x = element_text(size=13, face="bold", vjust=-.75), 
+        axis.title.y = element_text(size=13, face="bold", vjust=1.5), 
+        axis.text.x = element_text(size=9, vjust=1), 
+        axis.text.y = element_text(size=9, hjust=1)) +
+  facet_wrap( ~ variable, nrow=2) 
+
+
+```
+
+\vspace{6mm}
+
+###Studying these models in greater detail
+
+I also mentioned above that there are several ways you can check the fit of your models. Besides comparing residuals with observed data, we can also look at the rate of correct predictions. A logistic regression model useful for the analysis of a phenomena will be able to provide many correct predictions. A benchmark for the number of correct predictions we would expect to see from a useful model is the null model, which is a model that predicts all the outcomes would be 1 (therefore, if 55 per cent of outcomes are coded 1 in the observed data, it will have a success rate of 55 per cent). If our model is not an improvement on the null model, then it is not adding much to the analysis and we would do as well flipping a coin. 
+
+To run this check we need to install package `pscl`. Do you remember how to do this? Once this is done, we can use the function `hitmiss()`, which it provides, to obtain cross-tabulations of actual outcomes against predicted outcomes for our models.
+
+```{r vote 15 - load pscl, echo=FALSE, message=FALSE}
+
+library(pscl)
+
+```
+
+\vspace{6mm}
+
+```{r vote 15 - correct estimates for 1993}
+
+hitmiss(fit.vote.major.1993)
+
+```
+
+\vspace{6mm}
+
+In the `hitmiss()` output we are provided a cross-tab of `y` (the observed outcome) with `yhat` (the predicted outcome). A correct prediction is one where both `yhat` and `y` predict 0 or 1. We are then shown the percent of outcomes correct predicted (in total and then for both `y`=0 and `y`=1).
+
+We can run this function for all of our models, and save the values in a single dataset, with this code: 
+\vspace{6mm}
+
+
+```{r vote 15a - code for correct estimates for all years, eval=FALSE}
+
+fit.vote.major.hit <- data.frame(rbind(hitmiss(fit.vote.major.1993)[1], 
+                                       hitmiss(fit.vote.major.1996)[1], 
+                                       hitmiss(fit.vote.major.1998)[1],
+                                       hitmiss(fit.vote.major.2001)[1], 
+                                       hitmiss(fit.vote.major.2004)[1],
+                                       hitmiss(fit.vote.major.2007)[1],
+                                       hitmiss(fit.vote.major.2010)[1]))
+
+
+```
+
+
+```{r vote 15b - correct estimates for all years, message=FALSE, warning=FALSE, include=FALSE}
+
+fit.vote.major.hit <- data.frame(rbind(hitmiss(fit.vote.major.1993)[1], 
+                                       hitmiss(fit.vote.major.1996)[1], 
+                                       hitmiss(fit.vote.major.1998)[1],
+                                       hitmiss(fit.vote.major.2001)[1], 
+                                       hitmiss(fit.vote.major.2004)[1],
+                                       hitmiss(fit.vote.major.2007)[1],
+                                       hitmiss(fit.vote.major.2010)[1]))
+
+
+```
+
+\vspace{6mm}
+
+
+
+In those code we specify that we only want the first output produced by `hitmiss()`, which corresponds with the total correct predictions (rather than the correct predicts produced individually for the zeros and ones).
+
+If you view the output we have saved in `fit.vote.major.hit`, you can see it is a list of values: the number of correct predictions from each model. However, this is poorly labelled, and is not intuitive (if we are sharing out data with a colleague) and will not present well if we were to publish it:
+
+\vspace{6mm}
+
+```{r vote 16 - saved hitmiss output}
+
+fit.vote.major.hit 
+
+```
+
+\vspace{6mm}
+
+
+We can begin to fix the shortcomings of this output by re-labelling the row of output from this to 'predicted', so that when we compare them to the null model, we know which is which output in which:
+
+\vspace{6mm}
+
+```{r vote 17 - re-label hitmiss output}
+
+names(fit.vote.major.hit)[1] <- "predicted"
+
+```
+
+\vspace{6mm}
+
+Unfortunately, there is no easy way to extract the null model information from `hitmiss()`, so we look at the output for each model and then combine these manually: 
+
+\vspace{6mm}
+
+```{r vote 18 - null model data}
+
+fit.vote.major.hit$null <- c(50.12,58.72,51.88,55.37,57.83,51.1,50.99)
+```
+
+\vspace{6mm}
+
+We then deduct the value of the null model from our predicted values to get the difference, drop the value of the null model, add year information, stack these columns on top of each other and label them correctly, with this code:  
+
+\vspace{6mm}
+
+```{r vote 19 - combine correct predictions with null model values}
+
+fit.vote.major.hit$pred.minus.null <- fit.vote.major.hit$predicted - 
+  fit.vote.major.hit$null
+
+fit.vote.major.hit <- fit.vote.major.hit[c("predicted","pred.minus.null")]
+
+fit.vote.major.hit$year <- as.numeric(c(1993,1996,1998,2001,2004,2007,2010))
+
+fit.vote.major.hit <- melt(fit.vote.major.hit, id.vars="year") 
+
+levels(fit.vote.major.hit$variable) <- c("Correctly predicted", "Compared to null model")
+
+```
+
+\vspace{6mm}
+
+
+Finally, we divide them by zero so they can be labelled as a percentage in our plot: 
+
+\vspace{6mm}
+
+```{r vote 20 - divide by zero}
+
+fit.vote.major.hit$value <- fit.vote.major.hit$value / 100
+
+
+```
+
+\vspace{6mm}
+
+
+We are now almost ready to plot this check of our model fit. Before we do, though, we need to load the `scales` package, to allow us to add percentage labels to our plot. Once this is done, we can create our graph using this code:  
+
+
+\vspace{6mm}
+
+```{r vote 21 - code plot of correct predictions, eval=FALSE}
+
+ggplot(fit.vote.major.hit, aes(year, value)) + 
+  geom_point(alpha=1, colour="black", size=3) +   
+   labs(x = "Year") +
+   scale_x_continuous(breaks=c(1995, 2005), limits=c(1990,2010)) +
+   scale_y_continuous(minor_breaks=c(0.0001), limits=c(0,1), labels=percent) +
+  theme_bw() +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_line(colour="grey", size=0.25), 
+          legend.position="none", 
+          strip.text.x = element_text(size=11, vjust=.5), 
+          strip.background = element_blank(), 
+          axis.title.x = element_text(size=14, vjust=-.75), 
+          axis.title.y = element_blank(), 
+          axis.text.x = element_text(size=10, vjust=-.25), 
+          axis.text.y = element_text(size=10, hjust=1)) +
+       facet_wrap( ~ variable, nrow=1) 
+
+```
+
+\vspace{6mm}
+
+
+This will create a plot that looks like:
+
+\vspace{6mm}
+
+```{r vote 22 - plotting correct predictions, echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width=4, fig.align="center"}
+
+ggplot(fit.vote.major.hit, aes(year, value)) + 
+  geom_point(alpha=1, colour="black", size=3) +   
+   labs(x = "Year") +
+   scale_x_continuous(breaks=c(1995, 2005), limits=c(1990,2010)) +
+   scale_y_continuous(minor_breaks=c(0.0001), limits=c(0,1), labels=percent) +
+  theme_bw() +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_line(colour="grey", size=0.25), 
+          legend.position="none", 
+          strip.text.x = element_text(size=11, vjust=.5), 
+          strip.background = element_blank(), 
+          axis.title.x = element_text(size=14, vjust=-.75), 
+          axis.title.y = element_blank(), 
+          axis.text.x = element_text(size=10, vjust=-.25), 
+          axis.text.y = element_text(size=10, hjust=1)) +
+       facet_wrap( ~ variable, nrow=1) 
+
+```
+
+\vspace{6mm}
+
+The plot on the left represents the percentage of correct predictions from the models fit to the AES data. The plots on the right show the percent correctly predicted compared with the null models. A higher rate of prediction indicates better performance. These indicate that in five of the seven years the model outperformed the null model, usually by approximately six per cent. This indicates that these socioeconomic variables provide a relatively small amount of information on voters’ partisan choice at the federal level.
+
+
+
+\vspace{3mm}
+
+###Using logistic regression to predict probabilities
+
+Now that we have done this, we can examine other ways to explore our data. The best way to visualise output from a logistic regression is by using the parameters from these models to find the predicted probabilities of a Coalition vote at each of these elections. This is similar to what we have done previously when estimating regression lines, except that we need to use the inverse logit function $exp(x)/(1+exp(x)$ to convert our regression coefficients (which are on the logistic scale) to probabilities.
+
+If we wish to calculate the probability three voters would have supported the Coalition over Labor in 1993, one with a household income half a standard deviation above the average, one with an income a standard below, and another with an income equal to the average, but who were otherwise identitical (on the characteristics included in our model), we could calculate the probability of them doing so by first adding the value of the intercept from our model to the predictor for income, which is multiplied by -.5, 0 and .5 for each level of income. For our three income levels this is: 
+
+
+\vspace{6mm}
+
+```{r vote 23 - calculating income slopes, eval=FALSE}
+
+.21360 + (.4898709 * -.5) = -.03133545
+.21360 + (.4898709 * 0) = .2136
+.21360 + (.4898709 * .5) = .4585355
+
+```
+
+\vspace{6mm}
+
+We then use the inverse logit function to convert these values into predicted probabilities:
+
+\vspace{6mm}
+
+```{r vote 24 - inverse logit function, eval=FALSE}
+
+exp(-.03133545) / (1+exp(-.03133545)) = .4921668
+exp(.2136) / (1+exp(.2136)) = .5531979
+exp(.4585355) / (1+exp(.4585355)) = .6126667
+
+```
+
+\vspace{6mm}
+
+Thankfully, we do not have to calculate all of this manually every time we want to estimate the probability of an outcome from a logistic refgression. We can instead use the `invlogit()` function to calculate these probabilities for us. So, for 1993 we use the following code:  
+
+\vspace{6mm}
+
+```{r vote 25 - the easy way to calculate the inverse logit, eval=FALSE}
+
+invlogit(summary(fit.vote.major.1993)$coefficients[1,1] +
+                      (summary(fit.vote.major.1993)$coefficients[2,1] *  c(-.5,0,.5)))
+
+```
+
+\vspace{6mm}
+
+Which calculates the probability of a Coalition vote at each income level. We can save the values from this calculation into a new item, which we will name `income.slope.1993`, change the name of the variable to `vote.major` for plotting, and create a variable for the year of the survey, with the code:
+
+\vspace{6mm}
+
+```{r vote 26 - calculating the inverse logit and saving the outputs}
+
+income.slope.1993 <- data.frame(
+  invlogit(summary(fit.vote.major.1993)$coefficients[1,1] +
+             (summary(fit.vote.major.1993)$coefficients[2,1] * c(-.5,0,.5))))
+names(income.slope.1993)[1] <- "vote.major"
+income.slope.1993$year <- "1993" 
+
+```
+
+\vspace{6mm}
+
+**_Task_**: Once you have done this, and it works correctly, replicate it for each year, and then combine the datasets for each year into a single data frame called `income.slope`. For the next step, repeat the process we followed previously to create a data frame of the observed variables and the number of observations for each group, which we will call `income.vote.average`. 
+
+Once we have done all of this, plot your findings using this code: 
+
+\vspace{6mm}
+
+```{r vote 27 - prepping predicted probabilities, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(dplyr)
+
+income.slope.1993 <- data.frame(invlogit(summary(fit.vote.major.1993)$coefficients[1,1] + (summary(fit.vote.major.1993)$coefficients[2,1] *  c(-.5,0,.5))))
+names(income.slope.1993)[1] <- "vote.major"
+income.slope.1993$Year <- "1993" 
+
+income.slope.1996 <- data.frame(invlogit(summary(fit.vote.major.1996)$coefficients[1,1] + (summary(fit.vote.major.1996)$coefficients[2,1] *  c(-.5,0,.5))))
+names(income.slope.1996)[1] <- "vote.major"
+income.slope.1996$Year <- "1996" 
+
+income.slope.1998 <- data.frame(invlogit(summary(fit.vote.major.1998)$coefficients[1,1] + (summary(fit.vote.major.1998)$coefficients[2,1] *  c(-.5,0,.5))))
+names(income.slope.1998)[1] <- "vote.major"
+income.slope.1998$Year <- "1998" 
+
+income.slope.2001 <- data.frame(invlogit(summary(fit.vote.major.2001)$coefficients[1,1] + (summary(fit.vote.major.2001)$coefficients[2,1] *  c(-.5,0,.5))))
+names(income.slope.2001)[1] <- "vote.major"
+income.slope.2001$Year <- "2001" 
+
+income.slope.2004 <- data.frame(invlogit(summary(fit.vote.major.2004)$coefficients[1,1] + (summary(fit.vote.major.2004)$coefficients[2,1] *  c(-.5,0,.5))))
+names(income.slope.2004)[1] <- "vote.major"
+income.slope.2004$Year <- "2004" 
+
+income.slope.2007 <- data.frame(invlogit(summary(fit.vote.major.2007)$coefficients[1,1] + (summary(fit.vote.major.2007)$coefficients[2,1] *  c(-.5,0,.5))))
+names(income.slope.2007)[1] <- "vote.major"
+income.slope.2007$Year <- "2007" 
+
+income.slope.2010 <- data.frame(invlogit(summary(fit.vote.major.2010)$coefficients[1,1] + (summary(fit.vote.major.2010)$coefficients[2,1] *  c(-.5,0,.5))))
+names(income.slope.2010)[1] <- "vote.major"
+income.slope.2010$Year <- "2010" 
+
+income.slope <-  rbind(income.slope.1993, income.slope.1996, income.slope.1998, income.slope.2001, income.slope.2004, income.slope.2007, income.slope.2010)
+
+income.slope$income.quintiles <- ((c(-.5,0,.5) * 2) * sd(survey.data$income_percentile, na.rm=TRUE)) + mean(survey.data$income_percentile, na.rm=TRUE)
+
+income.fit.vote.major.average <- na.omit(ddply(survey.data, .(income.quintiles, Year), summarise,
+                                               vote.major = mean(vote.major, na.rm=TRUE)))
+
+income.fit.vote.major.n <- na.omit(ddply(survey.data, .(income.quintiles, Year), summarise,
+                                         n = length(vote.major)))
+
+income.fit.vote.major.average <- left_join(income.fit.vote.major.average, income.fit.vote.major.n)
+
+income.fit.vote.major.average$income.quintiles <- as.numeric(as.character(income.fit.vote.major.average$income.quintiles))
+
+income.fit.vote.major.average$Year <- ifelse(income.fit.vote.major.average$Year == "1967",NA, income.fit.vote.major.average$Year)
+
+
+```
+
+\vspace{6mm}
+
+```{r vote 28 - code for plotting predicted probabilities, eval=FALSE}
+
+
+ggplot(income.fit.vote.major.average, aes(income.quintiles, vote.major, size=n)) + 
+  geom_point(alpha=1, shape=1) +   
+  geom_smooth(data = income.slope, 
+              method = 'lm', 
+              se=FALSE,
+              size=1, colour="black", 
+              fullrange = TRUE) + 
+  labs(x = "Household income percentile", 
+       y = "Probability of voting Coalition over Labor") + 
+  scale_x_continuous(expand=c(0,0), 
+                     breaks=c(25,50,75), 
+                     limits=c(0,100)) + 
+  scale_y_continuous(expand=c(0,0), 
+                     minor_breaks=c(0.0001), 
+                     breaks=c(.25,.5,.75), 
+                     limits=c(0,1), 
+                     labels=percent) + 
+  scale_size_area() +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor.y = element_line(colour="grey", size=0.4), 
+        panel.grid.minor.x = element_blank(), 
+        legend.position="none", 
+        strip.text.x = element_text(size=13, face="bold", vjust=1), 
+        strip.background = element_blank(), 
+        axis.title.x = element_text(size=12, vjust=-.4), 
+        axis.title.y = element_text(size=12, vjust=1.5), 
+        axis.text.x = element_text(size=9, vjust=-.25), 
+        axis.text.y = element_text(size=9, hjust=.25)) + 
+facet_wrap(~ Year, nrow=2) 
+
+```
+
+\vspace{6mm}
+
+In this syntax we display the data for each survey year in a seperate plot using `facet_wrap()`. We also use this syntax to limit the graph to two rows. Once we have done all of this, plot your findings using this code: 
+
+
+\vspace{6mm}
+
+```{r vote 29 - plotting predicted probabilities, echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width=4, fig.align="center"}
+
+ggplot(subset(income.fit.vote.major.average, !is.na(Year)), aes(income.quintiles, vote.major, size=n)) +
+  geom_point(alpha=1, shape=1) +   
+  geom_smooth(data = income.slope, 
+              method = 'lm', 
+              se=FALSE,
+              size=1, colour="black", 
+              fullrange = TRUE) + 
+  labs(x = "Household income percentile", 
+       y = "Probability of voting Coalition over Labor") + 
+  scale_x_continuous(expand=c(0,0), 
+                     breaks=c(25,50,75), 
+                     limits=c(0,100)) + 
+  scale_y_continuous(expand=c(0,0), 
+                     minor_breaks=c(0.0001), 
+                     breaks=c(.25,.5,.75), 
+                     limits=c(0,1), 
+                     labels=percent) + 
+  scale_size_area() +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor.y = element_line(colour="grey", size=0.4), 
+        panel.grid.minor.x = element_blank(), 
+        legend.position="none", 
+        strip.text.x = element_text(size=13, face="bold", vjust=1), 
+        strip.background = element_blank(), 
+        axis.title.x = element_text(size=12, vjust=-.4), 
+        axis.title.y = element_text(size=12, vjust=1.5), 
+        axis.text.x = element_text(size=9, vjust=-.25), 
+        axis.text.y = element_text(size=9, hjust=.25)) + 
+facet_wrap(~ Year, nrow=2) 
+
+```
+
+\vspace{6mm}
+
+This shows clearly how the probability of supporting the Coalition increases on average as incomes rise, and the variation in this pattern between years. This is much more intuitive than printing out tables of regression coefficients, or even plots of those coefficients, and makes your job of communicating your findings that much easier. 
+
+
+
+
+\vspace{6mm}
+
+##Group activity
+
+In the remaining time, in groups of four spend a few minutes developing a basic theory on what you expect to predict vote choice and why. Use this to select which variables you are going to study. Make some predictions about what you expect to find and write these down. Your tutor will ask you to explain your theory and what you expect to find. 
+
+Conduct a descriptive exploratory analysis of the relationship between these four variables and some of the other variables in the dataset. Calculate crosstabs or means, and plot your findings and confidence intervals using the methods from week 1. You can save time by tasking each member of your group to examine a different independent variable. What do you find, and do these findings match your theories and predictions? 
+
+Once you have done this, fit a logistic regression to these data using the predictors you expect to add explanatory power to your model. If you complete this quickly, you can plot your regression coefficients and the line from your regression model. Doing this is an effective way to communicate the findings of your research. 
+
+Once this is all done, if there is time we will spend a few minutes at the end of the lab session discussing theories, findings, conclusions, and any problems encountered.

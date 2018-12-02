@@ -1,0 +1,181 @@
+---
+title: "Week 5: Non-linear problems in the social sciences"
+author: "Nick James"
+date: "08/04/2018"
+output: pdf_document
+subtitle: 'DATA5207: Data Analysis in the Social Sciences - Semester 1, 2018 '
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Outline for today
+
+This week you will be working again on a groupp-based task. Together you will study what predicts differences in crime rates in New South Wales (NSW). The dataset you will be using this week has been collated from several sources related to crime rates in New South Wales. Crime rates are measured at the level of local government area and cover August 2016. These data were obtained from the NSW Bureau of Crime Statistics and Research and cover five potential types of offences: murder, robbery without a weapon, break and enter into a dwelling, motor vehicle theft and fraud. Each variable is a count of the number of offences committed in each local government area in that month. We provide a total of 16 potential independent variables. These are all aggregate local government area statistics from the 2016 census. 
+
+Frequently we will be called up on work with a large amount of data, and you will be required to recognise the most important patterns and relationships within the available data, and focus your analysis on this.
+
+The task for week 5 is to build a model estimating the relationship between the available predictors and crime rates, using a maximum of five independent variables and one dependent variable from the options available. Please break into teams of four, build a model of your choosing satisfying these requirements, and discuss the exploratory questions among your group. The exploratory questions should serve as some support during the model-building process. 
+
+
+\vspace{3mm}
+
+**The dependent variables we can choose from (what we are trying to predict) are:**
+
+- **Murder** number of murders in each LGA.
+- **Robbery without a weapon** number of robberies in each LGA conducted without a weapon.
+- **Break & enter into a dwelling** number of break ins in each LGA.
+- **Motor vehicle theft** number of motor vehicles stolen in each LGA.
+- **Fraud** Number of fraud offences in each LGA.
+
+\vspace{3mm}
+
+**The independent variables (precitors) you are able to use are:**
+
+- **Median_mortgage_repay_monthly** median Monthly mortgage repayments, in dollars.
+- **Median_rent_weekly** median weekly rent, in dollars.
+- **Median_tot_hhd_inc_weekly** median total household income, in dollars.
+- **Average_household_size** Number of people living in a household. 
+- **X..Indigenous** percentage of population that is Indigenous.
+- **Birthplace.outside.Australia** proportion of population born outside of Australia.
+- **English.is.only.language.spoken.at.home** percentage of households in which English only language spoken.
+- **X..of.People.who.completed.Year.12** percentage of people who completed highschool.
+- **X..Population.5.14** percentage of people within the ages of 5-14.
+- **X..Population.15.19** proportion of people within the ages of 15-19.
+- **X..Population.20.24** Percentage of people within the ages of 20-24.
+- **X..Population.25.34** Percentage of people within the ages of 25-34.
+- **X..Population.35.44** Percentage of people within the ages of 35-44.
+- **X..Population.45.54** Percentage of people within the ages of 45-54.
+- **X..Population.55.64** Percentage of people within the ages of 55-64.
+- **X..Population.55.74** Percentage of people within the ages of 65-74.
+
+
+```{r prep survey data, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(foreign)
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(car)
+library(arm)
+library(reshape2)
+```
+
+\vspace{6mm}
+
+## Steps and discussion questions:
+
+
+1) Import relevant packages, read in the data and run some exploratory analysis. Plot the independent and dependent variables, and choose your 5 independent variables and your candidate dependent variable.
+
+\vspace{6mm}
+
+Histrograms of your five dependent variables can be created with the following code: 
+
+\vspace{6mm}
+
+
+```{r}
+
+# Read in the data and plot the distribution of our dependent variables 
+  #(note the file path will be different for your computer)
+
+
+crime.data <- read.csv("/Users/wangxuying/Desktop//NSW_Crime_data_clean.csv")
+
+hist(crime.data$Murder)
+hist(crime.data$Robbery.without.a.weapon)
+hist(crime.data$Break...Enter..Dwelling.)
+hist(crime.data$Motor.Vehicle.Theft)
+hist(crime.data$Fraud)
+
+```
+
+\newpage
+
+2) Make any transformations to the data you think may be relevant.
+
+\vspace{3mm}
+
+*HINT*: you may wish to log-transform both the outcome you are estimating and the predictors you include in your model. Some questions to think about as you do this include: When do we use a log-transform, and does our data look skewed prior to our transforming it?
+
+Let us take a look at the association between fraud rates versus monthly mortgage repayments versus. This can be done with the code:
+
+\vspace{6mm}
+
+**Plot data on its original scale**
+
+```{r}
+
+plot(crime.data$Median_mortgage_repay_monthly, crime.data$Fraud)
+
+```
+
+\newpage
+
+**Plot data on the log scale**
+
+```{r}
+
+log.mortgage <- log(crime.data$Median_mortgage_repay_monthly)
+log.fraud <- log(crime.data$Fraud)
+plot(log.mortgage, log.fraud)
+
+```
+
+\vspace{6mm}
+
+What are the differences between the variables on these two scales, and how might a transformation help us measure their relationship? 
+
+
+\newpage
+
+3) Build your model. When doing this, spend just a few minutes theorising which variables might have a strong relationship with the outcome you are measuring, and why this might be the case. If you were to implement a very simple linear regression model, it may look like this:
+
+\vspace{6mm}
+
+
+```{r}
+
+library(arm) #load the arm package to provide you with the display() function 
+
+linear.model.1 <- lm(Fraud ~ crime.data$Median_mortgage_repay_monthly + crime.data$Median_rent_weekly + crime.data$Median_tot_hhd_inc_weekly + crime.data$Average_household_size, data=crime.data)
+
+display(linear.model.1)
+
+```
+```{r}
+log.fraud <- log(crime.data$Fraud)
+log.birthplace <- log(crime.data$Birthplace.outside.Australia)
+
+log.65.74<-log(crime.data$X..Population.65.74)
+log.55.64<-log(crime.data$X..Population.55.64)
+
+linear.model.2 <- lm(Fraud ~ crime.data$Median_mortgage_repay_monthly + crime.data$Median_rent_weekly + crime.data$Median_tot_hhd_inc_weekly + crime.data$Average_household_size, data=crime.data)
+
+display(linear.model.1)
+
+
+
+plot(log.20.24, log.fraud)
+
+```
+
+\vspace{6mm}
+
+When you fit your own model, select a different specification to this, and make sure to log-transform your data when required.
+
+
+\newpage
+
+4) Analyse the results and discuss them among your group. If you have time, change the model and see if you can improve your predictiveness.
+
+\vspace{6mm}
+
+5) As we have already discussed, ethical considerations are an increasingly important issue in data science. What sort of ethical concerns arise in this dataset? What sort of inference could you make from your analysis that you feel accurately or inaccurately reflects the actuality of the situation regarding crime rates in NSW?
+
+\vspace{6mm}
+
+6) What factors excluded from this dataset do you think would help predict crime in NSW?

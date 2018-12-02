@@ -1,0 +1,279 @@
+---
+title: "Lab 2+ Solution"
+author: "Kun Zhang"
+date: "5 December 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Survey Data
+## Preprocessing
+```{r preprocessing}
+library(foreign)
+library(plyr)
+library(ggplot2)
+library(scales)
+library(car)
+library(arm)
+
+survey.data <- read.csv("Data/survey.data_messed_up.csv")
+
+#Education 
+#prop.table(table(survey.data$Education_all, survey.data$Year) ,2)
+survey.data$Education_all <- recode(survey.data$Education_all, "'Did not finish highschool' = 'Some schooling';  
+                                    'Completed HS' = 'High school'")
+
+# Vote 
+#prop.table(table(survey.data$Vote_allparties, survey.data$Year),2)
+survey.data$Vote_allparties <- recode(survey.data$Vote_allparties, 
+                                      "'ALP' = 'Labor';
+                                      c('Liberals and Country Party', 'LNP') = 'Coalition';
+                                      c('Call to Au', 'Democrats', 'DLP', 'Grey Power', 'One Nation') = 'Other'")
+survey.data$vote.major <- as.numeric(as.character(recode(survey.data$Vote_allparties,
+                                                         "'Coalition' = 1;
+                                                         'Labor' = 0;
+                                                         c('Other', 'Greens') = NA")))
+
+#Birthplace
+#prop.table(table(survey.data$Birthplace, survey.data$Year),2)
+survey.data$Birthplace <- recode(survey.data$Birthplace, 
+                                 "'Overseas' = 'Other'")
+
+#Income 
+survey.data$income.quintiles <- cut(survey.data$income_percentile, 
+                                    5, labels = c(10,30,50,70,90)) # this is to recode into quintiles
+survey.data$z.income <- scale(survey.data$income_percentile,
+       scale = (sd(survey.data$income_percentile, na.rm=TRUE)*2)
+       )
+ 
+#Age standardised
+survey.data$z.age <- scale(survey.data$Age_year,
+       scale = (sd(survey.data$Age_year, na.rm=TRUE)*2)
+       )
+```
+
+
+## Visualising Linear Regression Coefficients
+```{r Visualising Linear Regression Coefficients}
+tax.model.1 <-lm(formula =Taxes_Social ~ z.income, data=survey.data)
+tax.model.2 <- lm(Taxes_Social ~ z.income + z.age + Birthplace + Education_all +
+Urban, data = survey.data)
+
+# Store model coefficients
+coef.fit.taxes.job <- data.frame(coef(tax.model.2))
+se.fit.taxes.job <- data.frame(se.coef(tax.model.2))
+
+coef.fit.taxes.job$one.se.upper <- coef.fit.taxes.job[,1] + se.fit.taxes.job[,1]
+coef.fit.taxes.job$one.se.lower <- coef.fit.taxes.job[,1] - se.fit.taxes.job[,1]
+coef.fit.taxes.job$two.se.upper <- coef.fit.taxes.job[,1] + se.fit.taxes.job[,1] *2
+coef.fit.taxes.job$two.se.lower <- coef.fit.taxes.job[,1] - se.fit.taxes.job[,1] *2
+coef.fit.taxes.job$vars <- as.factor(variable.names(tax.model.2)) 
+levels(coef.fit.taxes.job$vars) <- c("Intercept", "Household income", "Age",
+                                     "Birthplace - Other", "Education - Some schooling",
+                                     "Education - Some tertiary",
+                                     "Education - University", "Urban resident")
+
+# Plot
+ggplot(coef.fit.taxes.job, aes(x = coef.tax.model.2., y = vars)) +
+  geom_point(alpha=1, colour="black", size=2.3) +   
+  geom_errorbarh(aes(xmin=one.se.lower,xmax=one.se.upper), height=0,size=.75) +
+  geom_errorbarh(aes(xmin=two.se.lower,xmax=two.se.upper), height=0,size=.25) +
+  geom_vline(xintercept=0, colour="black", size = .5) + # vline() vertica line
+  labs(x = "Coefficient values", y = "Regression coefficients") + 
+  theme_bw() +
+  theme(panel.border = element_blank(), 
+      panel.grid.major.x = element_blank(), 
+      panel.grid.major.y = element_line(colour="light grey", size=0.1), 
+      panel.grid.minor = element_blank(), 
+      legend.position="none", 
+      title = element_text(size=13, face="bold"), 
+      strip.background = element_blank(), 
+      axis.title.x = element_text(size=12, face="bold", vjust=-.75), 
+      axis.title.y = element_text(size=12, face="bold", vjust=1.5), 
+      axis.text.x = element_text(size=10, vjust=-.25), 
+      axis.text.y = element_text(size=8.5), 
+      axis.ticks.y=element_blank())
+
+```
+
+
+## Visualising the regression line
+```{r Visualising the regression line}
+
+
+income.slope <- data.frame(coef(tax.model.2)[1] +
+                             (coef(tax.model.2)[2] * c(-.5,0,.5)))
+names(income.slope)[1] <- "Taxes_Social"
+
+# convert z.income to income quintiles
+income.slope$income.quintiles <- (c(-.5,0,.5) *attr(survey.data$z.income, 'scaled:scale')) +
+  attr(survey.data$z.income, 'scaled:center')
+
+# Average Taxes_Social by income quintiles
+income.average <- na.omit(ddply(survey.data, .(income.quintiles), summarize,
+                                Taxes_Social = mean(Taxes_Social, na.rm=TRUE)))
+income.average$income.quintiles <- as.numeric(as.character(income.average$income.quintiles))
+
+ggplot(income.average, aes(x=income.quintiles, y=Taxes_Social)) +
+  geom_point(alpha=1, size=4, shape=1) +  
+  geom_hline(yintercept = 0) + #horizontal line
+  geom_smooth(data = income.slope, #linear regression curve
+              method = 'lm', 
+              size=1, 
+              colour="black", 
+              fullrange = TRUE) + 
+  labs(x = "Household income percentile", 
+      y = "Taxes or social services\n(Higher = Greater support for tax cuts)") +
+  scale_x_continuous(expand=c(0,0), 
+                     breaks=c(25,50,75), limits=c(0,100)) +
+  scale_y_continuous(expand=c(0,0), 
+                     minor_breaks=c(0.0001), breaks=c(-.25, 0,.25, .5), limits=c(-.5,.55)) + 
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position="none", 
+        strip.text.x = element_text(size=16, face="bold", vjust=1), 
+        title = element_text(size=16, face="bold", 
+        vjust=1.75),strip.background = element_blank(), 
+        axis.title.x = element_text(size=13, vjust=-.4), 
+        axis.title.y = element_text(size=13, vjust=1.5), 
+        axis.text.x = element_text(size=9, vjust=-.25), 
+        axis.text.y = element_text(size=9, hjust=.25)) 
+
+# Alternatively the plot can be done by
+# plot(x=income.average$income.quintiles, y=income.average$Taxes_Social)
+# abline(lm(income.average$Taxes_Social~income.average$income.quintiles))
+```
+
+## Incorporating Interactions
+```{r Incorporating Interactions}
+
+#Include an interaction between income and education,
+tax.model.3 <- lm(formula = Taxes_Social ~ z.income + z.age + Birthplace +
+                    Education_all + Urban + z.income * Education_all, data = survey.data)
+
+# Store coefficients
+coef.fit.taxes.job <- data.frame(coef(tax.model.3))
+se.fit.taxes.job <- data.frame(se.coef(tax.model.3))
+coef.fit.taxes.job$one.se.upper <- coef.fit.taxes.job[,1] + se.fit.taxes.job[,1]
+coef.fit.taxes.job$one.se.lower <- coef.fit.taxes.job[,1] - se.fit.taxes.job[,1]
+coef.fit.taxes.job$two.se.upper <- coef.fit.taxes.job[,1] + se.fit.taxes.job[,1] *2
+coef.fit.taxes.job$two.se.lower <- coef.fit.taxes.job[,1] - se.fit.taxes.job[,1] *2
+coef.fit.taxes.job$vars <- as.factor(variable.names(tax.model.3))
+# rename and reorder levels
+levels(coef.fit.taxes.job$vars) <-
+  c("Intercept", "Household income", "Age", "Birthplace - Other",
+    "Education - Some schooling", "Education - Some tertiary",
+    "Education - University", "Urban resident", "Income x Some schooling ",
+    "Income x Some tertiary ", "Income x University")
+coef.fit.taxes.job$vars <- 
+  factor(coef.fit.taxes.job$vars, c("Income x Some schooling ", 
+                                   "Income x Some tertiary ", "Income x University", 
+                                   "Birthplace - Other", "Education - Some schooling", 
+                                   "Education - Some tertiary",  
+                                   "Education - University", "Urban resident", "Age",
+                                   "Household income", "Intercept"))
+
+#Plot coefficients
+ggplot(coef.fit.taxes.job, aes(coef.tax.model.3., factor(vars))) +
+  geom_point(alpha=1, colour="black", size=2.3) +    
+  geom_errorbarh(aes(xmin=one.se.lower,xmax=one.se.upper), height=0,size=.75) +
+  geom_errorbarh(aes(xmin=two.se.lower,xmax=two.se.upper), height=0,size=.25) +
+  geom_vline(xintercept=0, colour="black", size = .5) + 
+  labs(Title = "Income", x = "Coefficient values", y = "Regression coefficients") + 
+  scale_x_continuous() +
+  scale_y_discrete() + 
+  theme_bw() +
+  theme(panel.border = element_blank(), 
+      panel.grid.major.x = element_blank(), 
+      panel.grid.major.y = element_line(colour="light grey", size=0.1), 
+      panel.grid.minor = element_blank(), 
+        legend.position="none", 
+        title = element_text(size=13, face="bold"), 
+        strip.background = element_blank(), 
+        axis.title.x = element_text(size=12, face="bold", vjust=-.75), 
+        axis.title.y = element_text(size=12, face="bold", vjust=1.5), 
+        axis.text.x = element_text(size=10, vjust=-.25), 
+        axis.text.y = element_text(size=8.5), 
+        axis.ticks.y=element_blank())
+
+
+income.edu.slope.expand <- data.frame(some.school = c(coef(tax.model.3)[1] +  
+                                                 (coef(tax.model.3)[2] * c(-.5,0,.5)) +
+                                                 coef(tax.model.3)[5] + 
+                                                 (coef(tax.model.3)[9] * c(-.5,0,.5))),
+                           
+                               high.school = c(coef(tax.model.3)[1] +
+                                                 (coef(tax.model.3)[2] * c(-.5,0,.5))), #high school is baseline (0)
+                            
+                               some.tertiary = c(coef(tax.model.3)[1] + 
+                                                   (coef(tax.model.3)[2] * c(-.5,0,.5)) +
+                                                   coef(tax.model.3)[6] + 
+                                                   (coef(tax.model.3)[10] * 
+                                                      c(-.5,0,.5))),
+                            
+                               university = c(coef(tax.model.3)[1] + 
+                                                (coef(tax.model.3)[2] * c(-.5,0,.5)) +
+                                                coef(tax.model.3)[7] + 
+                                                (coef(tax.model.3)[11] * c(-.5,0,.5))))
+
+library(reshape2)
+#melt the slopes data
+income.edu.slope <- melt(income.edu.slope.expand)
+names(income.edu.slope) <- c("education", "Taxes_Social")
+levels(income.edu.slope$education) <- c("Some school", "High school", 
+                                        "Some tertiary", "University")
+
+# rescale z.income
+income.edu.slope$income.quintiles <- (c(-.5,0,.5) *
+                                        attr(survey.data$z.income, 'scaled:scale')) +
+  attr(survey.data$z.income, 'scaled:center')
+
+# incorporate education in income average
+survey.data$education <- survey.data$Education_all
+levels(survey.data$education) <- c("High school", "Some school", "Some tertiary", "University")
+income.average <- na.omit(ddply(survey.data, .(income.quintiles, education), summarize,
+                                Taxes_Social = mean(Taxes_Social, na.rm=TRUE)))
+
+income.average$income.quintiles <- as.numeric(as.character(income.average$income.quintiles)) # string to float
+income.average$education <- factor(income.average$education, c("High school", "Some school", 
+                                                               "Some tertiary", "University"))
+                                
+ggplot(income.average, aes(income.quintiles, Taxes_Social)) + 
+  geom_point(alpha=1, shape=1) +  
+  geom_smooth(data = income.edu.slope, 
+              method = 'lm', 
+              size=.5,
+              colour="black", 
+              fullrange = TRUE) +  	
+  geom_hline(yintercept = 0) +
+  labs(x = "Household income percentile", 
+       y = "Taxes or social services\n(Higher = Greater support for tax cuts)") + 
+  scale_x_continuous(expand=c(0,0), breaks=c(25,50,75), limits=c(0,100)) + 
+  scale_y_continuous(, minor_breaks=c(0.0001)) +  	 
+theme_bw() + 
+  theme(panel.grid = element_blank(), 
+        legend.position="none", 
+        strip.text.x = element_text(size=13, face="bold", vjust=1), 
+        title = element_text(size=13, face="bold", vjust=1.75),
+        strip.background = element_blank(), 
+        axis.title.x = element_text(size=13, vjust=-.4), 	 	
+        axis.title.y = element_text(size=13, vjust=1.5), 
+        axis.text.x = element_text(size=9, vjust=-.25), 	 
+        axis.text.y = element_text(size=9, hjust=.25)) + 
+facet_wrap(~ education)
+
+
+
+
+
+
+
+```
+
+
+

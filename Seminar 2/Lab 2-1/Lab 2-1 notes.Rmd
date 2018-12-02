@@ -1,0 +1,487 @@
+---
+title: "Seminar 2-1: Confounding factors and human behaviour"
+subtitle: "DATA5207: Data Analysis in the Social Sciences - Summer Semester, 2018"
+author: Dr Shaun Ratcliff
+output:
+  pdf_document:
+    latex_engine: xelatex
+urlcolor: blue    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r prep earnings data, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(foreign)
+library(plyr)
+library(ggplot2)
+library(scales)
+library(dplyr)
+
+
+earnings.data <- read.dta("Data/Earnings/earnings.dta")
+
+
+#recode gender
+
+earnings.data$gender <- recode(earnings.data$sex, '2' = 'Female', 
+                                                  '1' = 'Male')	
+#recode age
+
+earnings.data$age <- 91 - earnings.data$yearbn 	
+
+
+earnings.data$race2 <- recode(earnings.data$race, 
+                                        '1'='White',
+                                        '2' = 'Black',
+                                        '3' = 'Other',
+                                        '4' = 'Other',
+                                        '9' = NULL)
+
+earnings.data$race2[earnings.data$hisp == "1"] <- "Hispanic"
+
+earnings.data$earn.quintiles <- cut(earnings.data$earn, breaks=c(quantile(earnings.data$earn, probs = seq(0, 1, by = 0.20), na.rm=TRUE)), 
+labels=c("0-20","20-40","40-60","60-80","80-100"), include.lowest=TRUE)
+
+earnings.data$height.quintiles <- cut(earnings.data$height, 
+                                    breaks=c(quantile(earnings.data$height, 
+                                    probs = seq(0, 1, by = 0.20), na.rm=TRUE)),
+                                    labels=c("0-19","20-39","40-59","60-79","80-99"), 
+                                    include.lowest=TRUE)
+
+
+```
+
+
+Yesterday, we looked at running descriptive analyses in $R$. However, sometimes you need to do more than look at the descriptive data.
+
+In the additional tasks set for yesterday, we examined data collected in the United States that asked individuals about their annual earnings, and a number of their demographic characteristics. We conducted some exploratory analysis of these data, plotting different relationships between height, gender, race, and earnings. 
+
+However, although this analysis provided us with some interesting initial findings, as we discussed in the lecture, it is important when doing this to take potentially confounding factors into account. If we overlook these additional influences on outcomes, we might think all sorts of things are related when they have nothing to do with one another. Using our earnings example, for instance, are we certain that height influences earnings, or is it that men earn more than women and also happen to be taller? 
+
+We need to try and establish whether things are actually related, or at least, can be said to be related when other likely confounding variables are controlled for. 
+
+Today, we look at exploring relationships in our data using linear regression. This was the first type of regression to be extensively studied and used in practical applications, a result of their comparative simplicity compared to non-linear alternatives. Fitting these models allows us to understand the uncertainty in our estimates, as wellas to control for potentially confounding factors
+
+Like other regression models, linear regression is used to model associations between a continuous dependent variable $y$ and one or more explanatory variables $X$. The case of one explanatory variable is called simple linear regression. This can be written with the notation:
+
+\vspace{3mm}
+
+\begin{center}
+
+$y = X\beta + \epsilon$
+
+\end{center}
+
+\vspace{3mm}
+
+Where $X\beta$ is a vector of potentially multiple dependent variables and $\epsilon$ the errors -- the distance between the fitted value of the model and the observed value of the data. 
+
+We will start by fitting a simple linear regression model to the earnings data we have already examined above, and then move on to other datasets. We begin this process by creating a new editor file in the same folder as our earnings data, and in it we once again make this folder our working directory and load these data. We then want to load the `arm` package, which provides some useful functions for regression analysis. 
+
+Beyond this we are also using functions from the `lme4` package. We do not need to load this package, as it is a part of the base $R$ software. From this package, we are using the `lm()` function, which stands for `linear model`. This fits an ordinary least squares (OLS) regression model. These are the simplest -- conceptually and computationally -- type of regression. They calculate a model that produces the smallest distance between predicted and actual data values along a linear regression line. At least in part due to their simplicity, they are probably most common type of regression. 
+
+One advantage of fitting regression in $R$ is that the syntax mirrors the formula for the model:
+
+\vspace{3mm}
+
+\begin{center}
+
+$y \sim x$
+
+\end{center}
+
+\vspace{3mm}
+
+When specifying a linear regression model, we designate the dependent variable on the left, and then separated by a tilde, the independent variable(s).
+
+First, let us look at the relationship between an individuals annual earnings and their height. We do this by calling the lm function, followed by our formula, placed within parentheses: 
+
+\vspace{6mm}
+
+```{r earnings 19 - fit first linear regression to earnings data, eval=FALSE}
+
+lm(earn ~ height, data = earnings.data)
+
+```
+
+\vspace{6mm}
+
+
+What this tells $R$ is that we wish to fit a linear model with 'earn' (income in US dollars) as the dependent variable, output; 'height' (in inches) as the independent variable, or predictor; both of which we source from the `earnings.data` data frame. When you run this code you should obtain the following results: 
+
+
+\vspace{6mm}
+
+```{r output from first linear regression on earnings data}
+
+lm(earn ~ height, data = earnings.data)
+
+```
+
+\vspace{6mm}
+
+
+
+Or that for Americans in 1991, if using height to predict earnings, we can use the formula:
+
+
+\vspace{6mm}
+
+```{r earnings 20 - intepreting first linear regression on earnings data, eval=FALSE}
+
+earnings = -84078 + 1563 * height + error 
+
+```
+
+\vspace{6mm}
+
+```{r prep regression for earnings data, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(arm)
+
+earnings.model.1 <- lm(earn ~ height, data = earnings.data)
+
+pred.data <- data.frame(height = c(66, 72, 78))
+
+
+earnings.data$z.height <- scale(earnings.data$height, 
+      scale = (sd(earnings.data$height, na.rm=TRUE) * 2))
+
+earnings.data$z.age <- scale(earnings.data$age, 
+      scale = (sd(earnings.data$age, na.rm=TRUE) * 2))
+
+earnings.data$race2 <- relevel(as.factor(earnings.data$race2), ref =  "White")
+
+
+```
+
+How do we interpret these results? Remember, that the intercept in a regression is the predicted value of the output when all predictors are set to zero. Our regression predicts that earnings will on average be -\$84,078 for a person with a height of zero inches. This is clearly a nonsense, value, though. It is impossible for someone to have a height of zero. It also suggests that if we compare the incomes of two respondents an inch apart in height, on average the taller one will earn \$1,563 more than their shorter companion. 
+
+We can use the parameters of our model to predict the average earnings of respondents with different (reasonable) heights. First, we save our model outputs into an item we call `earnings.model.1`, which, amongst other benefits, allows us to store the results of this model within an item so that we can access, and use it, at a later date. We then use the following syntax to make our predictions for respondents with heights of 5.5 (66 inches), 6 (72 inches) and 6.5 feet (78 inches):
+
+\vspace{6mm}
+
+```{r earnings 21 - basic predictions from linear regression on earnings data, eval=FALSE}
+
+coef(earnings.model.1)[1] + coef(earnings.model.1)[2] * c(66, 72, 78)
+
+```
+
+\vspace{6mm}
+
+
+The function `coef()` extracts the coefficient values from the model, and nothing else. This allows us to manipulate, transform or display coefficient values without having to worry about the other regression output. By following the `coef` command with a number in brackets -- for instance, `[1]` -- we can extract the value for the first coefficient only. By individually extracting the value of both the first coefficient in our model (the intercept) and the second (height in inches), we can make estimates about the outcome we are modelling here for different values of the predictor. In the above example, we tell $R$ to sum the intercept to the value for the height coefficient, multiplied by the three heights with which we are interested. This indicates there is a substantial difference between taller and shorter respondents. Arguably far too much difference. We can obtain more information on our model with the `display()` function from the `arm` package (which we need to load):
+
+
+\vspace{6mm}
+
+```{r earnings 22 - printing results from linear regression on earnings data}
+
+display(earnings.model.1)
+
+```
+
+\vspace{6mm}
+
+Looking at these results, each row of text represents a different variable. The second column, `coef.est`, represents the regression coefficients. The third, `coef.se`, are the standard errors (SEs) of these coefficients. These indicate how (un)certain we can be about our predictions. A coefficient that is two standard errors from zero is usually considered statistically significant (if you want to use that terminology). Or conversely, the larger a variables effect size compared to its standard errors, the more certain we can be that the signal in these data is meaningful and not simply noise (although beyond measurement error we also need to worry about sampling error and other problems).
+
+At the end of the output we are also presented with the model's $n$ (the number of observations included), the number of parameters used in the model (`k =`), the residual standard deviation and the *$R$-Squared* ($R^2$).
+
+The residual standard deviation is the variance (measured as the standard deviation) of the residuals (or errors); the distance between the actual values of the observations we are modelling and the regression line. It is an estimate of the accuracy of the model, with smaller residuals indicating a more accurate model.
+ 
+The $R^2$ informs us of the proportion of the variance in the dependent variable explained by the inputs, out of 1. A higher $R^2$ indicates the model explains more variance in the outcome. 
+
+As you can see, the SE on the intercept is quite large. So, although we can be certain there is a relationship between height and earnings in the United States in the early 1990s, our predictions above are going to include a lot of uncertainty (the error in the earlier formula). 
+
+We can calculate this uncertainty with the predict function. To do this, first we save the values of height we wish to use in our predictions with the syntax: 
+
+\vspace{6mm}
+
+```{r earnings 23 - creating pred data for height for linear regression fit to earnings data, eval = FALSE}
+
+pred.data <- data.frame(height = c(66, 72, 78))
+
+```
+
+\vspace{6mm}
+
+
+This tells $R$ that we wish to create a new data frame with a variable named 'height' (matching the name of the predictor in our model), with the same values in 'height' that we used to make our predictions above. We then include this in the code we write for the `predict()` function, which specifies we want to predict outcome from `earnings.model.1`, using the values of 'height' we just specified, that we wish to make a prediction from this (this function provides a few different options) and that we wish to use this to estimate 95 per cent confidence intervals:
+  
+  
+\vspace{6mm}
+
+```{r earnings 24 - predicting earnings by height, eval = FALSE}
+
+predict(earnings.model.1, pred.data, interval="predict", level=.95)
+
+```
+
+\vspace{6mm}
+
+
+This provides us with the results: 
+
+\vspace{6mm}
+
+```{r earnings by height}
+
+predict(earnings.model.1, pred.data, interval="predict", level=.95)
+
+```
+
+\vspace{6mm}
+
+
+This indicates what we already suspected: there is quite a bit of uncertainty in our prediction. There is too much variation in the population for us to say with high confidence that someone who is taller will also have greater earnings. This can be seen by plotting a histogram of the distribution of reported earnings by height using the following syntax, which produces the plot below. This clearly shows there is significant variation in the earnings within height quintiles. While few individuals in lower the height quintiles earn high incomes, many taller individuals earn lower incomes, with a great deal of overlap. 
+
+This indicates, as we might reasonably suspect, that height alone does not determine an individual’s earnings. There are clearly other factors at work. Can you think of what these may be?  
+
+\vspace{6mm}
+
+```{r earnings 25 - code for plotting histogram earnings by height, eval=FALSE}
+
+ggplot(earnings.data[!is.na(earnings.data$height.quintiles),], aes(earn)) + 
+  geom_histogram() +
+  labs(title = "Earnings by height quintiles", y = "Density", x = "Annual earnings") +
+  scale_x_continuous(labels = dollar, breaks = c(0,100000)) +
+  facet_wrap(~ height.quintiles)
+
+```
+
+\vspace{6mm}
+
+
+\vspace{6mm}
+
+```{r plotting histogram earnings by height, echo=FALSE, warning=FALSE, message=FALSE}
+
+ggplot(earnings.data[!is.na(earnings.data$height.quintiles),], aes(earn)) + 
+  geom_histogram() +
+  labs(title = "Earnings by height quintiles", y = "Density", x = "Annual earnings") +
+  scale_x_continuous(labels = dollar, breaks = c(0,100000)) +
+  facet_wrap(~ height.quintiles)
+
+```
+
+\vspace{6mm}
+
+To try and understand what other confounding factors influence earnings, we can fit another regression that includes all the predictors available to us in these data. Before we run this regression, we want to make sure we have ordered the categorical variables in a way that makes sense. Remember, in a linear regression model the intercept is the value of your dependent variables at zero, or at the value of your baseline variable if you are using a categorical variable. `lm()` converts your categorical predictors into binary variables and drops the first out of the model as the baseline. We do not want to leave the choice of baseline variable to `lm()`. Rather, we want to specify which is dropped from the model to improve our ability to make inferences from these data. 
+
+Setting a baseline category for gender does not impact on our results, as there are only two roughly similar-sized categories. However, doing so for race and ethnicity matters. In this context let us set respondents who identified as white as our baseline, as this is by far the largest category for this variable, and these respondents shows a clear pattern in the relationship between height and earnings; although, depending on what you want to achieve, you could change this. We can set a specific baseline variable with the relevel function, using the code:
+
+
+\vspace{6mm}
+
+```{r earnings 26 - reset baseline category for race, eval = FALSE}
+
+earnings.data$race2 <- relevel(as.factor(earnings.data$race2), ref =  "White")
+
+```
+
+\vspace{6mm}
+
+This tells $R$ that within the `earnings.data` data frame, we want to treat `race2` as a factor and then specify `White` as its baseline level. Now that we have this, we are ready to run our next model. 
+
+
+\vspace{3mm}
+
+###Improving our analysis with linear transformations
+
+As documented above, there were some problems with the scaling of these models. The intercept of our first model was -\$84,078 and for our second it was -\$21,312. However, this has little meaning as it is the estimated income of a person with a height of zero inches. To illustrate this further, these are the results of the same model with height rescaled in millimetres, metres and kilometres:
+
+\vspace{6mm}
+
+```{r earnings 27 - printing regression output with height on different scales, eval = FALSE}
+
+#model with height in millimetres
+
+Coefficients:
+(Intercept)    height.mm  
+  -84078.32        61.54   
+
+#model with height in metres
+
+Coefficients:
+(Intercept)  height.mtrs  
+ -84078        61541
+
+#model with height in kilometres
+
+Coefficients:
+(Intercept)    height.km  
+ -84078     61540854
+
+```
+
+\vspace{6mm}
+
+Although these results mean the same thing, they appear quite different. An effect size of \$62 per year does not seem like a lot, but \$61,540,854 sure does. This becomes even more complicated when we start adding other coefficients to the model. How do we compare the effect size of height to race? How many inches (or a meters) in height is the equivalent of comparing a respondent who identifies as White with one who says they are Hispanic, or comparisons between men or women? Is an inch the same as a year of age? Since these are all measured on different scales (with two of our variables being categorical, so not on continuous scales at all) the comparisons seem meaningless and difficult to interpret. 
+
+These comparisons -- between different scales of height and different variables -- can be better understood if we can make sense of the variation in height of our respondents, and the variation in these other variables as well. One way to do this is to scale our coefficients by standardising them: subtracting them by their mean and dividing by their standard deviation. We will actually divide by two standard deviations, as this makes our continuous variable consistent with binary inputs. How does it do this? Consider the simplest binary variable with the values 0 and 1. These values exist in the same proportions and have a .5 probability of occurring. The standard deviation of this variable is therefore $\sqrt{(.5 * .5)} = .5$ and, with our standardised variables (divided by two standard deviations) also having a standard deviation of .5, they are measured on a comparable scale. Once we have done this, we will have a better sense of the comparable effect sizes (and therefore importance) of each predictor in our model.
+
+Why do we not only standardise, but also mean centre our predictors? Centring helps us interpret the intercept and main effects of a regression. As mentioned above, the intercept is the value of the dependent variable when predictors are held at zero. By making zero the mean value of our predictors, this provides us with an intercept that is the outcome when our predictors are held at their mean value. Combined with the selection of specific baselines for our categorical variables, this makes the model outputs easier to interpret. For instance, centring age and height provides:
+
+\vspace{6mm}
+
+```{r earnings 28 - linear regression on earnings data w centred height and age}
+
+earnings.model.2 <- lm(earn ~ z.height + race2 + gender + z.age, 
+                       data = earnings.data)
+display(earnings.model.2)
+
+```
+
+\vspace{6mm}
+
+The intercept is now a much more reasonable `16444.11` and when we look at interactions tomorrow, you will find standardising becomes increasingly useful as we build more complicated models. 
+
+There are several ways to standarise variables. You can manually deduct the mean and divide by one (or two) standard deviations:
+
+
+\vspace{6mm}
+
+```{r earnings 29 - manually standardising variables, eval=FALSE}
+
+(earnings.data$height - mean(earnings.data$height, na.rm=TRUE)) / 
+  sd(earnings.data$height, na.rm=TRUE)
+
+```
+
+\vspace{6mm}
+
+This tells $R$ to substract the mean of 'height' from the variable's value for each observation, and then to divide this by the standard deviation. This provides us with a *z-score* for height in inches. We can simply multiply the standard deviation of 'height' within this formula by two to standardise by two standard deviations:
+
+
+\vspace{6mm}
+
+```{r earnings 30 - manually standardising by two SD, eval=FALSE}
+
+(earnings.data$height - mean(earnings.data$height, na.rm=TRUE)) / 
+  (sd(earnings.data$height, na.rm=TRUE) * 2) 
+
+```
+
+\vspace{6mm}
+
+
+Although it is important to understand how this process works -- which means being able to do it manually -- it is often more efficient to automate the process so we can focus on more complex tasks. A simpler process is to use the `scale()` function:
+
+\vspace{6mm}
+
+```{r earnings 31 - autmate the scaling process, eval=FALSE}
+
+scale(earnings.data$height)
+
+```
+
+\vspace{6mm}
+
+
+Without additional information, scale automatically deducts the mean and multiples by the standard deviation. We can provide alternative values with which to centre or standardise these data with the center and scale commands. Since we are happy to mean centre these data, we can just add instructions for the `scale()` command:
+
+\vspace{6mm}
+
+```{r earnings 32 - automatically standardising by two SD, eval=FALSE}
+
+scale(earnings.data$height, scale = (sd(earnings.data$height, na.rm=TRUE) * 2))
+
+```
+
+\vspace{6mm}
+
+
+This provides us with a rescaled version of height that is mean centred and with a standard deviation of .5, which we can save into a new variable `z.height.` 
+
+You should also standardise the age variable using the same process. 
+
+\vspace{3mm}
+
+**_Task_**: Run this model again using the `display()` function to view, and interpret your results. Switch race with a binary variable representing White and other respondents. What difference does this make? What comparisons can you now make between different variables?
+
+\vspace{3mm}
+
+What you should observe is that linear transformations, including standardisation, do not affect the fit of a classical regression model like what we are fitting here. The residual standard deviation and $R^2$ do not change. However, our intercepts and main effects become much more interpretable and the comparisons between them more meaningful.  
+
+To understand what our results mean in the context of the original scale of height we can also convert height back to the original scale using the `attr()` function to reverse scale our data:
+
+\vspace{6mm}
+
+```{r earnings 33 - automatically standardising by two SD}
+
+coef(earnings.model.2)[1] + coef(earnings.model.2)[2] * 
+  ((c(66, 72, 78) - attr(earnings.data$z.height, 'scaled:center')) / 
+     attr(earnings.data$z.height, 'scaled:scale'))
+
+```
+
+\vspace{6mm}
+
+Doing this allows us to predict the average earnings of respondents at each of our three height levels, in inches. 
+
+However, we are not limited with linear transformations, either. Nor is it only our predictors that we can transform.
+
+
+
+\vspace{3mm}
+
+###Including an interaction in your model
+
+
+Many of the problems we want to understand are complex. Phenomena often have complex causes. This can include the interaction of different effects. When we were looking at the association between height and earnings, for instance, we might also hypothesise that height does not infuence earning power alone. Other factors, including gender and race, may also be associated with earnings, and also interact with height; with height not being equally important for all individuals, but rather its significance being boosted when present with other characteristics of our respondents.
+
+Adding an interaction to a regression model in $R$ is relatively straightforward, involving the variables you want to interact specified in your code and separated by an asterix ($*$). We can fit a model to these data with the same specification that we used earlier -- with predictors for height, race, gender and age -- and an interaction between height and gender, with the syntax: 
+
+
+\vspace{6mm}
+
+```{r earnings 34 - regression with interaction}
+
+
+earnings.model.3 <- lm(earn ~ z.height + race2 + gender + z.age + 
+                         z.height * gender, 
+                       data = earnings.data)
+display(earnings.model.3)
+
+
+```
+
+\vspace{6mm}
+
+As you should be able to see, new parameters showing the slopes for gender and height are now included. Compare this to your original model to see how it differs (hint: the interactions add to our understanding of earnings, but not a lot). 
+
+
+
+\vspace{6mm}
+
+##Group activity
+
+
+In the second hour of this lab, we will look at a new (and larger) set of data, learn how to make high quality plots of this information, and then run regression on these data. 
+
+We are going to do this by, **in groups of four**, examining data from a series of public opinion surveys that have been run (on and off) since the late 1960s: the Australian National Political Attitudes Survey (1967, 1969 and 1979) and the Australian Election Study (at every election since 1987). These data provide a relatively consistent set of questions asked over four decades. We will use these data to study the voters’ attitudes towards immigration, and other policy issues. This can be done a few different ways. You can look at the patterns over time using a time-series plot, or desegregate the data by voters’ demographic characteristics. 
+
+These data can be obtained from the file *survey.data.csv*, which can be found in the canvas module for this seminar
+
+For this session, your first objective is to examine these data and clean them, if necessary. Start by saving these data in a new folder, make that folder your working directory and load the file in your $R$ editor. Then, examine each variable in the file by year using the table to isolate cases where variables are coded inconsistently between surveys. Recode these using the recode function and report back to the group on what you found and how you fixed it. 
+
+
+\vspace{3mm}
+
+###Examining patterns in these data
+
+Once we have recoded these data, we want to understand what patterns exist in these data. Here we are going to focus on four dependent variables: `Union_Power`, `Taxes_Social`, `Migrant_Num`, and `Immigrants_jobs`. Respectively, these represent the questions on whether trade unions have too much power, which should be chosen if the government had to choose between reducing taxes or spending more on social services, whether the immigration intake was too high, and do immigrants take the jobs of the Australian born. These are all coded consistently from -2 for the position farthest on the left (unions do not have enough power, increase social spending, less concerned about immigration), to +2 for the position farthest to the right (less union power, lower taxes, more concerned about immigration). 
+
+Your assignment for this session is to select one of our four dependent variables and, in your groups, spend a few minutes developing a basic theory on why some of these variables may influence attitudes towards immigration, and then use this to select which variables you are going to study. Make some predictions about what you expect to find and write these down. Your tutor will ask you to explain your theory and what you expect to find. 
+
+Conduct a descriptive exploratory analysis of the relationship between these four variables and some of the other variables in the dataset. Calculate crosstabs or means, and plot your findings and confidence intervals using the methods from yesterday. You can save time by tasking each member of your group to examine a different independent variable. What do you find, and do these findings match your theories and predictions? 
+
+Once you have done this, fit a linear regression to these data using the predictors you expect to add explanatory power to your model. If you complete this quickly, you can follow the instructions in the *additional tasks* notes in the seminar 2-2 module on Canvas to plot your regression coefficients and the line from your regression model. Doing this is an effective way to communicate the findings of your research. 
+
+To finish the session, we will spend a few minutes at the end of the lab session discussing theories, findings, conclusions, and any problems encountered.
+
+

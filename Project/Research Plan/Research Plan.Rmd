@@ -1,0 +1,80 @@
+---
+title: 'Research plan'  
+subtitle: 'An investigation on factors influencing domestic violence against males'
+date: "7 December 2018"
+author: '420033455'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Introduction 
+The research will focus on male victims of domestic violence related assaults in New South Wales. Common factors that impact domestic violence against both genders may include unemployment rate, weekly income, household composition and so forth (Oliver, 2011).  We aim to investigate the effect of these factors on domestic violence within the context of NSW local government areas and explore whether they affect male victims to comparable or different extents.
+
+\vspace{6mm}
+
+# Literature 
+The term “domestic violence” has historically been associated with the concept of female victims perpetrated by men. Countering to popular belief, however, numerous sources have revealed that approximately one-third victims of domestic violence in Australia are males (Australian Broadcasting Corporation, 2017) (Australian Bureau of Statistics, 2017) (Victorian Royal Commission , 2016). In fact, this has led to Men’s Right Movements groups voicing for men in recent years, with the preeminent one being the “One in Three Campaign” arguing that male victims of domestic violence have long been overlooked by the police, media and society (One in Three Campaign, 2009).
+
+\vspace{6mm}
+
+# Data
+Further datasets that may be used
+
+* All criminal incidents by LGA in 2017, provided by Bureau of Crime Statistics and Research (BOSCAR). This dataset includes gender information of domestic violence victims (Bureau of Crime Statistics and Research, 2017). 
+* 2016 census data by LGA in NSW (Australian Bureau of Statistics, 2016), which is the latest census data available.
+
+\newpage
+
+# Methodology
+It is expected that the investigation be conducted the with the following steps:
+
+1.	Data collection and pre-processing
+2.	Identify factors that impact domestic violence against both genders
+3.	Explore the effect of these factors for male and female
+
+\vspace{3mm}
+
+## Data collection and pre-processing
+The BOSCAR and 2016 census datasets both contain hundreds of tables that need to be downloaded from their respective web pages. Once the tables are ready, relevant information will be extracted, transformed and stored. In particular, the numbers of victims of each gender (male and female) will be summarized by LGA. As remoteness may be a contributing factor (Campo & Tayton, 2015), the data may be split by metro, regional and remote according to Australian Statistical Geography Standard (ASGS), if time permits. 
+
+\vspace{3mm}
+
+## Identify factors that impact domestic violence against both genders
+Given the nature of the research topic, gender-biased factors will not be taken into consideration. Factors to be explored may include but not limited to unemployment rate, weekly income, household composition, etc. Correlation between these factors and domestic violence against both genders will be evaluated by conducting regression analysis. Models will be verified to determine if they can properly represent the trend of the data. It is highly possible that the choice of models will differ by factors. 
+
+\vspace{3mm}
+
+## Explore the effect of these factors against male and female 
+Following a similar process, correlation between gender-impartial factors and domestic violence against male and female will be investigated. The results will then be compared with each other and those of domestic violence against both gender to identify the difference of impact. Furthermore, domestic violence (rate/number) on men will be used as test data for the models constructed from the previous step, which may provide in-depth perspective on the topic. 
+
+\vspace{6mm}
+
+# Expectation and Limitation
+It is expected that several factors would be identified as impacting domestic violence rate against male more than against both gender or female. Although we aim to investigate the effect of gender-impartial factors only, it is noted that some of the factors, such as income, are usually biased against certain gender. Moreover, the models to be used in the analysis are simple and crude. Therefore, we concede that the expected results of the research will be far from accurate, but we hope they could shed some light to further researches on the topic in the future.
+
+
+\newpage
+
+# Bibliography 
+Australian Broadcasting Corporation. (2017, Sep 26 ). What about men?: Challenging the MRA claim of a domestic violence conspiracy. Retrieved from ABC News: https://www.abc.net.au/triplej/programs/hack/challenging-the-mra-claim-of-a-domestic-violence-conspiracy/8632190
+
+Australian Bureau of Statistics. (2016). 2016 Census Datapacks. Retrieved 12 7, 2018, from https://datapacks.censusdata.abs.gov.au/datapacks/
+Australian Bureau of Statistics. (2017, November 08). 4906.0 - Personal Safety, Australia, 2016. Retrieved from Australian Bureau of Statistics: http://www.abs.gov.au/ausstats/abs@.nsf/mf/4906.0
+
+Bureau of Crime Statistics and Research. (2017). NSW Local Government Area excel crime tables. Retrieved 12 7, 2018, from https://www.bocsar.nsw.gov.au/Pages/bocsar_crime_stats/bocsar_lgaexceltables.aspx
+
+Campo, M., & Tayton, S. (2015, Dec). Domestic and family violence in regional, rural and remote communities. Retrieved 12 7, 2018, from https://aifs.gov.au/cfca/publications
+
+Oliver, M. K. (2011). Domestic Violence: Factors, Perpetuation, Cultural Differences & Treatment. San Luis Obispo: California Polytechnic State University.
+One in Three Campaign. (2009, Novermber). One in Three. (One in Three Campaign) Retrieved 12 07, 2018, from http://www.oneinthree.com.au
+
+Victorian Royal Commission . (2016). Royal Commission into Family Violence Summary and recommendations. Melbourne: Victorian Government Printer.
+

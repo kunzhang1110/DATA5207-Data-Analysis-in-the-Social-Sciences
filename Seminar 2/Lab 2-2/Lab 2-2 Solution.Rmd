@@ -1,0 +1,106 @@
+---
+title: "Lab 2-2 Solution"
+author: "Kun Zhang"
+date: "5 December 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Earning Data
+```{r initialize}
+data <- read.csv("Data/finance/EconomicDataSummerSchool.csv", header=TRUE)
+data2 <- read.csv("Data/finance/BoujeeCapital.csv", header=TRUE)
+
+library(arm)
+library(ggplot2)
+```
+
+## Exploratory Data Analysis
+### BHP Share Price vs AUD/USD Currency
+```{r BHP Share Price vs AUD/USD Currency}
+x1 = data$AUD.USD
+x2 = data$BHP.Share.Price
+plot(x1, x2, xlab="AUD:USD", ylab="BHP Share Price")
+abline(lm(x2~x1))
+title("Effect of currency vs BHP Share Price")
+```
+
+### BHP Share Price vs Inflation
+```{r BHP Share Price vs Inflation}
+x3 = data$Inflation
+x4 = data$BHP.Share.Price
+plot(x3, x4, xlab="Inflation", ylab="BHP Share Price")
+title("Effect of Australian GDP Growth vs BHP Share Price")
+```
+
+### BHP Share Price vs AUD:CNY Currency
+```{r BHP Share Price vs AUD:CNY Currency}
+x5 = data$AUD.CNY.Growth
+x6 = data$BHP.Share.Price
+plot(x5, x6, xlab="AUD:CNY", ylab="BHP Share Price")
+title("AUD/CNY vs BHP Share Price")
+```
+
+### Distribution of BHP Share Price
+```{r Distribution of BHP Share Price}
+plot(density(x1), main="Distribution of AUD:USD Share Price", ylab="Frequency", xlab = "Currency")
+plot(density(x2), main="Distribution of BHP Share Price", ylab="Frequency", xlab = "Share Price")
+plot(density(x3), main="Australian Inflation Rate", ylab="Frequency", xlab = "Inflation Rate")
+plot(density(x5), main="Distribution of AUD:CNY Growth", ylab="Frequency", xlab = "AUD:CNY")
+```
+
+## Regression Analysis 1: Fitting a simple model to these data
+```{r Regression Analysis 1: Fitting a simple model to these data}
+model1 <- lm(x2 ~ x1)
+display(model1)
+plot(model1)
+```
+## Regression Analysis 2: BHP Share Price
+```{r Regression Analysis 2: BHP Share Price}
+y = data$BHP.Share.Price
+x1 = data$Unemployment.Rate
+x2 = data$AUD.USD
+x3 = data$Crude.oil..average
+x4 = data$Iron.ore..cfr.spot
+x5 = data$Gold
+model2 <- lm(y ~ x1 + x2 + x3 + x4 + x5)
+display(model2)
+plot(model2)
+```
+
+## Regression Analysis 3: Hedge Fund Returns
+Alpha:0.01
+  
+Beta: 0.33
+  
+A beta of less than 1 means that the security will be less volatile than the index.
+  
+The hedge fund outperform index by 1% and 66% less volatile than the index. Given the management expense ratio (MER) is usually high for hedge funds, if the return data is recorded before fee deduction, this hedge fund has very poor performance.
+  
+```{r Regression Analysis 3: Hedge Fund Returns}
+index_returns <- data2$Managed.Futures
+hf_returns <- data2$Boujee.Capital
+plot(density(index_returns), main="Index Returns Histogram", ylab="Frequency", xlab = "Index Returns")
+plot(density(hf_returns), main="Hedge Fund Returns Histogram", ylab="Frequency", xlab = "Hedge Fund Returns")
+
+model3 <- lm(hf_returns ~ index_returns)
+display(model3)
+plot(model3) #alpha 0.01, beta 0.33
+plot(index_returns, hf_returns)
+abline(model3)
+title("Analysis of hedge fund returns")
+```
+
+
+
+
+
+
+
+
+

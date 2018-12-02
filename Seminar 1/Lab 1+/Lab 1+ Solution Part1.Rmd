@@ -1,0 +1,141 @@
+---
+title: "Lab 1+ Solution Part1"
+author: "Kun Zhang"
+date: "5 December 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Smoking Data
+```{r initialize}
+library(plyr)
+smoke.data <- read.csv("./Data/Smoking/smoke_data.csv", head=TRUE, sep=",", na.strings=" ") #na.strings = " " blank
+
+```
+
+## Percentage of adolescents who report smoking
+```{r Percentage of adolescents who report smoking}
+library(ggplot2)
+
+smoke.trend.1 <- ddply(smoke.data, .(wave), summarise, smokes=mean(smkreg)) 
+
+ggplot(smoke.trend.1, aes(x = wave, y = smokes)) +
+  geom_line(alpha=.6, size=1) +
+  labs(title = "Percentage of adolescents who report smoking",
+       x = "survey wave",
+       y = "Proportion of smokers") +
+  scale_y_continuous(labels = percent, limits=c(0,.2),breaks=c(.05,.1,.15)) +
+  theme_bw() +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size=10, face="bold", hjust=.5))
+```
+
+## Percentage of adolescents who report smoking by parents smoking status
+```{r Percentage of adolescents who report smoking}
+smoke.trend.2 <- ddply(smoke.data, .(wave, parsmk), summarise, smokes=mean(smkreg))
+print(smoke.trend.2)
+
+#Convert numerics to factors; variables parsmk are numeric
+smoke.trend.2$parents <- as.factor(smoke.trend.2$parsmk)
+levels(smoke.trend.2$parents) <- c("Non-smokers", "Smokers") 
+
+library(directlabels)
+#Plot mutiple lines group by "parents"
+ggplot(smoke.trend.2, aes(x = wave, y = smokes, group=parents)) +
+  geom_line(alpha=.6, size=1) +
+  geom_dl(aes(label=parents), alpha=.5, method=last.qp) +  #geom_dl() adds a label to each line
+  labs(title = "Percentage of adolescents who report smoking\n by parents smoking status",
+       x = "survey wave",
+       y = "Proportion of smokers") +
+  scale_x_continuous(breaks = c(2,3,4,5), limits=c(1,7)) +
+  scale_y_continuous(labels = percent, limits=c(0,.3),breaks=c(.05,.15, .25)) +
+  theme_bw() +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size=10, face="bold", hjust=.5))
+```
+
+## Calculating and plotting confidence intervals
+```{r Calculating and plotting confidence intervals}
+library(Rmisc)
+
+# CI() confident level: lower, mean, upper
+smoke.trend.3 <- ddply(smoke.data, .(wave, parsmk), summarize,
+      smokes=CI(smkreg , ci = 0.95)[2],
+      upper.ci=CI(smkreg , ci = 0.95)[1],
+      lower.ci=CI(smkreg , ci = 0.95)[3])
+
+#Convert numerics to factors; variables parsmk are numeric
+smoke.trend.3$parents <- as.factor(smoke.trend.2$parsmk)
+levels(smoke.trend.3$parents) <- c("Non-smokers", "Smokers") 
+
+#Plot confidence intervals with ribbon
+ggplot(smoke.trend.3, aes(x = wave, y = smokes, group=parents)) +
+  geom_line(alpha=.6, size=1) +
+  geom_dl(aes(label=parents), alpha=.5, method=last.qp) +  #geom_dl() adds a label to each line
+  geom_ribbon(aes(ymin = lower.ci, ymax = upper.ci), alpha = .1) + #add confidence intervals
+  labs(title = "Percentage of adolescents who report smoking\n by parents smoking status",
+       x = "survey wave",
+       y = "Proportion of smokers") +
+  scale_x_continuous(breaks = c(2,3,4,5), limits=c(1,7)) +
+  scale_y_continuous(labels = percent, limits=c(0,.3),breaks=c(.05,.15, .25)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(), 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(colour="grey", size=0.4 , linetype = "dashed"),
+        axis.text = element_text(size=10),
+        plot.title = element_text(size=10, face="bold", hjust=.5))
+
+
+```
+
+## Percentage of adolescents who report smoking by gender and parents smoking status
+```{r Percentage of adolescents who report smoking by gender and parents smoking status}
+smoke.trend.4 <- ddply(smoke.data, .(wave, parsmk, sex.1.F.), summarise,
+      smokes=CI(smkreg , ci = 0.95)[2],
+      upper.ci=CI(smkreg , ci = 0.95)[1],
+      lower.ci=CI(smkreg , ci = 0.95)[3])
+
+smoke.trend.4$parents <- as.factor(smoke.trend.4$parsmk)
+levels(smoke.trend.4$parents) <- c("Non-smokers", "Smokers") 
+smoke.trend.4$gender <- as.factor(smoke.trend.4$sex.1.F.)
+levels(smoke.trend.4$gender) <- c("Male", "Female") 
+
+print(smoke.trend.4)
+
+smoke.graph.1 <- ggplot(smoke.trend.4, aes(x = wave, y = smokes)) +
+  geom_line(alpha=.6, size=1) +
+  geom_ribbon(aes(ymin = lower.ci, ymax = upper.ci), alpha = .1) + #add confidence intervals
+  labs(title = "Percentage of adolescents who report smoking\n by parents smoking status",
+       x = "survey wave",
+       y = "Proportion of smokers") +
+  scale_x_continuous(breaks = c(2,3,4,5), limits=c(1,6)) +
+  scale_y_continuous(labels = percent, limits=c(0,.36),breaks=c(.05,.15, .25)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(), 
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(colour="grey", size=0.4 , linetype = "dashed"),
+        axis.text = element_text(size=10),
+        plot.title = element_text(size=10, face="bold", hjust=.5),
+        legend.position = "none")+
+  facet_wrap(parents~ gender, scales = "free") #using free/automatic scale for different graphs
+
+# Save Graph
+pdf(file="./ smoke.graph.1.pdf", width=8, height=5)
+print(smoke.graph.1)
+aux <- dev.off()
+
+```
+
+
+
+
+
+
+
+
+
+
+

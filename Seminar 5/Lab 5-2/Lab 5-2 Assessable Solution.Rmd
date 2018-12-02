@@ -1,0 +1,122 @@
+---
+title: "Lab 5-2 Assessable Solution"
+author: "Kun Zhang"
+date: "12 December 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Assessable group work
+
+```{r initialization}
+library(dplyr)
+wvs.dat <- read.csv("./Data/au.edu.anu.ada.ddi.01252_F1.csv")
+dim(wvs.dat)
+```
+
+```{r define functions to recode variables}
+
+
+recode_likert4 <- function(my_var) {
+  as.numeric(as.character(recode(my_var,
+                                  '1' = '4',
+                                   '2' = '3',
+                                   '3' = '2',
+                                   '4' = '1',
+                                  '-2' = NULL)))
+}
+
+recode_likert10 <- function(my_var) {
+    as.numeric(as.character(recode(my_var,
+                                  '1' = '10',
+                                   '2' = '9',
+                                   '3' = '8',
+                                   '4' = '7',
+                                   '5' = '6',
+                                   '6' = '5',
+                                   '7' = '4',
+                                   '8' = '3',
+                                   '9' = '2',
+                                   '10' = '1',
+                                  '-2' = NULL)))
+}
+
+recode_to_notnull <- function(my_var) {
+  as.numeric(as.character(recode(my_var,
+                                 '-2' = NULL,
+                                 .default = my_var)))
+}
+
+```
+
+```{r recode and cleanup}
+wvs.dat$happiness <- recode_likert4(wvs.dat$V10)
+wvs.dat$health <- recode_likert4(wvs.dat$V11)
+wvs.dat$family <- recode_likert4(wvs.dat$V4)
+wvs.dat$friend <- recode_likert4(wvs.dat$V5)
+wvs.dat$fair <- recode_to_notnull(wvs.dat$V56)
+
+ir.pca <- prcomp(na.omit(wvs.dat[,c("happiness",
+                                    "health",
+                                    "family", 
+                                    "friend",
+                                    "fair")])) 
+
+plot(ir.pca, type = "l") # variance latent variable ~ variance
+
+```
+
+
+## Factor Analysis 
+From the pca graph, we can see that there is significant drop between 1 and 2, meaning only one latent variable would suffice.
+```{r factor analysis }
+library(psych)
+library(ggplot2)
+fa.fit <- fa(wvs.dat[,c("happiness",
+                         "health",
+                         "family", 
+                         "friend",
+                         "fair")], 
+             nfactors=1, rotate="varimax")
+
+fa.fit
+# MR1: is the factor load
+# h2: how latent traits drives the observed variable
+# u2: uniqueness u2 = 1 - h2
+
+wvs.dat$life.quality <- fa.fit$scores
+head(wvs.dat$life.quality)
+
+ggplot(wvs.dat, aes(life.quality)) + 
+  geom_histogram()
+
+
+```
+From the histogram, we can  see that the range of quality of life is between [-4.775051, 1.245401]
+
+## Linear Regression 
+For the linear regression model we try to perdict how the degree a personstrusts his/her neighbours and acquaintances would affect quality of life.
+```{r Linear Regression}
+library(arm)
+
+
+wvs.dat$trust.neighbours <- recode_likert4(wvs.dat$V103)
+wvs.dat$trust.acquaintances <- recode_likert4(wvs.dat$V104)
+
+life.quality.linear.model.age = lm(life.quality ~ trust.neighbours + trust.acquaintances,
+                               data=wvs.dat)
+
+
+
+display(life.quality.linear.model.age)
+range(wvs.dat$life.quality, na.rm=T)
+
+```
+We can see that the linear regression model's coefficient that the degree you trust your neighbours and acquaintances positively correlate with quality of lifet, with the latter having higher impact. With some with serious trusting issues , will have a -1.45 quality of life. 
+

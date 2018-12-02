@@ -1,0 +1,571 @@
+---
+title: 'Seminar 1-1: Understanding the social world using data science'
+author: "Dr Shaun Ratcliff"
+subtitle: 'DATA5207: Data Analysis in the Social Sciences - Summer Semester, 2018'
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We are in the middle of a data revolution. Modern computing power, the internet, and the tools they provide us to understand the world. Today we focused on why we use the tools of data science to answer questions in the social sciences (including politics and economics) and public policy (including criminology and public health).
+
+To do this we use a combination of theory and empirical data science methods. For the data analysis components of this course, we will be using $R$. In the Seminar 1-1 lab, we will look at how we operate in the $R$ environment, focusing on basic descriptive statistics.
+
+
+##Loading and exploring your data
+
+This course is designed to help you learn how to use $R$ to solve real world problems. Going beyond the processes we ran in the pre-semester notes, in this lab we look at running some initial analyses of real datasets. 
+
+
+\vspace{3mm}
+
+###Accessing data, and beginning to examine it
+
+
+We are going to examine data related to an important issue: the rate of smoking amongst adolescent Australians, collected over six waves. This saved in the file *smoke_data.csv*, and can be obtained from the *Seminar 1-1* module page on the canvas site for this unit. These data were collected by the University of Melbourne researcher John Carlin, and were obtained from the website of Columbia University’s Andrew Gelman:
+
+\vspace{6mm}
+
+[http://www.stat.columbia.edu/~gelman/arm/examples/](http://www.stat.columbia.edu/~gelman/arm/examples/)
+
+\vspace{6mm}
+
+
+
+
+```{r prep for smoke plots, echo=FALSE,  warning=FALSE, message=FALSE}
+
+library(plyr)
+library(ggplot2)
+library(scales)
+library(reshape2)
+
+smoke.data <- read.csv("Data/Smoking/smoke_data.csv", head=TRUE, sep=",", na.strings="")
+
+smoke.trend.1 <- ddply(smoke.data,~ wave, function(smoke.data) prop.table(table(smoke.data$smkreg))) 
+
+names(smoke.trend.1)[3] <- "smokes"  
+
+```
+
+Using these data we can examine a few different processes: we can study the role played by gender, whether parents smoke, and also repeated measurement. We can examine the association between these different variables and adolescent behaviour. Studying these kinds of problems can help policy-makers understand their causes better (constrained by the limitations of our data). If policy-makers can better understand what causes social problems (in this case, smoking amongst young people), they can then start to look at real solutions. 
+
+In the pre-semester course notes, we worked with our (made up) data directly in the command prompt. This is fine for simple operations, where we are essentially treating $R$ as an over-powered calculator. However, for more complex operations this is a less than satisfactory way to work with our data. A better way to work is to open an editor document and work from there. You can do this using several options, but the easiest is from the menu options at the top left of the *$R$ Studio* window by selecting *File > New file > R Markdown* and create a new PDF document. 
+
+This will create a blank workspace which gives you a place to type your syntax in order to enter instructions into $R$. This is useful when you're working with more complex processes, as you can work on your code extensively, and R only processes it when you tell it to (accidentally pressing enter will not run the code). You can also easily save your work, like any other document. On a Mac just press *command and s*. On a Windows machine press *control and s*. Then, select the folder you want to save your work in and then a file name. For the work you are doing for this course I suggest you create a folder to specifically save everything in (and use sub-files for separate exercises). 
+
+A benefit of $R$ *Markdown* is that it also allows you to type text around your code to create entire documents (papers, slides, books, html documents). These notes were written entirely in *Markdown*.
+
+To write R code, use $R$ *chunks.* You can add these to the document by going to the *Insert* button above the editor window and selecting *R*. When you wish to code a command for $R$ to run, write your code in these chunks. To run it, either highlight the portions of the code you wish to run and then hit the *run* button near the top of the screen. Or on a Mac use the shortcut *command and enter*; On a Windows machine press *control and enter*. To run all the code in the chunk you can also hit the small green arrow at the top right of the chunk. 
+
+Once you have saved your document editor, you will want to direct $R$ to read the data from the folder you saved the smoking data. This is done by changing the working directory you are operating from. 
+
+Whenever we operate in the $R$ environment, we are also doing so from within a working directory on your computer. You can find the location of the directory by running the `getwd()` function, which tells $R$ to get the working directory. Most functions you will use in $R$ involve arguments within the parentheses. These command $R$ to undertake specific processes using the named function. The `getwd()` function has no arguments that we need to include in the parentheses, though. You run it with the code: 
+
+\vspace{6mm}
+
+```{r get the working directory, eval=FALSE}
+
+getwd()
+
+```
+
+\vspace{6mm}
+
+There are multiple ways to change your working directory. One is to use `setwd` and specify the path to the desired folder on your computer where you want to source inputs and save outputs. In this and following sessions of this unit, we will always be working from a specified working directory on our computer. This is the folder in which we will save the data we are working with, and where we want to save our code and other outputs. My suggestion is that you create a new folder for this subject on your computer (or if you are working on one of the lab computers, a USB stick), and within this create a new folder for each set of data you are working with. Create this folder, and then let us point $R$ to this working directory. 
+
+If you are using a Mac:
+
+\vspace{6mm}
+
+```{r smoking 1 - setwd mac, eval=FALSE}
+
+setwd("/Users/filepath/your folder")
+
+```
+
+\vspace{6mm}
+
+
+If you are using a PC:
+
+\vspace{6mm}
+
+```{r smoking 2 - setwd win, eval=FALSE}
+
+setwd("C:/filepath/your folder")
+
+```
+
+\vspace{6mm}
+
+As outlined above, the command prompt shows that your instructions to change the working directory have been run. The lack of an error message – and the fact that the command prompt indicates it is ready for further input – tells you no problems were encountered. We can check this further using the `getwd()`. This should return to the location we entered above if everything is working properly.
+
+We do not actually need to do this when working within *R Markdown.* It will instead use the folder in which the *Markdown* file is saved as the directory. However, it is important to understand how directories work in $R$, as you will still be using them (indirectly) from *Markdown*. 
+
+Now that we have told $R$ to use a specific folder for this project, we want to direct it to load our dataset. In this case we want to work with the file *smoke_data.csv*, saved in our working directory. You can do this by entering the code below and then hitting enter: 
+
+\vspace{6mm}
+
+```{r smoking 3 - load your data, eval=FALSE}
+
+smoke.data <- read.csv("smoke_data.csv", head=TRUE, sep=",", na.strings="")
+
+```
+
+\vspace{6mm}
+
+This is assigning the data frame `smoke.data` with the values held in the data file *smoke_data.csv*, which is saved in our working directory. The code *read.csv()* tells $R$ that you want it to read a *.csv* file. The next part, `head=TRUE`, tells $R$ that the top row of data in the file provides the names of each variable, `sep="","` instructs it that a comma represents a separation between a variable (or column), and `na.strings=" "` that any blank spaces indicate an `NA` value (that is, missing data). In our case, there is no missing data, and the structure of the file (comma delimited) is unambiguous. Running the code without these last two commands would have produced the same result. However, it is a good habit to use these commands so you consider these attributes of your data as you call it up into the $R$ environment. 
+
+If you highlight the syntax `smoke.data` and hit command (or control in Windows) and enter, you should see the entire data frame. This provides us with a lot of information that we cannot necessarily take in all at once. We can simplify the output in several ways. We can restrict the output to the first $n$ observations of the data frame with the `head()` command: 
+
+\vspace{6mm}
+
+```{r smoking 4 - data summary}
+
+head(smoke.data)
+
+```
+
+\vspace{6mm}
+
+
+Similarly, `tail()` can be used to print the last $n$ observations of these data. Although it is not required, you can specify the number of observations you view, using our data as an example, with the code `head(smoke.data, 10)`, with the ',10' instructing $R$ that we wish to view the first ten observations in these data (the default is six). We can also obtain a summary of the variables in the data frame with the `names()` command. Doing this will give you: 
+
+\vspace{6mm}
+
+```{r smoking 4 - variable names}
+
+names(smoke.data)
+
+```
+
+\vspace{6mm}
+
+This confirms that our dataset includes five variables (or columns, as we saw when we examined these data): the first, `newid` recording the unique id number for each respondent; the second, `sex.1.F` the respondent’s gender (coded 1 if female, 0 male); `parsmk`, whether or not at least one of the respondent’s parents smoked (coded 1 if they did, 0 if they did not); `wave` is the survey wave this response was collected; and `smkreg` whether the respondent reported smoking regularly (1 if yes, 0 of no).
+
+We are now ready to look at these data in more detail.
+
+
+\vspace{3mm}
+
+###Examining group averages
+
+Let us start with examining the mean (or average) rates of smoking. An easy way to examine means is to simply type `mean(prisons.data2$value)`. Doing this should provide: 
+
+\vspace{6mm}
+
+```{r smoking 5 - mean values}
+
+mean(smoke.data$smkreg)
+
+```
+
+\vspace{6mm}
+
+This reports a single result, which is the mean value of the variable `smkreg`. As this is a binary variable, coded 0 for respondents who do not smoke, and 1 for those who reported doing so, this equals the proportion of our respondents who reported smoking regularly.
+
+However, we are not interested in the averages for the entire population. Rather, we want to know how this varies amongst sub-groups of our sample, such as those whose parents smoked or did not. Slightly more complex data, like we have here, where there are multiple groups we want to analyse, can be better examined using several different functions. One of these is the `ddply()` function. To use `ddply`, we load the package `plyr`:
+
+\vspace{6mm}
+
+```{r smoking 8 - load plyr, eval=FALSE}
+
+library(plyr)
+
+```
+
+\vspace{6mm}
+
+We then use `ddply()` to split the means for `smkreg` by the variable `parsmk` using the following syntax:
+
+
+\vspace{6mm}
+
+```{r smoking 9 - smoking by parents status, eval=FALSE}
+
+ddply(smoke.data, .(parsmk), summarize, 
+      mean = mean(smkreg))
+
+```
+
+\vspace{6mm}
+
+
+From left to right, this syntax specifies the data frame to be processed (`smoke.data`), the variables we wish to split data frame by (`parsmk`; we can have more than one here), the function (we want `ddply` to summarise the data for us) and the command (to provide the `mean` value of `smkreg`). This should give you the following results: 
+
+
+\vspace{6mm}
+
+```{r smoking 9 - show results smoking by parents status, echo=FALSE}
+
+ddply(smoke.data, .(parsmk), summarize, 
+      mean = mean(smkreg))
+
+```
+
+\vspace{6mm}
+
+This particular code provides two columns of output. The first is the value for `parsmk`, the variable that denotes whether the respondents’ parents smoked, and with which we desegregated these data. The second is the mean value of the dependent variable `smkreg` for each group of respondents. Within this second column, we have two outputs, the mean of our respondents reporting smoking behaviour for respondents whose parents did not smoke (`parsmk`=0) and who reported that their parents did smoke (`parsmk`=1). 
+
+As `smkreg` is a binary variable, the means correspond to the percentage of respondents who reported smoking regularly in each group, and indicates that less than nine per cent of respondents whose parents did not smoke reported smoking, compared to 19 per cent of those whose parents were smokers. 
+
+We can also use `ddply()` to run a number of functions simultaneously. For instance, we might want to know the standard deviation of smoking rates in our two groups, we can add another command following the syntax used to produce the mean values. Doing so produces:
+
+\vspace{6mm}
+
+```{r smoking 10 - mean and sd of smoking by parents status}
+
+ddply(smoke.data, .(parsmk), summarize, 
+       mean = mean(smkreg),
+       sd = sd(smkreg))
+
+
+
+```
+
+\vspace{6mm}
+
+
+This can be useful if we are interested in calculating confidence intervals, to which we will return later. 
+
+However, we are not just interested in the mean outcome for different groups. We might want to break this down further, looking at the averages across male and female respondents, and the different waves of the survey, or even a combination of these. First, though, we want to understand how our data represents the populations of these different groups. Before we do this, though, save your editor file again. You don’t want to lose this work.
+
+
+\vspace{3mm}
+
+###Exploring your data with tables
+
+
+This is a relatively simple dataset. However, a good general principle is to dig as deep into your data as you can to understand exactly what you are looking at. We can use the `tables()` function to examine the proportion of respondents in each category of our variables. Doing so gives us: 
+
+\vspace{6mm}
+
+```{r smoking 11 - tables for gender, parents and wave}
+
+# table of respondents by gender
+
+table(smoke.data$sex.1.F.) 
+
+
+# table of respondents by whether their parents smoked
+
+table(smoke.data$parsmk) 
+
+
+# table of respondents by survey wave
+
+table(smoke.data$wave) 
+
+```
+
+\vspace{6mm}
+
+Each table shows the number of respondents in each category of each variable. The text after the hash symbol (#) is simply an identification label I placed after the syntax on each line, so that I could identify what I was doing (anything after a #hash symbol in $R$ is ignored when the code runs). 
+
+We can improve on this by wrapping the syntax with `prop.table()`, which calculates the proportion of the sample in each cell. This shows that 54 per cent of our sample is female; 35 per cent had a parent who smoked regularly; and that wave 1 was the smallest survey, comprising 10 per cent of our survey, and wave 3 the largest, at 18 per cent of the sample.  
+
+\vspace{6mm}
+
+```{r smoking 12 - proportions tables for gender, parents and wave}
+
+# table of respondents by gender
+
+prop.table(table(smoke.data$sex.1.F.))
+
+
+# table of respondents by whether their parents smoked
+
+prop.table(table(smoke.data$parsmk)) 
+
+
+# table of respondents by survey wave
+
+prop.table(table(smoke.data$wave)) 
+
+```
+
+\vspace{6mm}
+
+You can also explore using the `round()` command to print more intuitive output. 
+
+Also, don’t forget save your editor file before moving on.
+
+
+\vspace{3mm}
+
+###Digging deeper into these data 
+
+This was a panel study. We might be interested in examining how reported behavior changes over the six waves of the survey. There are a few different ways we can do this. One is to use the `table()` function documented above. 
+
+We command $R$ to create a table with two variables by entering both within the inner-parenthese of the syntax, seperated by a comma. We enter the variable on the y-axis (forming the rows) first -- in this case the survey waves -- and that on the x-axis (the columns of our table) second -- in this instance `smkreg`. In the outer parentheses, we also tell $R$ that we wish cell values to reflect the proportions of the sample population of each row (rather than the total sample) contained in each cell of our table (that is, what percentage of each wave reported to be regular smokers). We do this by listing a '1' following a comma after the table command. To obtain the value of your cells as proportions of each column, replace the '1' with a '2'. Your code should look like this:
+
+
+\vspace{6mm}
+
+```{r smoking 13 - creating parents x wave table, eval=FALSE}
+
+prop.table(table(smoke.data$wave, smoke.data$smkreg), 1) 
+
+```
+
+\vspace{6mm}
+
+We also want to look at alternative functions. Another method for obtaining these results is a variation of the `ddply()` function. Our syntax for this looks a little different to that used above. We can consider this command in two halves, divided by a comma. The first half of the command deals with desegregation of the data. From left to right, we specify the data frame to be processed (smoke.data), then after the comma and tilde the variables we wish to split data frame by (wave). In the second half we deal with the function we then want to run on this desegregated data. Within function() we need to again specify the data frame we are using for this function and then following this we specify the command. In this case, to produce a table for variable smkreg. The syntax should read:
+
+\vspace{6mm}
+
+Using ddply:
+ 
+```{r smoking 13b - creating parents x wave table, eval=FALSE}
+
+ddply(smoke.data, .(wave), summarize, 
+      smkreg = prop.table(table(smkreg))) 
+
+```
+
+\vspace{6mm}
+
+These two methods provides us with the output:
+
+
+\vspace{6mm}
+
+Using the table function:
+
+```{r smoking 14s - output of parents x wave table using table}
+
+prop.table(table(smoke.data$wave, smoke.data$smkreg), 1)
+
+```
+   
+\vspace{6mm}   
+
+Using ddply:
+
+```{r smoking 14b - output of parents x wave table using ddply}
+
+ddply(smoke.data, .(wave), summarize, 
+      smkreg = prop.table(table(smkreg))) 
+
+```
+
+\vspace{6mm}
+
+
+They provide the same results, and indicate that over the six waves, the proportion of smokers in our sample increased. For a simple calculation like this, I would recommend using the `table()` function. However, it is important to get used to `ddply()` and similar functions for more complex processes.
+
+We can learn more about our respondents' behaviour, as it is observed in these data, by desegregating our sample still further. We are interested in how those respondents who reported their parents smoked might have behaved differently to those who said they did not (with a caveat that there are, of course, limitations with these kinds of observational data). 
+
+We can examine the association between parental and respondent behaviour, by survey wave, using `ddply()`. This looks similar to our first effort with this function, with the exception that we also include a second variable (`wave`) in our command. Your syntax and output should like this:
+
+\vspace{6mm}
+
+```{r smoking 15 - creating smoking by parents x wave table, eval=FALSE}
+
+ddply(smoke.data, .(wave, parsmk), summarize, 
+       smoke = mean(smkreg))
+```
+
+\vspace{6mm}
+
+
+Which provides us with the following output:
+
+\vspace{6mm}
+
+```{r smoking 16 - printing smoking by parents x wave table}
+
+ddply(smoke.data, .(wave, parsmk), summarize, 
+        smoke = mean(smkreg))
+ 
+```
+
+\vspace{6mm}
+
+This shows the proportion of respondents in each `wave`, who either reported their parents smoked (`parsmk` = 1) or did not (`parsmk` = 0), who themselves reported smoking (with the caveat we may be observing some social desirability bias).
+
+You can once again use the `round()` function to make these results easier to read. However, once we reach this point, the patterns in our data begin to become harder to interpret regardless of whether we round the figures. This will increase significantly further if we begin to desegregate by additional variables, such as gender. At this point, creating a visualisation of our data becomes increasingly attractive. We look at this option in the next seminar. 
+
+Before we move on, save the output from our `ddply()` analysis into a new item called `smoke.trend.2` to facilitate our further use of these data. Then, save your editor file.
+
+
+\vspace{6mm}
+
+##Analysing public opinion data using the tidyverse
+
+```{r loading data, include=FALSE, cache=FALSE}
+
+load("Data/Midterm elections/us_data.RData")
+
+
+```
+
+Americans went to to the polls on November 6 to vote on a range of congressional, state and local offices, as well as ballots for a number of issues. In early October the United States Studies Centre and YouGov polled `r format(dim(us.data)[1],big.mark=",")` respondents in the US to learn what voters in in America thought about key issues.
+
+Here we will examine respondents answers to some key questions. 
+
+First, open a new *R Markdown* editor and save it with a descriptive name that will make sense to you when you come back to it in the future, 
+
+We start our analysis by loading the data file *us_data.RData*, which can be downloaded from the *Seminar 1-1* module page on the canvas site for this unit.
+
+\vspace{6mm}
+
+```{r show code to load data, eval=FALSE}
+
+load("Data/Midterm elections/us_data.RData")
+
+
+```
+
+\vspace{6mm}
+
+This loads a data frame named `us.data` into the $R$ environment. 
+
+
+###Examining vote intention
+
+Here we are now going to explore functions and code from the tidyverse. This is a collection of $R$ packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures (**[more details here](https://www.tidyverse.org/)**). You can install the complete tidyverse group of packages with:
+
+\vspace{6mm}
+
+```{r show code to install tidyverse, eval=FALSE}
+
+r install.packages("tidyverse")
+
+
+```
+
+\vspace{6mm}
+
+We then load one of these packages, `dplyr`: 
+
+\vspace{6mm}
+
+```{r, message=FALSE} 
+
+library(dplyr)
+
+```
+
+
+\vspace{6mm}
+
+Then we use the following code to calculate the proportion of voters who said they would support each party in the House of Representative at the 2018 midterm elections:
+
+\vspace{6mm}
+
+```{r prepping vote intention, eval=FALSE}
+
+us.data %>% 
+  group_by(vote) %>%
+  summarise(sum.val = sum(weights)) %>% 
+  na.omit() %>%
+  mutate("Voters (%)" = sum.val / sum(sum.val) * 100) %>% 
+  rename('Party' = vote) %>%
+  dplyr::select(-sum.val)
+
+```
+
+\vspace{6mm}
+
+
+We use the piping operator `%>%` to include nested commands in our code. In this instance, the piping operator comes from the `dplyr` package we loaded above. This operator allows for a block of code consisting of a number of functions to be chained together --- the output of one function inserted it into the next --- from left to right.
+
+In this example, we group respondents in the `us.data` frame by the variable `vote` (respondents' House of Representatives vote intention), and then `summarise` this by the weighted `sum` of voters with each response. This provides the weighted sum of respondents that said they would vote for the Democrats, Republicans, etc. Run the initial two lines of this code to see what it does. Then run the initial three lines. 
+
+We then use `na.omit()` to remove respondents who did not provide an answer to the vote intention question. Then `mutate` is used to to calculate the proportion of voters who said they would vote for each party. Add these lines to your selection and then run those too. 
+
+When you run all of this code together you should get the following output: 
+
+\vspace{6mm}
+
+```{r run vote intention code, echo=FALSE}
+
+us.data %>% 
+  group_by(vote) %>%
+  summarise(sum.val = sum(weights)) %>% 
+  na.omit() %>%
+  mutate("Voters (%)" = sum.val / sum(sum.val) * 100)
+
+```
+
+\vspace{6mm}
+
+
+##Vote and attitudes towards key issues 
+
+We can expand our examination of these data by adding another component to the analysis. In this case, vote by attitudes towards key issues. 
+
+Besides vote choice, the respondents to this survey were asked their opinions on the following issues: 
+
+- The government should permit more hydraulic fracturing (or fracking) as a means of increasing the production of natural gas and oil
+- The government should offer financial subsidies for renewable energy sources, such as solar and wind
+- America should accept fewer immigrants
+- Tariffs (i.e., levies or fees) on products imported from China will help the American economy
+- Tax cuts for businesses help grow the economy
+- The differences between the rich and poor have become too large
+- Instead of cutting taxes, the government should spend more on infrastructure such as roads, bridges, tunnels, railways, airports and dams
+- The differences between the rich and poor have become too large
+
+These are all five-point Likert scales, from *strongly agree* to *strongly disagree*. 
+
+We are going to use the last of these to examine support for the Democrats and Republicans based on respondents' attitudes towards the statement that *the differences between the rich and poor have become too large*. 
+
+We do this by using the same code as above, but then inserting the variable `rich.poor.diffs` into the grouping command, before vote:
+
+\vspace{6mm}
+
+```{r example issue preferences by vote intention code, eval=FALSE}
+
+us.data %>% 
+  group_by(rich.poor.diffs, vote) %>%
+  summarise(sum.val = sum(weights)) %>% 
+  na.omit() %>%
+  mutate("Voters (%)" = sum.val / sum(sum.val) * 100)
+
+```
+
+\vspace{6mm}
+
+As you will see when you run this, though, this produces a lot of data. More results than than we can easily browse. Let's simplify things by adding these lines of code: 
+
+\vspace{6mm}
+
+```{r some additional lines of code to add, eval=FALSE}
+
+  subset(., vote == "Democratic" | vote == "Republican") %>%
+  dplyr::select(-sum.val)
+
+```
+
+\vspace{6mm}
+
+```{r run vote issue preferences by intention code, include=FALSE}
+
+rich.poor_by_vote <- us.data %>% 
+  group_by(rich.poor.diffs, vote) %>%
+  summarise(sum.val = sum(weights)) %>% 
+  na.omit() %>%
+  mutate("Voters (%)" = sum.val / sum(sum.val) * 100) %>% 
+  subset(., vote == "Democratic" | vote == "Republican") %>%
+  dplyr::select(-sum.val)
+
+```
+
+\vspace{6mm}
+
+This limits the results printed to those for voters of the Democratic and Republican parties. Using this code, we can see that that `r paste0(round(rich.poor_by_vote[1,3]), "%")` of respondents that strongly agreed that the differences between the rich and poor have become too large intended to vote Democratic, compared with `r paste0(round(rich.poor_by_vote[2,3]), "%")` who said they would vote Republican. Conversely, just `r paste0(round(rich.poor_by_vote[7,3]), "%")` who strongly disagreed said they intended vote Democratic, while `r paste0(round(rich.poor_by_vote[8,3]), "%")` were planned to support their Republican candidate. 
+
+
+##Conclusion and next steps
+
+Here we have learned to conduct some descriptive analysis. However, as we dig deeper into data, patterns become harder to interpret when presented in tabular format. An alternative to tables is data visualisation. $R$ has several functions for making graphs. In the next session, we will learn how to visualise these data to communicate our findings to the broadest possible audience. 
+
+Before we move on, though, remember to save your editor file.
